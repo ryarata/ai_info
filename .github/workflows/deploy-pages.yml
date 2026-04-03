@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 */6 * * *"
+
+concurrency:
+  group: github-pages-deploy
+  cancel-in-progress: true
 
 permissions:
   contents: read

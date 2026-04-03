@@ -56,8 +56,8 @@ The scripts automatically read `.env`, so you do not need to export environment 
 
 ## Low-cost deployment path
 
-- host the generated `public/` directory on GitHub Pages or Cloudflare Pages
-- use GitHub Actions for scheduled rebuilds
+- host the generated `public/` directory on GitHub Pages
+- use GitHub Actions for automatic scheduled refresh and deploy
 - keep notifications simple at first, then add richer delivery if needed
 
 ## Fastest real-device test: GitHub Pages
@@ -71,13 +71,26 @@ Recommended path:
 5. Push to `main`
 6. Enable GitHub Pages for GitHub Actions
 
-After that, every push to `main` will build and deploy the latest static site.
+After that:
+
+- every push to `main` will build and deploy the latest static site
+- a scheduled GitHub Actions run will also refresh and redeploy automatically every 6 hours
 
 The deployment workflow is:
 
 - [deploy-pages.yml](C:\Users\arata\ws\ai_info\.github\workflows\deploy-pages.yml)
 
 The workflow fails early if `OPENAI_API_KEY` is missing.
+
+## Auto-update behavior
+
+The production site now updates automatically through GitHub Actions.
+
+- trigger 1: push to `main`
+- trigger 2: manual run from the Actions tab
+- trigger 3: scheduled refresh every 6 hours
+
+No local machine needs to stay on for scheduled updates.
 
 ## Near-term roadmap
 
