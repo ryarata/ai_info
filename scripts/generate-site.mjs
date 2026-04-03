@@ -1,0 +1,596 @@
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadEnv } from "./load-env.mjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(__dirname, "..");
+await loadEnv(root);
+const analyzedDataPath = path.join(root, "data", "updates.analyzed.json");
+const generatedDataPath = path.join(root, "data", "updates.generated.json");
+const sampleDataPath = path.join(root, "data", "updates.sample.json");
+const sourcesPath = path.join(root, "config", "sources.json");
+const publicDir = path.join(root, "public");
+
+const data = JSON.parse(await readFile(await resolveDataPath(), "utf8"));
+const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
+
+const renderBadge = (text) => `<span class="badge">${escapeHtml(text)}</span>`;
+
+const renderAlert = (alert) => `
+  <article class="card alert-card">
+    <div class="card-top">
+      <div class="badge-row">
+        ${renderBadge(alert.company)}
+        ${renderBadge(alert.product)}
+        ${renderBadge(alert.action)}
+        ${renderBadge((alert.trustLevel ?? "official").toUpperCase())}
+      </div>
+      <a class="link" href="${escapeHtml(alert.sourceUrl)}">原文</a>
+    </div>
+    <h3>${escapeHtml(alert.titleJa)}</h3>
+    <p class="summary">${escapeHtml(alert.summaryJa)}</p>
+    <details class="translation">
+      <summary>英語原文タイトル</summary>
+      <p>${escapeHtml(alert.titleEn)}</p>
+    </details>
+    <div class="score-row">
+      ${renderBadge(`Context UX ${alert.scores.contextUx}`)}
+      ${renderBadge(`Work UX ${alert.scores.workUx}`)}
+      ${renderBadge(`Workflow ${alert.scores.workflow}`)}
+    </div>
+    <div class="why-now">
+      <strong>今見る理由</strong>
+      <p>${escapeHtml(alert.whyNow)}</p>
+    </div>
+  </article>
+`;
+
+const renderDigestItem = (item) => `
+  <article class="card digest-card">
+    <div class="badge-row">
+      ${renderBadge(item.company)}
+      ${renderBadge(item.action)}
+      ${renderBadge((item.trustLevel ?? "official").toUpperCase())}
+    </div>
+    <h3>${escapeHtml(item.titleJa)}</h3>
+    <p class="summary">${escapeHtml(item.summaryJa)}</p>
+  </article>
+`;
+
+const renderGroupedItems = (items, renderer, options = {}) =>
+  groupByCompany(items)
+    .map(
+      ([company, groupedItems]) => `
+        <details class="company-group" ${shouldOpenGroup(groupedItems, options) ? "open" : ""}>
+          <summary class="company-group-head">
+            <span class="company-group-title">${escapeHtml(company)}</span>
+            <span class="company-group-meta">
+              <span class="subtle">${groupedItems.length}件</span>
+              <span class="group-toggle">表示</span>
+            </span>
+          </summary>
+          <div class="stack company-group-body">
+            ${groupedItems.map(renderer).join("")}
+          </div>
+        </details>
+      `
+    )
+    .join("");
+
+const renderSource = (source) => `
+  <article class="source-item">
+    <div>
+      <strong>${escapeHtml(source.company)}</strong>
+      <p>${escapeHtml(source.label)}</p>
+    </div>
+    <div class="source-meta">
+      ${renderBadge(source.type)}
+      ${renderBadge(source.trustLevel ?? "official")}
+      ${renderBadge(`${source.pollIntervalHours}h`)}
+    </div>
+  </article>
+`;
+
+const renderHealth = (item) => `
+  <article class="card health-card ${item.status === "ok" ? "" : "health-error"}">
+    <div class="card-top">
+      <div class="badge-row">
+        ${renderBadge(item.company)}
+        ${renderBadge(item.status === "ok" ? "取得成功" : "取得失敗")}
+        ${renderBadge(item.trustLevel ?? "official")}
+      </div>
+      <span class="subtle">${escapeHtml(formatDate(item.fetchedAt))}</span>
+    </div>
+    <h3>${escapeHtml(item.label)}</h3>
+    <p class="summary">${
+      item.status === "ok"
+        ? item.changed
+          ? "前回取得との差分を検出しました。"
+          : "現時点では大きな差分はありません。"
+        : `取得エラー: ${escapeHtml(item.error ?? "unknown")}`
+    }</p>
+  </article>
+`;
+
+const html = `<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Update Intel</title>
+    <meta name="theme-color" content="#2e5b4b" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Personal dashboard</p>
+          <h1>AI Update Intel</h1>
+          <p class="subtle">更新日時: ${escapeHtml(formatDate(data.generatedAt))}</p>
+        </div>
+        <button class="notify-button" type="button">通知を有効化</button>
+      </header>
+
+      <section class="hero-grid">
+        <article class="metric-card">
+          <span>緊急アラート</span>
+          <strong>${data.summary.urgentCount}</strong>
+        </article>
+        <article class="metric-card">
+          <span>今日のDigest</span>
+          <strong>${data.summary.digestCount}</strong>
+        </article>
+        <article class="metric-card">
+          <span>監視企業</span>
+          <strong>${data.summary.monitoredCompanies}</strong>
+        </article>
+        <article class="metric-card">
+          <span>アクティブソース</span>
+          <strong>${data.summary.activeSources}</strong>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>今すぐ確認したい更新</h2>
+          <span class="subtle">スマホで最優先表示</span>
+        </div>
+        ${renderGroupedItems(data.alerts, renderAlert, { defaultOpen: true })}
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>今日のDigest</h2>
+          <span class="subtle">非緊急だが追うべき更新</span>
+        </div>
+        ${renderGroupedItems(data.digest, renderDigestItem, { defaultOpen: false })}
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>今週の見立て</h2>
+          <span class="subtle">3〜6か月の意味づけ</span>
+        </div>
+        <div class="stack">
+          ${data.weeklyThemes
+            .map(
+              (theme) => `
+            <article class="card theme-card">
+              <h3>${escapeHtml(theme.title)}</h3>
+              <p class="summary">${escapeHtml(theme.body)}</p>
+            </article>
+          `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>監視ソース</h2>
+          <span class="subtle">低コスト運用向け最小構成</span>
+        </div>
+        <div class="source-list">
+          ${sources.map(renderSource).join("")}
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>取得状況</h2>
+          <span class="subtle">定期実行のヘルスチェック</span>
+        </div>
+        <div class="stack">
+          ${(data.sourceHealth ?? []).map(renderHealth).join("")}
+        </div>
+      </section>
+    </main>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
+
+      const alertIds = ${JSON.stringify((data.alerts ?? []).map((item) => item.id))};
+      const button = document.querySelector(".notify-button");
+      if (button && "Notification" in window) {
+        button.addEventListener("click", async () => {
+          const result = await Notification.requestPermission();
+          button.textContent = result === "granted" ? "通知が有効です" : "通知は未許可です";
+        });
+
+        if (Notification.permission === "granted") {
+          const seen = JSON.parse(localStorage.getItem("seen-alert-ids") ?? "[]");
+          const unseen = alertIds.filter((id) => !seen.includes(id));
+          if (unseen.length > 0 && navigator.serviceWorker?.controller) {
+            navigator.serviceWorker.controller.postMessage({
+              type: "notify",
+              count: unseen.length
+            });
+          } else if (unseen.length > 0) {
+            new Notification("AI Update Intel", {
+              body: unseen.length + "件の新しい緊急アラートがあります。"
+            });
+          }
+          localStorage.setItem("seen-alert-ids", JSON.stringify(alertIds));
+        }
+      } else if (button) {
+        button.disabled = true;
+        button.textContent = "このブラウザでは通知非対応";
+      }
+    </script>
+  </body>
+</html>`;
+
+const css = `:root {
+  --bg: #f4f1ea;
+  --panel: #fffdf8;
+  --ink: #1f1b16;
+  --muted: #6f675e;
+  --line: #ddd3c8;
+  --line-strong: #b7aa9c;
+  --accent: #2e5b4b;
+  --alert: #fff4e7;
+  --shadow: 0 12px 32px rgba(46, 34, 22, 0.08);
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+  background: linear-gradient(180deg, #f7f2ea 0%, #efe7dc 100%);
+  color: var(--ink);
+}
+.app-shell {
+  width: min(760px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 18px 0 40px;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  padding: 8px 4px 18px;
+}
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 8vw, 42px);
+  line-height: 1.05;
+}
+.subtle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.notify-button {
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 11px 14px;
+  font-size: 13px;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.metric-card, .card, .source-item {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.metric-card {
+  padding: 16px;
+}
+.metric-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.metric-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 28px;
+}
+.section-block {
+  margin-top: 18px;
+}
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+.section-head h2 {
+  margin: 0;
+  font-size: 17px;
+}
+.stack {
+  display: grid;
+  gap: 12px;
+}
+.company-group + .company-group {
+  margin-top: 14px;
+}
+.company-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 248, 0.9);
+  cursor: pointer;
+}
+.company-group-head::-webkit-details-marker {
+  display: none;
+}
+.company-group-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.company-group-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.group-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8f4ee;
+  color: var(--muted);
+  font-size: 11px;
+}
+.company-group[open] .group-toggle::after {
+  content: "中";
+}
+.company-group:not([open]) .group-toggle::after {
+  content: "開";
+}
+.company-group-body {
+  margin-top: 10px;
+}
+.card {
+  padding: 16px;
+}
+.alert-card {
+  background: linear-gradient(180deg, var(--alert) 0%, var(--panel) 100%);
+}
+.health-card {
+  background: linear-gradient(180deg, #f5f7f2 0%, var(--panel) 100%);
+}
+.health-error {
+  background: linear-gradient(180deg, #fff1ee 0%, var(--panel) 100%);
+}
+.card-top, .badge-row, .source-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.badge-row {
+  justify-content: start;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #f8f4ee;
+  color: var(--muted);
+  font-size: 11px;
+}
+.badge:nth-child(4) {
+  letter-spacing: 0.03em;
+}
+.link {
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: none;
+}
+h3 {
+  margin: 12px 0 8px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.summary {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.translation {
+  margin-top: 12px;
+}
+.translation summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 13px;
+}
+.translation p, .why-now p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.score-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.why-now {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.why-now strong {
+  font-size: 13px;
+}
+.source-list {
+  display: grid;
+  gap: 10px;
+}
+.source-item {
+  padding: 14px 16px;
+}
+.source-item strong {
+  display: block;
+}
+.source-item p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.source-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+  .topbar, .section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+`;
+
+const manifest = {
+  name: "AI Update Intel",
+  short_name: "AI Intel",
+  start_url: "./index.html",
+  display: "standalone",
+  background_color: "#f7f2ea",
+  theme_color: "#2e5b4b",
+  lang: "ja"
+};
+
+const serviceWorker = `self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "notify") {
+    self.registration.showNotification("AI Update Intel", {
+      body: event.data.count + "件の新しい緊急アラートがあります。",
+      tag: "ai-update-intel-alert"
+    });
+  }
+});
+`;
+
+await mkdir(publicDir, { recursive: true });
+await writeFile(path.join(publicDir, "index.html"), html, "utf8");
+await writeFile(path.join(publicDir, "styles.css"), css, "utf8");
+await writeFile(path.join(publicDir, "manifest.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
+await writeFile(path.join(publicDir, "sw.js"), serviceWorker, "utf8");
+
+console.log(`Generated site in ${publicDir}`);
+
+async function resolveDataPath() {
+  try {
+    await readFile(analyzedDataPath, "utf8");
+    return analyzedDataPath;
+  } catch (error) {
+    if (!(error && typeof error === "object" && "code" in error && error.code === "ENOENT")) {
+      throw error;
+    }
+  }
+
+  try {
+    await readFile(generatedDataPath, "utf8");
+    return generatedDataPath;
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+      return sampleDataPath;
+    }
+    throw error;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function groupByCompany(items = []) {
+  const groups = new Map();
+  for (const item of items) {
+    const company = item.company ?? "Unknown";
+    if (!groups.has(company)) {
+      groups.set(company, []);
+    }
+    groups.get(company).push(item);
+  }
+  return [...groups.entries()];
+}
+
+function shouldOpenGroup(items, options) {
+  if (options.defaultOpen) {
+    return true;
+  }
+  return items.length === 1 && (items[0].trustLevel ?? "official") === "official";
+}

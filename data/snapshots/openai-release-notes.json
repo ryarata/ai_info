@@ -1,0 +1,19 @@
+{
+  "id": "openai-release-notes",
+  "sourceId": "openai-release-notes",
+  "company": "OpenAI",
+  "label": "API changelog",
+  "url": "https://platform.openai.com/docs/changelog",
+  "trustLevel": "official",
+  "fetchedAt": "2026-04-03T19:48:49.678Z",
+  "status": "error",
+  "error": "HTTP 403",
+  "title": "API changelog",
+  "description": "OpenAI の取得に失敗しました。次回再試行します。",
+  "excerpt": "",
+  "hash": "333491e045a7109ed0b9d390d8a12bb2f68f6c04a0939586821af0dbca8988a6",
+  "previousHash": "e9e0b09b2ef3aa5f4ea3ead217b621d06ad41dbb934518422c3216b7db072bb6",
+  "changed": false,
+  "changedAt": null,
+  "changeSummary": "初回取得"
+}

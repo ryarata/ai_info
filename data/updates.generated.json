@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2026-04-03T19:48:51.466Z",
+  "summary": {
+    "urgentCount": 2,
+    "digestCount": 2,
+    "monitoredCompanies": 3,
+    "activeSources": 5
+  },
+  "alerts": [
+    {
+      "id": "anthropic-context-memory",
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "product": "Claude Cowork",
+      "action": "今すぐ試す",
+      "titleEn": "Cross-session project memory expanded in workspace UI",
+      "titleJa": "セッションをまたいだプロジェクト記憶が強化され、ワークスペース上で扱いやすくなった",
+      "summaryJa": "前回の作業状態を引き継ぎやすくなり、再開時の説明コストが下がる可能性があります。",
+      "whyNow": "コンテキストUXへの影響が非常に大きく、日々の作業の進め方が変わる可能性があるため。",
+      "scores": {
+        "contextUx": 5,
+        "workUx": 4,
+        "workflow": 4
+      },
+      "sourceUrl": "https://www.anthropic.com/news"
+    },
+    {
+      "id": "openai-project-workflow",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "product": "ChatGPT Workspace",
+      "action": "今週理解",
+      "titleEn": "Project-oriented task flow for long-running agent collaboration",
+      "titleJa": "長時間のAI協働向けに、プロジェクト単位で進める作業フローが導入された",
+      "summaryJa": "単発のチャットより、継続的な作業セッションを前提にした体験へ寄ってきています。",
+      "whyNow": "作業UXの変化が大きく、今後の主要UIパターンになる可能性が高いため。",
+      "scores": {
+        "contextUx": 3,
+        "workUx": 4,
+        "workflow": 3
+      },
+      "sourceUrl": "https://openai.com/news/"
+    }
+  ],
+  "digest": [
+    {
+      "id": "openai-status-history-digest",
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "titleJa": "OpenAI の一次情報更新: ChatGPT Dictation Elevated Error Rate",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
+      "action": "定点観測"
+    },
+    {
+      "id": "openai-testingcatalog-chatgpt-digest",
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "titleJa": "OpenAI の一次情報更新: OpenAI launches visual product discovery in ChatGPT for all users",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
+      "action": "定点観測"
+    }
+  ],
+  "weeklyThemes": [
+    {
+      "title": "主要監視先の定点観測を開始",
+      "body": "OpenAI、Anthropic、Google の一次情報をもとに、スマホで読める個人用ダッシュボードを更新できる基盤ができています。"
+    },
+    {
+      "title": "一部ソースは取得失敗時のフォールバックを保持",
+      "body": "1 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
+    }
+  ],
+  "sourceHealth": [
+    {
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "label": "API changelog",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-03T19:48:49.678Z",
+      "changed": false,
+      "error": "HTTP 403"
+    },
+    {
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "label": "Status history feed",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-03T19:48:49.848Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "label": "TestingCatalog ChatGPT feed",
+      "trustLevel": "secondary",
+      "status": "ok",
+      "fetchedAt": "2026-04-03T19:48:49.944Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "label": "Claude product updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-03T19:48:50.011Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "google-gemini-updates",
+      "company": "Google",
+      "label": "Gemini updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-03T19:48:50.414Z",
+      "changed": false,
+      "error": null
+    }
+  ]
+}

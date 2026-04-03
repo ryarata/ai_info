@@ -1,0 +1,18 @@
+{
+  "id": "openai-blog",
+  "sourceId": "openai-blog",
+  "company": "OpenAI",
+  "label": "Product updates",
+  "url": "https://openai.com/news/",
+  "fetchedAt": "2026-04-03T19:16:18.753Z",
+  "status": "error",
+  "error": "HTTP 403",
+  "title": "Product updates",
+  "description": "OpenAI の取得に失敗しました。次回再試行します。",
+  "excerpt": "",
+  "hash": "4c5065a08a9028975c893243ed40b9ce423d945ec2ef7ca39ccd70c5a6ebee0a",
+  "previousHash": "5cf1a3bfc79ddcc80afb32233cf2f71b8157cca8bac69a18cc9a5b9ec12ba7a3",
+  "changed": false,
+  "changedAt": null,
+  "changeSummary": "初回取得"
+}

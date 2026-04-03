@@ -1,0 +1,57 @@
+[
+  {
+    "id": "openai-release-notes",
+    "company": "OpenAI",
+    "label": "API changelog",
+    "type": "release_notes",
+    "url": "https://platform.openai.com/docs/changelog",
+    "pollIntervalHours": 6,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "openai-status-history",
+    "company": "OpenAI",
+    "label": "Status history feed",
+    "type": "atom",
+    "url": "https://status.openai.com/history.atom",
+    "pollIntervalHours": 6,
+    "priority": "medium",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "openai-testingcatalog-chatgpt",
+    "company": "OpenAI",
+    "label": "TestingCatalog ChatGPT feed",
+    "type": "rss",
+    "url": "https://www.testingcatalog.com/tag/chatgpt/rss/",
+    "pollIntervalHours": 8,
+    "priority": "medium",
+    "trustLevel": "secondary",
+    "enabled": true
+  },
+  {
+    "id": "anthropic-claude-updates",
+    "company": "Anthropic",
+    "label": "Claude product updates",
+    "type": "release_notes",
+    "url": "https://www.anthropic.com/news",
+    "pollIntervalHours": 4,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "google-gemini-updates",
+    "company": "Google",
+    "label": "Gemini updates",
+    "type": "docs",
+    "url": "https://deepmind.google/technologies/gemini/",
+    "pollIntervalHours": 8,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  }
+]

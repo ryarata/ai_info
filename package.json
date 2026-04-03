@@ -1,0 +1,19 @@
+{
+  "name": "ai-update-intel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal AI update intelligence app with static generation",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/generate-site.mjs",
+    "dev": "node scripts/generate-site.mjs",
+    "refresh": "node scripts/refresh-data.mjs && node scripts/analyze-updates.mjs && node scripts/generate-site.mjs",
+    "fetch": "node scripts/refresh-data.mjs",
+    "analyze": "node scripts/analyze-updates.mjs",
+    "serve": "node scripts/serve-preview.mjs",
+    "preview": "npm run refresh && node scripts/serve-preview.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

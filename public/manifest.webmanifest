@@ -1,0 +1,9 @@
+{
+  "name": "AI Update Intel",
+  "short_name": "AI Intel",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7f2ea",
+  "theme_color": "#2e5b4b",
+  "lang": "ja"
+}
