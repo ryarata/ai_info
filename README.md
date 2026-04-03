@@ -74,7 +74,7 @@ Recommended path:
 After that:
 
 - every push to `main` will build and deploy the latest static site
-- a scheduled GitHub Actions run will also refresh and redeploy automatically every 6 hours
+- a scheduled GitHub Actions run will also refresh and redeploy automatically three times per day
 
 The deployment workflow is:
 
@@ -88,7 +88,13 @@ The production site now updates automatically through GitHub Actions.
 
 - trigger 1: push to `main`
 - trigger 2: manual run from the Actions tab
-- trigger 3: scheduled refresh every 6 hours
+- trigger 3: scheduled refresh three times per day
+
+Current scheduled times:
+
+- 09:00 JST
+- 12:00 JST
+- 21:00 JST
 
 No local machine needs to stay on for scheduled updates.
 
