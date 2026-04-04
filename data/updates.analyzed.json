@@ -1,46 +1,30 @@
 {
-  "generatedAt": "2026-04-04T08:05:28.528Z",
+  "generatedAt": "2026-04-04T08:15:00.961Z",
   "summary": {
-    "urgentCount": 2,
+    "urgentCount": 1,
     "digestCount": 2,
     "monitoredCompanies": 3,
-    "activeSources": 6
+    "activeSources": 7
   },
   "alerts": [
     {
-      "id": "anthropic-context-memory",
-      "sourceId": "anthropic-claude-updates",
+      "id": "anthropic-claude-code-changelog-alert",
+      "sourceId": "anthropic-claude-code-changelog",
       "company": "Anthropic",
-      "product": "Claude Cowork",
-      "action": "今すぐ試す",
-      "titleEn": "Cross-session project memory expanded in workspace UI",
-      "titleJa": "ワークスペースでセッションを超えてプロジェクトの記憶が拡張",
-      "summaryJa": "Claude CoworkのワークスペースUIにて、複数セッションにまたがるプロジェクトの記憶機能が強化されました。これにより、以前の作業内容を引き継ぎやすくなり、作業の再開時に説明や再設定の手間が大幅に減る可能性があります。",
-      "whyNow": "作業の効率化とユーザー体験向上のため、継続的なプロジェクト管理がより容易になるアップデートです。日常的に複数のセッションをまたいで作業を進める利用者にとって大きな実用的インパクトがあります。",
+      "product": "Claude Code changelog",
+      "action": "監視",
+      "titleEn": "chore: Update CHANGELOG.md",
+      "titleJa": "CHANGELOG.mdの更新",
+      "summaryJa": "CHANGELOG.md（変更履歴ファイル）が更新されました。機能追加や改善内容の記載更新のみで、プロダクト利用体験に直接的な変更はありません。",
+      "whyNow": "公式の変更履歴ファイルが更新されたため、今後の製品改善情報の把握に役立ちます。",
       "scores": {
-        "contextUx": 5,
-        "workUx": 5,
-        "workflow": 4
+        "contextUx": 2,
+        "workUx": 1,
+        "workflow": 1
       },
-      "sourceUrl": "https://www.anthropic.com/news",
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
       "trustLevel": "official"
-    },
-    {
-      "id": "openai-project-workflow",
-      "sourceId": "openai-release-notes",
-      "company": "OpenAI",
-      "product": "ChatGPT Workspace",
-      "action": "今週理解",
-      "titleEn": "Project-oriented task flow for long-running agent collaboration",
-      "titleJa": "長時間のAI協働向けに、プロジェクト単位で進める作業フローが導入された",
-      "summaryJa": "単発のチャットより、継続的な作業セッションを前提にした体験へ寄ってきています。",
-      "whyNow": "作業UXの変化が大きく、今後の主要UIパターンになる可能性が高いため。",
-      "scores": {
-        "contextUx": 3,
-        "workUx": 4,
-        "workflow": 3
-      },
-      "sourceUrl": "https://openai.com/news/"
     }
   ],
   "digest": [
@@ -48,11 +32,11 @@
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
       "company": "OpenAI",
-      "titleJa": "OpenAI サービス障害復旧のお知らせ",
-      "summaryJa": "ChatGPTの音声モード、Completions API、SSOによるログイン、アカウント作成・ログイン、Responses APIなど複数の機能で一時的な障害や高いエラー率が発生していましたが、すべて復旧しています。現在は各機能が正常に利用可能です。",
+      "titleJa": "OpenAI サービス障害報告（全サービス復旧済み）",
+      "summaryJa": "ChatGPTの音声モードやAPIなど複数のサービスで障害が発生しましたが、現在はすべて復旧しています。影響を受けたのは音声入力、チャットAPI、ログイン、レスポンスAPIなどで、一時的にエラー率が上昇し、ログインやアカウント作成も不安定になっていました。現在、全て正常に稼働しています。",
       "action": "今週理解",
       "publishedAt": "2026-04-02T17:49:44.404Z",
-      "whyNow": "最近複数機能で障害が発生していたため、安定運用や利用時の注意点を再確認する必要があります。",
+      "whyNow": "一部サービスでアクセスや利用が不安定になったユーザーがいたが、すべて解消されたため。現時点で利用上の支障はありません。",
       "scores": {
         "contextUx": 2,
         "workUx": 2,
@@ -64,14 +48,14 @@
       "id": "openai-testingcatalog-chatgpt-digest",
       "sourceId": "openai-testingcatalog-chatgpt",
       "company": "OpenAI",
-      "titleJa": "OpenAI 製品群の最新アップデートまとめ（2024年6月報道）",
-      "summaryJa": "OpenAI に関する二次報道によれば、ChatGPT に大手小売業者の商品をビジュアルで発見・比較・調査できるショッピング体験が全ユーザー向けに提供開始とのことです。また、API・Codex・ChatGPT 向けに高速・コスト効率重視の GPT-5.4 mini および nano モデルが追加され、作業・自動化エージェント開発向けに利用可能となった模様です。加えて、ChatGPT には70以上の主要な数学・科学トピックで変数調整や数式可視化などの対話型モジュール強化、GPT-5.4 モデルも一般提供が開始、Windows 用 Codex アプリ（PowerShell連携・堅牢なサンドボックス環境搭載）が Microsoft Store で公開された、との情報です。なお、これらは公式発表でなく、二次情報として報道されています。",
-      "action": "監視",
+      "titleJa": "OpenAIの新機能・モデルアップデートまとめ（視覚的商品探索、GPT-5.4、数理ツールなど）",
+      "summaryJa": "OpenAIがChatGPTに複数の新機能やモデルを追加したと報じられています。主な内容は、視覚的インターフェースで商品の比較・発見ができるショッピング体験の全ユーザー向け提供、GPT-5.4・GPT-5.4 mini・GPT-5.4 nanoのAPI公開、高速かつ低コストのコーディング補助への活用、70以上のトピックに対して変数調整や可視化が可能な数学・科学系インタラクティブツールの追加、そしてPowerShell連携のWindows向けCodexアプリの提供開始などです。いずれも公式発表ではなく二次情報による報道です。",
+      "action": "今週理解",
       "publishedAt": "2026-03-25T10:47:48.000Z",
-      "whyNow": "OpenAI 製品群に大規模なアップデートが短期間で複数報道されており、AI 活用現場への影響を慎重に見極める必要があります。",
+      "whyNow": "GPT-5シリーズの強化や実用的な新機能が相次いで登場しており、プロダクトおよびユーザー体験の幅が広がっているため。",
       "scores": {
         "contextUx": 4,
-        "workUx": 4,
+        "workUx": 3,
         "workflow": 3
       },
       "trustLevel": "secondary"
@@ -79,16 +63,16 @@
   ],
   "weeklyThemes": [
     {
-      "title": "ChatGPTプロダクト障害の復旧状況",
-      "body": "ChatGPTの音声モードやアカウント作成・ログイン、APIレスポンス等で一時的な障害が発生しましたが、全て復旧済みです。エンタープライズや教育機関向けのSSOも正常化しています。今後も業務アプリ連携や自動化フローの安定性には注意が必要です。"
+      "title": "AIサービスの安定性と障害への備え",
+      "body": "最近、OpenAIのChatGPTや音声モード、ログイン機能などで数度のサービス障害が発生しました。全て解決済みですが、ワークフロー面ではAIツール利用時の一時的な停止やエラー発生リスクを考慮した冗長な業務設計が必要です。短期的には、重要なフローにAI依存しすぎない運用やエラー時切り替え方針の検討が求められます。"
     },
     {
-      "title": "ChatGPTの新機能：ビジュアル商品発見体験",
-      "body": "ChatGPTで新たに製品の比較やインサイト取得ができるビジュアルショッピング機能が展開されました。ユーザー体験や業務における商品選定・調査の効率化に活用可能です。ワークフロー設計時は、この新しい機能を含むUI/UXフローの最適化も検討推奨です。"
+      "title": "OpenAIの新しいUX機能とAPI提供状況",
+      "body": "OpenAIはChatGPTに「ビジュアル商品発見」機能を全ユーザー向けに展開し、ビジュアルチャットでショッピング情報の一括取得が可能になりました。また、GPT-5.4 mini/nanoモデルがAPIで利用可能となり、高速・低コストな自動化やコーディング補助に活用できます。ワークスタイル上、データ集約や反復タスクの自動化に関する探索価値が高まっています。"
     },
     {
-      "title": "OpenAI GPT-5.4 mini/nano APIの活用",
-      "body": "OpenAIはGPT-5.4 miniおよびnanoをAPI経由で提供開始。特にminiは高速かつコスト効率の高い自動化やコーディング支援用に設計されています。業務プロセス自動化やAIエージェント展開時に処理速度・コスト制約下でも導入しやすくなりました。従来のワークフローとの切替や並行運用を検討してください。新しいモデルの応答品質評価も重要です。 "
+      "title": "インタラクティブな数式・サイエンスモジュールの追加",
+      "body": "ChatGPTに70以上の主要トピックを網羅したインタラクティブな数学・科学ツールが追加されました。変数調整や式可視化機能により、資料作成や教育用途、意思決定支援の幅が広がります。資料作成やプレゼンのワークフローに組み込むことで効率向上が期待されます。今後3～6か月でトレーニング用途などへの応用検討が有効です。},{"
     }
   ],
   "sourceHealth": [
@@ -98,7 +82,7 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:05:08.243Z",
+      "fetchedAt": "2026-04-04T08:14:47.751Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -109,7 +93,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.477Z",
+      "fetchedAt": "2026-04-04T08:14:47.935Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -120,7 +104,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.670Z",
+      "fetchedAt": "2026-04-04T08:14:48.062Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -131,7 +115,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.942Z",
+      "fetchedAt": "2026-04-04T08:14:48.312Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -142,10 +126,21 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:09.341Z",
+      "fetchedAt": "2026-04-04T08:14:51.185Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "changed": true,
+      "error": null
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-04T08:14:51.510Z",
       "publishedAt": null,
       "changed": false,
-      "error": null
+      "error": "HTTP 403"
     },
     {
       "sourceId": "google-gemini-updates",
@@ -153,7 +148,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:17.279Z",
+      "fetchedAt": "2026-04-04T08:14:51.564Z",
       "publishedAt": null,
       "changed": false,
       "error": null

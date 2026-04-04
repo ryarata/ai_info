@@ -1,45 +1,29 @@
 {
-  "generatedAt": "2026-04-04T08:05:18.780Z",
+  "generatedAt": "2026-04-04T08:14:52.653Z",
   "summary": {
-    "urgentCount": 2,
+    "urgentCount": 1,
     "digestCount": 2,
     "monitoredCompanies": 3,
-    "activeSources": 6
+    "activeSources": 7
   },
   "alerts": [
     {
-      "id": "anthropic-context-memory",
-      "sourceId": "anthropic-claude-updates",
+      "id": "anthropic-claude-code-changelog-alert",
+      "sourceId": "anthropic-claude-code-changelog",
       "company": "Anthropic",
-      "product": "Claude Cowork",
+      "product": "Claude Code changelog",
       "action": "今すぐ試す",
-      "titleEn": "Cross-session project memory expanded in workspace UI",
-      "titleJa": "セッションをまたいだプロジェクト記憶が強化され、ワークスペース上で扱いやすくなった",
-      "summaryJa": "前回の作業状態を引き継ぎやすくなり、再開時の説明コストが下がる可能性があります。",
-      "whyNow": "コンテキストUXへの影響が非常に大きく、日々の作業の進め方が変わる可能性があるため。",
+      "titleEn": "chore: Update CHANGELOG.md",
+      "titleJa": "Anthropic の更新を検知: chore: Update CHANGELOG.md",
+      "summaryJa": "Anthropic の一次情報から抽出した要点: chore: Update CHANGELOG.md",
+      "whyNow": "一次情報に変化があり、今後の作業体験の変化につながる可能性があるためです。",
       "scores": {
-        "contextUx": 5,
-        "workUx": 4,
-        "workflow": 4
+        "contextUx": 4,
+        "workUx": 2,
+        "workflow": 2
       },
-      "sourceUrl": "https://www.anthropic.com/news"
-    },
-    {
-      "id": "openai-project-workflow",
-      "sourceId": "openai-release-notes",
-      "company": "OpenAI",
-      "product": "ChatGPT Workspace",
-      "action": "今週理解",
-      "titleEn": "Project-oriented task flow for long-running agent collaboration",
-      "titleJa": "長時間のAI協働向けに、プロジェクト単位で進める作業フローが導入された",
-      "summaryJa": "単発のチャットより、継続的な作業セッションを前提にした体験へ寄ってきています。",
-      "whyNow": "作業UXの変化が大きく、今後の主要UIパターンになる可能性が高いため。",
-      "scores": {
-        "contextUx": 3,
-        "workUx": 4,
-        "workflow": 3
-      },
-      "sourceUrl": "https://openai.com/news/"
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
+      "publishedAt": "2026-04-04T00:41:56.000Z"
     }
   ],
   "digest": [
@@ -64,12 +48,16 @@
   ],
   "weeklyThemes": [
     {
+      "title": "一次情報の差分を自動検知できる状態に入った",
+      "body": "1 件のソース更新を検出しました。今後はこの差分をもとに、日本語要約と重要度判定の精度を上げていく段階です。"
+    },
+    {
       "title": "主要監視先の定点観測を開始",
       "body": "OpenAI、Anthropic、Google の一次情報をもとに、スマホで読める個人用ダッシュボードを更新できる基盤ができています。"
     },
     {
       "title": "一部ソースは取得失敗時のフォールバックを保持",
-      "body": "1 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
+      "body": "2 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
     }
   ],
   "sourceHealth": [
@@ -79,7 +67,7 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:05:08.243Z",
+      "fetchedAt": "2026-04-04T08:14:47.751Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -90,7 +78,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.477Z",
+      "fetchedAt": "2026-04-04T08:14:47.935Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -101,7 +89,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.670Z",
+      "fetchedAt": "2026-04-04T08:14:48.062Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -112,7 +100,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:08.942Z",
+      "fetchedAt": "2026-04-04T08:14:48.312Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -123,10 +111,21 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:09.341Z",
+      "fetchedAt": "2026-04-04T08:14:51.185Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "changed": true,
+      "error": null
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-04T08:14:51.510Z",
       "publishedAt": null,
       "changed": false,
-      "error": null
+      "error": "HTTP 403"
     },
     {
       "sourceId": "google-gemini-updates",
@@ -134,7 +133,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:05:17.279Z",
+      "fetchedAt": "2026-04-04T08:14:51.564Z",
       "publishedAt": null,
       "changed": false,
       "error": null

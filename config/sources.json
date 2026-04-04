@@ -47,9 +47,20 @@
     "id": "anthropic-claude-code-changelog",
     "company": "Anthropic",
     "label": "Claude Code changelog",
-    "type": "docs",
-    "url": "https://docs.claude.com/en/release-notes/claude-code",
+    "type": "atom",
+    "url": "https://github.com/anthropics/claude-code/commits/main/CHANGELOG.md.atom",
     "pollIntervalHours": 4,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "openai-chatgpt-release-notes",
+    "company": "OpenAI",
+    "label": "ChatGPT release notes",
+    "type": "docs",
+    "url": "https://help.openai.com/ja-jp/articles/6825453-chatgpt-release-notes",
+    "pollIntervalHours": 6,
     "priority": "high",
     "trustLevel": "official",
     "enabled": true
