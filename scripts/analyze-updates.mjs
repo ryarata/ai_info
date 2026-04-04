@@ -149,6 +149,7 @@ async function enrichItem(item, kind, snapshotMap, options) {
     whyNow: result.why_now || item.whyNow,
     action: result.action || item.action,
     scores: result.scores || item.scores,
+    publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
     trustLevel
   };
 }
@@ -270,11 +271,13 @@ function applyFallbackAnalysis(base, snapshotMap, reason) {
   next.alerts = (base.alerts ?? []).map((item) => ({
     ...item,
     whyNow: item.whyNow ?? "分析理由は次回更新で補完します。",
+    publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
 
   next.digest = (base.digest ?? []).map((item) => ({
     ...item,
+    publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
 

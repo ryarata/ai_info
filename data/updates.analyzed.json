@@ -1,29 +1,48 @@
 {
-  "generatedAt": "2026-04-04T08:21:24.363Z",
+  "generatedAt": "2026-04-04T08:27:45.296Z",
   "summary": {
-    "urgentCount": 1,
+    "urgentCount": 2,
     "digestCount": 2,
     "monitoredCompanies": 3,
     "activeSources": 7
   },
   "alerts": [
     {
-      "id": "openai-release-notes-alert",
-      "sourceId": "openai-release-notes",
-      "company": "OpenAI",
-      "product": "API changelog",
+      "id": "anthropic-context-memory",
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "product": "Claude Cowork",
       "action": "今すぐ試す",
-      "titleEn": "Changelog | OpenAI API",
-      "titleJa": "OpenAI API最新アップデート：GPT-5.4 mini/nano、Sora 2拡張など多数追加",
-      "summaryJa": "OpenAI APIでは、GPT-5.4 miniとGPT-5.4 nanoが新たにリリースされました。miniは高機能かつ高速・効率的なモデルで、大規模用途に適しています。nanoはさらに高速・低コストな大量処理向けですが、一部機能が限定されます（tool search非対応など）。Sora-2 APIはキャラクター参照や20秒生成、1080p出力、拡張機能、バッチAPIサポートなど大幅に拡充されました。動画編集エンドポイントも改善され、既存のremixエンドポイントは6ヶ月後に廃止予定です。また、gpt-5.3-chat-latestのモデル指標更新や画像入力のバグ修正も行われ、画像認識精度が向上しています。",
-      "whyNow": "新モデルの投入やAPI拡張により、開発者の作業効率やコスト削減に直結するため、早期の把握・適応が業務効率化やプロダクト競争力確保に重要です。",
+      "titleEn": "Cross-session project memory expanded in workspace UI",
+      "titleJa": "セッションをまたいだプロジェクト記憶がワークスペースUIで拡張",
+      "summaryJa": "Claude CoworkのワークスペースUIで、複数のセッションにまたがるプロジェクトの記憶が強化されました。これにより、前回の作業内容をそのまま引き継ぎやすくなり、作業の再開や継続がより簡単かつスムーズになります。ユーザーは追加説明にかかる手間を省き、効率よくプロジェクトの進行が可能になります。",
+      "whyNow": "プロジェクトを複数回に分けて進める場合でも、AIが過去のやりとりや作業内容をしっかり記憶し、再開時にスムーズにつながるようになったため、特に業務効率や体験向上につながるアップデートです。",
       "scores": {
         "contextUx": 5,
         "workUx": 5,
-        "workflow": 4
+        "workflow": 5
       },
-      "sourceUrl": "https://developers.openai.com/api/docs/changelog",
-      "publishedAt": "2025-12-15T00:00:00.000Z",
+      "sourceUrl": "https://www.anthropic.com/news",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "trustLevel": "official"
+    },
+    {
+      "id": "openai-project-workflow",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "product": "ChatGPT Workspace",
+      "action": "今週理解",
+      "titleEn": "Project-oriented task flow for long-running agent collaboration",
+      "titleJa": "プロジェクト指向タスクフローで長期間のAIエージェント協働が可能に",
+      "summaryJa": "ChatGPT Workspaceにおいて、単発のチャットではなくプロジェクト単位で作業を進めるフローが導入されました。これにより、長期間かつ継続的なAI協働やタスク管理がしやすくなり、複雑な業務や複数ステップにわたる作業の効率化が期待できます。従来の一問一答型から、連続して状況や進捗を維持したまま作業を進める体験が強化されます。",
+      "whyNow": "AIを使った業務や共同作業の現場では、単発チャットを超えた持続的な支援・自動化が強く求められており、作業効率や成果物品質を高めるための最新機能として注目されています。今後のUIや作業スタイルの標準化にもつながる重要な更新です。",
+      "scores": {
+        "contextUx": 5,
+        "workUx": 5,
+        "workflow": 5
+      },
+      "sourceUrl": "https://openai.com/news/",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
       "trustLevel": "official"
     }
   ],
@@ -32,11 +51,11 @@
       "id": "openai-release-notes-digest",
       "sourceId": "openai-release-notes",
       "company": "OpenAI",
-      "titleJa": "OpenAI API 最新アップデートまとめ（2026年3月）",
-      "summaryJa": "OpenAIは、API向けに高効率なGPT-5.4 mini・nanoモデルを新たに公開しました。miniはツール検索やPC利用など高度な機能も搭載し、大量処理や多様な業務に最適です。nanoはより単純で処理速度とコスト重視の用途向けです（ツール検索・PC利用は非対応）。また画像認識機能の品質も改善されました。Sora動画APIでは再利用可能なキャラクター参照、最長20秒・1080p生成、編集機能やバッチリクエストへの対応など大幅強化されています。",
-      "action": "今週理解",
-      "publishedAt": "2025-12-15T00:00:00.000Z",
-      "whyNow": "GPT-5.4世代による高効率モデルや動画生成APIは、生成AI活用と大規模運用のコスト効率化の需要が高まっているため。",
+      "titleJa": "OpenAI API: GPT-5.4 mini/nanoおよびSora APIの最新アップデート",
+      "summaryJa": "OpenAIは、GPT-5.4 miniとGPT-5.4 nanoをChat CompletionsやResponses API向けにリリースしました。GPT-5.4 miniは高性能かつ効率的でツール検索やコンピューター操作にも対応し、大量処理業務に好適です。GPT-5.4 nanoは処理速度とコスト重視のシンプルなタスクに最適化されています（ツール検索やPC利用は未対応）。また、画像入力の処理品質向上や、Sora APIの高精細動画生成（1080p/20秒）、動画編集エンドポイントの新設など実務活用を後押しする進化が進んでいます。",
+      "action": "今すぐ試す",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "whyNow": "GPT-5.4シリーズやSora 2系の新機能拡充により、AI活用現場での処理速度・コスト効率・出力品質が改善され、直近ニーズに即した業務改善が可能です。",
       "scores": {
         "contextUx": 5,
         "workUx": 5,
@@ -48,11 +67,11 @@
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
       "company": "OpenAI",
-      "titleJa": "OpenAI サービスでの一時的な障害発生と復旧のお知らせ",
-      "summaryJa": "ChatGPTの音声入力（ディクテーション）、API利用、Enterprise/EduワークスペースへのSSOログイン、アカウント作成やログイン機能、Responses APIなどで一時的にエラーや不安定な状態が発生しましたが、すべての影響を受けたサービスは現在正常に復旧しています。",
+      "titleJa": "OpenAIの各種サービスにおける障害の復旧報告",
+      "summaryJa": "ChatGPTの音声入力（ディクテーション）や完成API（completionsapi-gpt-5-nano）、ログイン、アカウント作成、一部ワークスペース（Enterprise/Edu）へのSSOログイン、レスポンスAPIやSoraで発生していたエラー率増加・障害がすべて解消し、全サービスで通常稼働に戻ったことが公式に報告されています。",
       "action": "今週理解",
       "publishedAt": "2026-04-02T17:49:44.404Z",
-      "whyNow": "本件は各種OpenAIサービスの障害が発生し、現時点ですべて復旧したことの公式発表によるものです。",
+      "whyNow": "複数の主要機能に影響する障害が発生していましたが、現在は全て復旧したため、安心して利用を再開できます。",
       "scores": {
         "contextUx": 2,
         "workUx": 2,
@@ -63,16 +82,16 @@
   ],
   "weeklyThemes": [
     {
-      "title": "OpenAIの新APIモデルによる業務効率化の可能性",
-      "body": "GPT-5.4 miniおよびnanoモデルがAPIで利用可能になりました。miniは高速かつ効率的で、大量ワークロードに適しています。nanoはコスト重視かつ極めて高速で、シンプルな大量処理業務に最適です。今後、高効率なワークフローやUX設計、エージェント自動化の基盤として活用が広がる可能性があります。特に速度やコストが重要な現場ではnano採用が現実的です。"
+      "title": "GPT-5.4 mini・nano APIリリースによるワークフロー最適化",
+      "body": "OpenAIはGPT-5.4 miniとnanoをAPIで提供開始。miniはコーディング支援やエージェント系の高速大量処理に適し、ツール検索や内蔵PC利用も可能。nanoはさらに軽量・安価で、シンプルな大量タスク処理向き。今後3～6ヶ月は高速処理・APIコスト最適化が可能なプロジェクト設計が重要になる。"
     },
     {
-      "title": "ChatGPTにおける新機能と障害からの教訓",
-      "body": "ChatGPTの音声入力・レスポンス等に一時的な障害が発生しましたが、すべて解消されています。業務利用時は障害発生時のリカバリ体制や、SLA（サービス稼働保証）を意識した運用フロー設計が求められます。多機能化・インタラクション増加に対応可能なワークフローの柔軟性が重要です。"
+      "title": "ChatGPTのショッピング体験・可視化モジュール拡充",
+      "body": "OpenAIはChatGPTでビジュアルプロダクト発見機能を展開、複数小売の製品比較・情報取得が1画面で完結するUXが実現。これによりビジネスでの情報収集効率や顧客体験の設計が変化、今後は可視化機能の業務転用やインタラクティブな数理・科学モジュール導入による新サービス展開が期待できる。"
     },
     {
-      "title": "AIによるビジュアルUX向上と文脈対応の進展",
-      "body": "ChatGPTでビジュアル型商品探索が追加され、直感的な比較・意思決定がしやすくなりました。今後はビジュアルインターフェースや文脈情報のダイナミックな活用がカギです。業務用途では、ワークフロー内での可視化・比較・選択の体験設計を見直すべきタイミングです。インタラクティブな数理ツールの実装も進んでいます。数理・論理作業の業務統合を検討ください。 "
+      "title": "主要AIモデルの選択幅拡大と用途特化",
+      "body": "Google Gemini 3.1シリーズやAnthropic Claude Sonnet/Opusなど最新モデルは、研究開発から高効率大量処理・クリエイティブタスクまで役割が明確化。ワークスタイルに適したAI選定・API活用、マルチモデル連携によるUX改善が、今後6ヶ月の競争力となる。"
     }
   ],
   "sourceHealth": [
@@ -82,9 +101,9 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:06.293Z",
-      "publishedAt": "2025-12-15T00:00:00.000Z",
-      "changed": true,
+      "fetchedAt": "2026-04-04T08:27:28.881Z",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "changed": false,
       "error": null
     },
     {
@@ -93,7 +112,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:06.508Z",
+      "fetchedAt": "2026-04-04T08:27:29.027Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -104,7 +123,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:06.615Z",
+      "fetchedAt": "2026-04-04T08:27:29.113Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -115,7 +134,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:06.761Z",
+      "fetchedAt": "2026-04-04T08:27:29.186Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -126,7 +145,7 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:11.651Z",
+      "fetchedAt": "2026-04-04T08:27:33.841Z",
       "publishedAt": "2026-04-04T00:41:56.000Z",
       "changed": false,
       "error": null
@@ -137,7 +156,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:21:12.004Z",
+      "fetchedAt": "2026-04-04T08:27:34.210Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -148,7 +167,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:21:12.144Z",
+      "fetchedAt": "2026-04-04T08:27:34.301Z",
       "publishedAt": null,
       "changed": false,
       "error": null

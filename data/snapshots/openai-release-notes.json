@@ -5,15 +5,15 @@
   "label": "API changelog",
   "url": "https://developers.openai.com/api/docs/changelog",
   "trustLevel": "official",
-  "fetchedAt": "2026-04-04T08:21:06.293Z",
+  "fetchedAt": "2026-04-04T08:27:28.881Z",
   "status": "ok",
   "title": "Changelog | OpenAI API",
   "description": "See all of the latest features and updates to the OpenAI API.",
-  "publishedAt": "2025-12-15T00:00:00.000Z",
+  "publishedAt": "2026-03-16T15:00:00.000Z",
   "excerpt": "Changelog March, 2026 Mar 17 Feature gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions Released GPT-5.4 mini and GPT-5.4 nano to the Chat Completions and Responses API. GPT-5.4 mini brings GPT-5.4-class capabilities to a faster, more efficient model for high-volume workloads, while GPT-5.4 nano is optimized for simple high-volume tasks where speed and cost matter most. GPT-5.4 mini supports tool search , built-in computer use , and compaction . GPT-5.4 nano supports compaction, but does not support tool search or computer use. Mar 16 Update gpt-5.3-chat-latest Updated the gpt-5.3-chat-latest slug to point to the latest model currently used in ChatGPT. Mar 13 Fix gpt-5.4 v1/responses v1/chat/completions Updated our image encoder to fix a small bug with input_image inputs in GPT-5.4. Some image understanding use cases may now see improved quality. No action is required. Mar 12 Feature sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Expanded the Sora API with reusable character references, longer generations up to 20 seconds, 1080p output for sora-2-pro , video extensions, and Batch API support for POST /v1/videos . 1080p generations on sora-2-pro are billed at $0.70 per second. Learn more here . Mar 12 Update sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix Added POST /v1/videos/edits for editing existing videos. This will replace POST /v1/videos/{video_id}/remix , which will be deprecated in 6 months. Learn more here . Mar 5 Feature gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions Released GPT-5.4 , our newest frontier ",
   "hash": "7dbf83f2fea95411a8d9b642366178a1efd188f4aec9441e0c02178835250665",
-  "previousHash": "24fcad9427ad221a6c4e9bcb0de2c9601cf2677b6fbf38786b7817a40f39d44c",
-  "changed": true,
+  "previousHash": "7dbf83f2fea95411a8d9b642366178a1efd188f4aec9441e0c02178835250665",
+  "changed": false,
   "changedAt": "2026-04-04T08:21:06.293Z",
-  "changeSummary": "初回取得"
+  "changeSummary": "目立つ差分なし"
 }

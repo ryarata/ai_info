@@ -379,6 +379,7 @@ function extractMeaningfulDescription(html, normalizedText) {
 
 function extractPublishedAt({ html, normalizedText, source }) {
   const candidates = [
+    extractLatestEntryDate(normalizedText, source),
     extractHtmlDatetime(html, "relative-time"),
     extractHtmlDatetime(html, "time"),
     extractGenericDatetimeAttribute(html),
@@ -395,6 +396,30 @@ function extractPublishedAt({ html, normalizedText, source }) {
     const normalizedCandidate = normalizeDateString(candidate);
     if (normalizedCandidate) {
       return normalizedCandidate;
+    }
+  }
+
+  return null;
+}
+
+function extractLatestEntryDate(normalizedText, source) {
+  const text = cleanExcerpt(normalizedText);
+
+  const fullDate = extractFirstFullDate(text);
+  if (fullDate) {
+    return fullDate;
+  }
+
+  const contextualDate = extractDateUsingMonthYearContext(text);
+  if (contextualDate) {
+    return contextualDate;
+  }
+
+  // Some pages list recent items as "Mar 17" under a current-year heading or section.
+  if (source.company === "OpenAI" || source.company === "Google") {
+    const partialDate = extractPartialMonthDate(text);
+    if (partialDate) {
+      return partialDate;
     }
   }
 
@@ -729,6 +754,72 @@ function extractDateFromText(text, source) {
   }
 
   return null;
+}
+
+function extractFirstFullDate(text) {
+  const match = text.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b/i);
+  return match ? match[0] : null;
+}
+
+function extractDateUsingMonthYearContext(text) {
+  const headingMatch = text.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December),\s+(\d{4})\b/i);
+  if (!headingMatch) {
+    return null;
+  }
+
+  const headingMonth = headingMatch[1];
+  const year = headingMatch[2];
+  const afterHeading = text.slice(headingMatch.index + headingMatch[0].length, headingMatch.index + headingMatch[0].length + 240);
+  const monthDayMatch = afterHeading.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+(\d{1,2})\b/);
+  if (!monthDayMatch) {
+    return null;
+  }
+
+  const monthName = expandShortMonth(monthDayMatch[1]);
+  if (!monthName) {
+    return null;
+  }
+
+  if (!sameMonthName(monthName, headingMonth)) {
+    return `${monthName} ${monthDayMatch[2]}, ${year}`;
+  }
+
+  return `${headingMonth} ${monthDayMatch[2]}, ${year}`;
+}
+
+function extractPartialMonthDate(text) {
+  const match = text.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+(\d{1,2})\b/);
+  if (!match) {
+    return null;
+  }
+
+  const currentYear = new Date().getUTCFullYear();
+  const monthName = expandShortMonth(match[1]);
+  return monthName ? `${monthName} ${match[2]}, ${currentYear}` : null;
+}
+
+function expandShortMonth(value) {
+  const map = {
+    jan: "January",
+    feb: "February",
+    mar: "March",
+    apr: "April",
+    may: "May",
+    jun: "June",
+    jul: "July",
+    aug: "August",
+    sep: "September",
+    sept: "September",
+    oct: "October",
+    nov: "November",
+    dec: "December"
+  };
+
+  return map[value.toLowerCase()] ?? null;
+}
+
+function sameMonthName(left, right) {
+  return left.slice(0, 3).toLowerCase() === right.slice(0, 3).toLowerCase();
 }
 
 function normalizeDateString(value) {
