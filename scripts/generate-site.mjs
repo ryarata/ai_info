@@ -16,6 +16,10 @@ const data = JSON.parse(await readFile(await resolveDataPath(), "utf8"));
 const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
 
 const renderBadge = (text) => `<span class="badge">${escapeHtml(text)}</span>`;
+const renderPublishedAt = (value) =>
+  `<p class="published-at">一次情報の投稿日時: ${
+    value ? escapeHtml(formatDate(value)) : "取得元から抽出できず"
+  }</p>`;
 
 const renderAlert = (alert) => `
   <article class="card alert-card">
@@ -29,6 +33,7 @@ const renderAlert = (alert) => `
       <a class="link" href="${escapeHtml(alert.sourceUrl)}">原文</a>
     </div>
     <h3>${escapeHtml(alert.titleJa)}</h3>
+    ${renderPublishedAt(alert.publishedAt)}
     <p class="summary">${escapeHtml(alert.summaryJa)}</p>
     <details class="translation">
       <summary>英語原文タイトル</summary>
@@ -54,6 +59,7 @@ const renderDigestItem = (item) => `
       ${renderBadge((item.trustLevel ?? "official").toUpperCase())}
     </div>
     <h3>${escapeHtml(item.titleJa)}</h3>
+    ${renderPublishedAt(item.publishedAt)}
     <p class="summary">${escapeHtml(item.summaryJa)}</p>
   </article>
 `;
@@ -103,6 +109,7 @@ const renderHealth = (item) => `
       <span class="subtle">${escapeHtml(formatDate(item.fetchedAt))}</span>
     </div>
     <h3>${escapeHtml(item.label)}</h3>
+    ${renderPublishedAt(item.publishedAt)}
     <p class="summary">${
       item.status === "ok"
         ? item.changed
@@ -440,6 +447,12 @@ h3 {
   color: var(--muted);
   line-height: 1.7;
   font-size: 14px;
+}
+.published-at {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.5;
 }
 .translation {
   margin-top: 12px;

@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-03T19:48:51.466Z",
+  "generatedAt": "2026-04-04T08:05:18.780Z",
   "summary": {
     "urgentCount": 2,
     "digestCount": 2,
     "monitoredCompanies": 3,
-    "activeSources": 5
+    "activeSources": 6
   },
   "alerts": [
     {
@@ -49,7 +49,8 @@
       "company": "OpenAI",
       "titleJa": "OpenAI の一次情報更新: ChatGPT Dictation Elevated Error Rate",
       "summaryJa": "OpenAI の一次情報から抽出した要点: Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
-      "action": "定点観測"
+      "action": "定点観測",
+      "publishedAt": "2026-04-02T17:49:44.404Z"
     },
     {
       "id": "openai-testingcatalog-chatgpt-digest",
@@ -57,7 +58,8 @@
       "company": "OpenAI",
       "titleJa": "OpenAI の一次情報更新: OpenAI launches visual product discovery in ChatGPT for all users",
       "summaryJa": "OpenAI の一次情報から抽出した要点: OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
-      "action": "定点観測"
+      "action": "定点観測",
+      "publishedAt": "2026-03-25T10:47:48.000Z"
     }
   ],
   "weeklyThemes": [
@@ -77,7 +79,8 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-03T19:48:49.678Z",
+      "fetchedAt": "2026-04-04T08:05:08.243Z",
+      "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
     },
@@ -87,7 +90,8 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-03T19:48:49.848Z",
+      "fetchedAt": "2026-04-04T08:05:08.477Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
     },
@@ -97,7 +101,8 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-03T19:48:49.944Z",
+      "fetchedAt": "2026-04-04T08:05:08.670Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
     },
@@ -107,7 +112,19 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-03T19:48:50.011Z",
+      "fetchedAt": "2026-04-04T08:05:08.942Z",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-code-changelog",
+      "company": "Anthropic",
+      "label": "Claude Code changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-04T08:05:09.341Z",
+      "publishedAt": null,
       "changed": false,
       "error": null
     },
@@ -117,7 +134,8 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-03T19:48:50.414Z",
+      "fetchedAt": "2026-04-04T08:05:17.279Z",
+      "publishedAt": null,
       "changed": false,
       "error": null
     }

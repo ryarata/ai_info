@@ -70,6 +70,7 @@ async function fetchSourceSnapshot(source) {
     const normalized = normalizeText(readable);
     const title = chooseBestTitle(rawTitle, normalized, source);
     const description = extractMeaningfulDescription(html, normalized) ?? normalized.slice(0, 280);
+    const publishedAt = extractPublishedAt({ html, normalizedText: normalized, source });
 
     return {
       id: source.id,
@@ -82,6 +83,7 @@ async function fetchSourceSnapshot(source) {
       status: "ok",
       title,
       description,
+      publishedAt,
       excerpt: normalized.slice(0, 1600),
       hash: hashText(`${title}\n${description}\n${normalized.slice(0, 4000)}`)
     };
@@ -126,6 +128,8 @@ function buildFeedSnapshot(source, xml, fetchedAt) {
     status: "ok",
     title,
     description: description || title,
+    publishedAt: normalizeDateString(latest.pubDate),
+    itemUrl: latest.link || source.url,
     excerpt,
     hash: hashText(`${title}\n${description}\n${excerpt}`)
   };
@@ -174,6 +178,7 @@ function buildGeneratedData(snapshotResults, sampleData) {
       trustLevel: item.source.trustLevel ?? "official",
       status: item.current.status,
       fetchedAt: item.current.fetchedAt,
+      publishedAt: item.current.publishedAt ?? null,
       changed: item.change.changed,
       error: item.current.error ?? null
     }))
@@ -194,7 +199,8 @@ function toAlert(item, index) {
     summaryJa: summarizeForJapanese(item.current.description, item.current.excerpt, item.source.company),
     whyNow: explainWhyNow(item),
     scores: scoreBase,
-    sourceUrl: item.source.url
+    sourceUrl: item.current.itemUrl ?? item.source.url,
+    publishedAt: item.current.publishedAt ?? null
   };
 }
 
@@ -206,7 +212,8 @@ function toDigest(item) {
     company: item.source.company,
     titleJa: `${item.source.company} の一次情報更新: ${translateTitle(meaningfulTitle)}`,
     summaryJa: summarizeForJapanese(item.current.description, item.current.excerpt, item.source.company),
-    action: item.change.changed ? "監視" : "定点観測"
+    action: item.change.changed ? "監視" : "定点観測",
+    publishedAt: item.current.publishedAt ?? null
   };
 }
 
@@ -370,6 +377,42 @@ function extractMeaningfulDescription(html, normalizedText) {
   return firstLine || null;
 }
 
+function extractPublishedAt({ html, normalizedText, source }) {
+  const candidates = [
+    extractHtmlDatetime(html, "relative-time"),
+    extractHtmlDatetime(html, "time"),
+    extractGenericDatetimeAttribute(html),
+    extractJsonLdDate(html, "datePublished"),
+    extractJsonLdDate(html, "dateCreated"),
+    extractJsonLdDate(html, "dateModified"),
+    matchMetaContent(html, "property", "article:published_time"),
+    matchMetaContent(html, "property", "article:modified_time"),
+    matchMetaContent(html, "name", "date"),
+    extractDateFromText(normalizedText, source)
+  ];
+
+  for (const candidate of candidates) {
+    const normalizedCandidate = normalizeDateString(candidate);
+    if (normalizedCandidate) {
+      return normalizedCandidate;
+    }
+  }
+
+  return null;
+}
+
+function extractHtmlDatetime(html, tagName) {
+  const match = html.match(
+    new RegExp(`<${tagName}[^>]*datetime=["']([^"']+)["'][^>]*>`, "i")
+  );
+  return match ? match[1] : null;
+}
+
+function extractGenericDatetimeAttribute(html) {
+  const match = html.match(/\bdatetime=["']([^"']+)["']/i);
+  return match ? match[1] : null;
+}
+
 function extractFeedItems(xml, type) {
   if (type === "rss") {
     const matches = [...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)];
@@ -406,6 +449,28 @@ function extractXmlTag(xml, tagName) {
 function extractAtomLink(xml) {
   const match = xml.match(/<link[^>]*href=["']([^"']+)["'][^>]*\/?>/i);
   return match ? match[1] : "";
+}
+
+function extractJsonLdDate(html, fieldName) {
+  const scripts = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const match of scripts) {
+    const content = stripCdata(match[1]).trim();
+    if (!content) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(content);
+      const date = findDateField(parsed, fieldName);
+      if (date) {
+        return date;
+      }
+    } catch {
+      // Ignore malformed JSON-LD blocks.
+    }
+  }
+
+  return null;
 }
 
 function extractMetaDescription(html) {
@@ -475,6 +540,10 @@ function stripCdata(text) {
 }
 
 function normalizeText(text) {
+  if (!text) {
+    return "";
+  }
+
   return text
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -633,6 +702,80 @@ function hashText(value) {
 
 function previousLikeHash(id, fetchedAt) {
   return hashText(`${id}:${fetchedAt}`);
+}
+
+function extractDateFromText(text, source) {
+  const normalized = cleanExcerpt(text);
+  const lines = normalized
+    .split(/(?<=[.!?])\s+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const prioritizedLines =
+    source.company === "Anthropic" || source.id.includes("claude-code")
+      ? lines
+      : [normalized, ...lines];
+
+  for (const line of prioritizedLines) {
+    const monthDate = line.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b/i);
+    if (monthDate) {
+      return monthDate[0];
+    }
+
+    const isoDate = line.match(/\b\d{4}-\d{2}-\d{2}(?:[tT ]\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)?\b/);
+    if (isoDate) {
+      return isoDate[0];
+    }
+  }
+
+  return null;
+}
+
+function normalizeDateString(value) {
+  if (!value || typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Date.parse(trimmed);
+  if (Number.isNaN(parsed)) {
+    return null;
+  }
+
+  return new Date(parsed).toISOString();
+}
+
+function findDateField(value, fieldName) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const found = findDateField(entry, fieldName);
+      if (found) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  if (typeof value[fieldName] === "string") {
+    return value[fieldName];
+  }
+
+  for (const nested of Object.values(value)) {
+    const found = findDateField(nested, fieldName);
+    if (found) {
+      return found;
+    }
+  }
+
+  return null;
 }
 
 function escapeRegExp(value) {

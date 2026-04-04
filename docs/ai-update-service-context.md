@@ -2,44 +2,51 @@
 
 ## Purpose
 
-This document captures the working context behind a personal AI update intelligence service.
-It exists so the product can preserve the user's intent, evaluation criteria, and decision-making
-logic even when implementation work is resumed later.
+This document captures both the original product intent and the current implementation state of
+the personal AI update intelligence service.
 
-## Problem Statement
+It exists so future work can resume with the right context, without losing:
 
-The user feels that the pace of progress in generative AI and AI agent products is now so fast
-that ad hoc catching up is no longer enough.
+- why this product is being built
+- what the user cares about most
+- how updates should be evaluated
+- what has already been implemented
+- what is still intentionally unresolved
 
-A recent example was starting to use `claude cowork` only a few days ago and feeling strong regret
-about not adopting it during the roughly two months after release. The user believes this happened
-because:
+## Core Problem
+
+The pace of progress in generative AI and AI agent products has become fast enough that ad hoc
+catch-up is no longer sufficient.
+
+The immediate trigger for this product was the user's experience of starting to use
+`claude cowork` only recently and feeling regret about not adopting it during the roughly two
+months after release. The user believes this happened because:
 
 - understanding of the path from earlier AI systems to modern generative AI was still shallow
-- the underlying approaches and ideas behind products were not sufficiently understood
-- important changes were therefore recognized late, after they were already materially useful
+- the underlying approaches and product ideas were not sufficiently understood
+- important changes were recognized only after they had already become materially useful
 
 The product should reduce this type of regret.
 
 ## Product Direction
 
-This is not meant to be a generic AI news summarizer.
+This is not meant to be a general AI news summarizer.
 
-The service should become a personal system for:
+It should act as a personal system for:
 
 - preventing important misses
-- understanding first-party updates quickly
-- identifying updates that change how work should be done
-- separating immediate action items from medium-term strategic signals
+- quickly understanding first-party updates
+- detecting updates that change how work should be done
+- separating immediate action from medium-term strategic interpretation
 - translating important English-language source material into easy-to-read Japanese
 
-The user especially wants a system that ingests first-party information, such as release notes,
+The user especially wants a system that ingests first-party information such as release notes,
 official blogs, product update pages, and other primary sources, then interprets them through a
 personal decision-making lens.
 
 ## Primary Monitoring Scope
 
-The highest-priority targets are major AI platform companies whose updates are likely to define
+The highest-priority targets are frontier AI platform companies whose updates are likely to define
 future product and workflow standards:
 
 - OpenAI
@@ -48,8 +55,8 @@ future product and workflow standards:
 - Google
 - leading Chinese AI companies
 
-The user believes these companies often ship updates that contain the technical foundations or
-interaction ideas that later spread through the rest of the AI ecosystem.
+The product currently starts narrower in implementation, but this is still the intended strategic
+scope.
 
 ## What Must Not Be Missed
 
@@ -57,77 +64,50 @@ The single most important category is:
 
 - major updates to existing services
 
-New services are still relevant, but they are secondary to meaningful updates in already important
+New services still matter, but they are secondary to meaningful updates in already important
 products.
 
-## Additional User Requirements Added Later
+## Practical Assumptions Added During Discussion
 
-The user later clarified several practical product requirements that should now be treated as part
-of the product's core assumptions.
+### 1. This is a personal-only product
 
-### 0. This is a personal-only product
+Implications:
 
-User perspective:
-
-- the product is only for the user's own use
-- generic onboarding or explanatory UX is unnecessary
-- the interface should feel like a personal operational tool, not a public-facing service
-
-Implication:
-
-- remove non-essential marketing or explanatory UI
+- generic onboarding or explanatory marketing UI is unnecessary
+- the interface should feel like a personal operational tool
 - optimize for speed, density, and personal utility over broad discoverability
-- make implementation choices that are valid for a single trusted user
 
-### 1. Translation support is essential
+### 2. Translation support is essential
 
-User perspective:
-
-- reading English source material is a real point of friction
-- if the service only summarizes in English, actual consumption quality will remain low
-
-Implication:
+Implications:
 
 - outputs should default to natural Japanese
-- important source excerpts should be translated
-- factual fidelity to the original source must still be preserved
+- important source excerpts should be translated or summarized in Japanese
+- readability should improve without losing fidelity to the source
 
-### 2. Smartphone-first consumption is strongly preferred
+### 3. Smartphone-first consumption is strongly preferred
 
-User perspective:
+Implications:
 
-- opening a PC often feels too heavy in daily life
-- the product is more likely to be used consistently if it can be checked on a phone
+- mobile reading flow is the primary UX assumption
+- desktop is secondary
+- the product should optimize for quick reading, triage, and low-friction follow-up on mobile
 
-Implication:
+### 4. The product should be web-based and capable of notifications
 
-- mobile reading flow should be the primary UX assumption
-- desktop should be secondary, not the default design center
-- the product should optimize for quick reading, fast triage, and low-friction follow-up on mobile
-
-### 3. The product should be web-based and capable of notifications
-
-User perspective:
-
-- the user wants to receive updates without having to remember to check manually
-
-Implication:
+Implications:
 
 - the delivery model should be web-first
-- push-like notifications should be part of the core design
+- the user should not need to remember to check manually
 - immediate alerts should be optimized for short, high-signal mobile delivery
 
-### 4. Server cost should be minimized
+### 5. Server cost should be minimized
 
-User perspective:
-
-- the user does not want to pay ongoing server costs if possible
-
-Implication:
+Implications:
 
 - prefer static or mostly static delivery where practical
-- prefer local execution, scheduled jobs, or low-cost serverless patterns over always-on servers
-- keep persistence and hosting requirements lightweight
+- prefer scheduled jobs over always-on servers
+- keep hosting, persistence, and operations lightweight
 
 ## Key Product Thesis
 
@@ -142,58 +122,35 @@ The core value is not broad coverage. The core value is strong interpretation.
 
 ## User Priorities By Evaluation Axis
 
-The original discussion produced ten possible evaluation axes, but the user clarified that these
+The original discussion produced ten possible evaluation axes, but the user clarified that they
 should not be treated equally.
 
 ### 1. Performance leap
 
-Priority: high, but mostly for strategic interpretation rather than immediate action.
+Priority: high, but primarily for strategic interpretation rather than immediate action.
 
-User perspective:
+Implications:
 
-- performance progress must be tracked carefully
-- however, raw performance does not directly drive immediate decisions in many cases
-- as of April 2026, a major industry constraint appears to be how AI capabilities align with
-  electricity cost and supply constraints
-- current usage limits likely reflect real operational and infrastructure pressure rather than
-  simple profit-maximization
-- many frontier systems already feel beyond the level of understanding that humans can fully reason
-  about intuitively
-
-Implication for product behavior:
-
-- treat performance updates as high-value report material
-- emphasize future implications, such as capacity, inference cost, pricing pressure, and likely UX
-  changes
-- do not over-prioritize them as instant notifications unless paired with direct workflow impact
+- track performance progress carefully
+- emphasize likely future implications such as capacity, inference cost, pricing pressure, and UX
+  shifts
+- do not over-prioritize raw performance as an interruptive alert unless it also changes workflow
 
 ### 2. Expansion of capabilities
 
 Priority: low for this product's initial scope.
 
-User perspective:
-
-- new capabilities can matter, but are often more relevant for speed-based opportunity capture or
-  media influence than for the user's current objective
-- the user is not currently trying to win by rapidly building derivative products on every new
-  capability release
-
-Implication:
+Implications:
 
 - include as supplementary information
-- do not center this in the first version of the service
+- do not center this in the first version
 - may become its own specialized media product later
 
 ### 3. Expansion of the user base
 
 Priority: low.
 
-User perspective:
-
-- closely related to capability expansion
-- general availability or broader access is not a top decision driver in this version
-
-Implication:
+Implications:
 
 - capture, but keep low-weight in ranking
 
@@ -201,102 +158,64 @@ Implication:
 
 Priority: medium.
 
-User perspective:
+Implications:
 
-- important, but often downstream of capability and infrastructure shifts
-- not worth tracking in isolation unless it changes practical usage
-
-Implication:
-
-- evaluate not as "price changed" but as "operational viability changed"
+- interpret as operational viability rather than price alone
 - focus on limits, plan utility, and usable cost-performance
 
 ### 5. UX change
 
 Priority: highest.
 
-User perspective:
+Implications:
 
 - especially important when the update changes how context is handled
 - context-related UX changes should trigger immediate attention and likely immediate adoption
-- when a frontier AI company changes UX in a way that alters the nature of work, that is nearly
-  equivalent to introducing a new concept into the world
-
-Implication:
-
-- this is the most important ranking axis
-- context UX should be treated as a separate sub-axis inside UX
+- context UX should be treated as the strongest signal in the system
 
 ### 6. Developer impact
 
 Priority: medium to high.
 
-User perspective:
+Implications:
 
-- important when the update changes the technical foundations other products can build on
-- overlaps with capability expansion but should be interpreted more as "how the ecosystem's
-  substrate changes"
-
-Implication:
-
-- rename mentally as "foundational importance" or "platform base impact"
+- interpret as foundational or platform impact
 - use it to identify shifts likely to shape the broader ecosystem
 
 ### 7. Workflow replaceability
 
-Priority: high, but nuanced.
+Priority: high, but often inferred rather than explicitly stated.
 
-User perspective:
+Implications:
 
-- highly important if real workflow compression happens
-- however, user-specific workflow replacement is often hard for product vendors to announce directly
-  because it depends on deep context
-- this may often be inferred through UX changes rather than explicitly stated
-
-Implication:
-
-- treat this as an interpretation layer rather than only a literal release-note claim
-- estimate how many steps in the user's working process might be reduced
+- treat this as an interpretation layer, not only a literal release-note claim
+- estimate whether the user's workflow becomes shorter, smoother, or easier to resume
 
 ### 8. Signal of standardization
 
 Priority: low.
 
-User perspective:
+Implications:
 
-- major players' ideas will often be copied anyway
-- standardization itself is less useful than understanding the change at the source
-
-Implication:
-
-- low ranking weight
+- major players will often be copied anyway
+- standardization itself is less useful than understanding the source change directly
 
 ### 9. Need for continued use
 
 Priority: low to medium.
 
-User perspective:
+Implications:
 
-- not a core ranking factor for this service
-- could matter later if used for media or influence products
-
-Implication:
-
-- keep as a secondary annotation rather than a top-level score driver
+- keep as secondary metadata rather than a top-level score driver
 
 ### 10. Relevance to the user
 
 Priority: derived from all of the above.
 
-User perspective:
+Implications:
 
-- the user's comments across the axes define what personal relevance means
-- personalization should come from the user's stated weighting and decision style, not generic
-  user profiling
-
-Implication:
-
-- the service must evaluate updates through the user's priorities, not through an average-user lens
+- personalization should come from the user's stated weighting and decision style
+- the product should not judge importance through an average-user lens
 
 ## Refined Core Axes For The Product
 
@@ -321,9 +240,9 @@ Very high priority.
 Examples:
 
 - movement from simple chat toward workspace-style interaction
-- better support for long-running tasks
+- support for long-running tasks
 - improved collaboration surfaces
-- reduced friction in review, iteration, and correction
+- lower friction in review, iteration, and correction
 
 ### C. Workflow compression
 
@@ -333,7 +252,7 @@ Examples:
 
 - fewer back-and-forth loops
 - lower handoff cost
-- fewer explicit prompt reconstruction steps
+- fewer prompt reconstruction steps
 - AI becomes more effective across a full task arc, not only a single response
 
 ### D. Medium-term impact of performance progress
@@ -356,7 +275,7 @@ Examples:
 - plan economics improve
 - practical sustained use becomes easier
 
-### F. Foundational/platform impact
+### F. Foundational or platform impact
 
 Medium priority.
 
@@ -365,14 +284,14 @@ Examples:
 - APIs or developer primitives shift what downstream products can be built
 - an update changes the substrate other teams will likely depend on
 
-## Recommended Weighting For Initial Version
+## Recommended Weighting
 
 - Context UX change: 5
 - Work UX change: 4
 - Workflow compression: 4
 - Medium-term performance impact: 3
 - Operational viability change: 2
-- Foundational/platform impact: 2
+- Foundational or platform impact: 2
 - Capability expansion: 1
 - User base expansion: 1
 - Standardization signal: 1
@@ -380,17 +299,17 @@ Examples:
 
 ## Strong-Alert Conditions
 
-Even before total score is computed, an update should trigger immediate high-priority handling if:
+An update should trigger immediate high-priority handling if any of the following is very strong:
 
-- context UX change is very high
-- work UX change is very high
-- workflow compression potential is very high
+- context UX change
+- work UX change
+- workflow compression
 
 These are the updates most likely to produce "I wish I had started using this earlier" regret.
 
 ## Notification Model
 
-The service should separate outputs into two tracks.
+The service separates outputs into two tracks.
 
 ### Immediate alerts
 
@@ -410,32 +329,286 @@ For updates that matter more as interpretation than immediate action:
 - foundational ecosystem changes
 - likely effects over the next 3 to 6 months
 
-## Decision Lens
-
-The product is not trying to answer:
-
-- "What happened in AI today?"
-
-It is trying to answer:
-
-- "What did the frontier companies change that affects how I should work?"
-- "What should I try immediately?"
-- "What should I understand deeply, even if I do not act on it today?"
-
 ## Product Identity
 
-The service can be described as a blend of:
+The service is a blend of:
 
 - release-note intelligence
 - regret prevention
 - first-party update interpretation
 - workflow-change detection
 - strategic AI trend briefing
-- translation-assisted mobile intelligence layer
+- translation-assisted mobile intelligence
+
+## Current Product Shape
+
+The implementation is now a static-first personal web application with scheduled generation.
+
+Current shape:
+
+- smartphone-first reading experience
+- Japanese summaries in the UI
+- first-party sources where possible
+- explicit `official` vs `secondary` source distinction
+- low-cost deployment via GitHub Pages
+- scheduled refresh and redeploy via GitHub Actions
+
+This means the product is no longer only a design concept. It already exists as a working personal
+tool with automated updates.
+
+## Current Technical Direction
+
+The product currently follows this low-cost architecture:
+
+- static site output generated into `public/`
+- scheduled fetch, analysis, and build pipeline
+- JSON-based storage for generated artifacts and snapshots
+- OpenAI API used for Japanese analysis and interpretation
+- GitHub Pages used as the delivery surface
+- GitHub Actions used for refresh and deployment
+
+This intentionally avoids always-on backend infrastructure.
+
+## Current Source Strategy
+
+The intended philosophy remains primary-source first, but implementation now distinguishes between:
+
+- `official`
+- `secondary`
+
+### Why the split exists
+
+Some vendors, especially OpenAI, block direct machine access to certain official pages from this
+environment. That means the product must preserve truthfulness without pretending every important
+source is equally available.
+
+### Current active monitored sources
+
+- OpenAI API changelog or release-note route: configured, but currently blocked by `403`
+- OpenAI status history feed: official and fetchable
+- OpenAI TestingCatalog ChatGPT RSS: secondary support source
+- Anthropic Claude updates: official
+- Anthropic Claude Code changelog docs: official
+- Google Gemini updates: official
+
+### Current trust behavior
+
+- official sources rank above secondary sources
+- secondary items are clearly labeled in the UI
+- secondary items are summarized more conservatively
+- secondary items are much harder to promote to immediate alerts
+
+This is an important design choice and should be preserved unless a better OpenAI official source
+path is found.
+
+## OpenAI Access Constraint
+
+The current implementation discovered that several public OpenAI update routes return `403` from
+this execution environment, while other OpenAI-owned routes remain accessible.
+
+Observed behavior:
+
+- `platform.openai.com/docs/changelog`: blocked
+- product release-note or help-style routes: blocked
+- `status.openai.com/history.atom`: accessible
+- `openai.com/sitemap.xml`: accessible
+
+Interpretation:
+
+- OpenAI is not fully unreachable
+- certain route families appear protected by bot or access controls
+- the issue is not a general code failure, but route-specific fetch restrictions
+
+Implication:
+
+- OpenAI monitoring currently combines official status data with a clearly marked secondary source
+- future work may revisit official acquisition methods, but current behavior is intentional
+
+## Current Pipeline
+
+The implemented pipeline is:
+
+1. fetch monitored sources
+2. store normalized snapshots in `data/snapshots/`
+3. detect changed or meaningful items
+4. generate `data/updates.generated.json`
+5. analyze updates into Japanese summaries and structured interpretation
+6. generate `data/updates.analyzed.json`
+7. build the mobile-oriented static site in `public/`
+8. deploy to GitHub Pages
+
+## Current Script Responsibilities
+
+Important implemented scripts:
+
+- `scripts/load-env.mjs`: loads `.env`
+- `scripts/refresh-data.mjs`: source fetching, snapshotting, and generated update creation
+- `scripts/analyze-updates.mjs`: OpenAI-powered Japanese analysis and interpretation
+- `scripts/generate-site.mjs`: builds the static site assets
+- `scripts/serve-preview.mjs`: local preview server
+
+Current package flow:
+
+- `npm run refresh` runs fetch -> analyze -> build
+
+## Current Analysis Behavior
+
+The product now supports LLM-assisted analysis using OpenAI.
+
+### Environment model behavior
+
+- `.env` is supported locally
+- `OPENAI_API_KEY` is required for OpenAI-powered analysis
+- `OPENAI_MODEL` defaults to `gpt-4.1`
+
+### Output behavior
+
+When analysis runs successfully, the product generates:
+
+- Japanese titles
+- Japanese summaries
+- short reasoning for why an update matters
+- simple score fields
+- weekly-theme style interpretation
+
+If no API key is available, the pipeline can still fall back, but the intended production mode is
+OpenAI-powered analysis.
+
+## Current UI Behavior
+
+The generated site already includes several design choices that reflect the user's priorities.
+
+### Reading experience
+
+- smartphone-first layout
+- Japanese-first reading flow
+- company-grouped alert and digest views
+- collapsible company sections to reduce mobile scrolling
+
+### Trust and prioritization
+
+- `OFFICIAL` and `SECONDARY` badges are visible
+- official items are favored in ranking
+- secondary items are less likely to become alerts
+
+### Delivery details
+
+- alert sections default open
+- digest sections are more compressed
+- basic PWA-style assets exist
+- lightweight browser notification behavior exists for urgent items on open
+
+## Current Deployment Model
+
+The production path now exists and is active through GitHub.
+
+### Hosting
+
+- GitHub Pages
+
+### Deployment workflow
+
+- `.github/workflows/deploy-pages.yml`
+
+### Trigger conditions
+
+- push to `main`
+- manual run from the Actions tab
+- scheduled refresh and redeploy
+
+### Current scheduled times
+
+The current auto-refresh schedule is aligned to the user's locale in JST:
+
+- 09:00 JST
+- 12:00 JST
+- 21:00 JST
+
+Internally this is implemented with a UTC cron expression in GitHub Actions, but the product-level
+assumption should be understood as "morning, noon, and night in Japan."
+
+## Current Cost Profile
+
+The current system is intentionally inexpensive to operate.
+
+Main cost characteristics:
+
+- no always-on server
+- static hosting
+- scheduled jobs only
+- LLM analysis happens during refresh runs
+
+Rough token-cost understanding from current implementation:
+
+- approximately low-thousands of tokens per refresh run
+- current implementation still has room to reduce wasted analysis on unchanged items
+
+This means the product is already usable, but cost optimization remains a valid next-step area.
+
+## Current Known Limitations
+
+The following are known limitations rather than mistakes:
+
+### 1. OpenAI official release-note access is incomplete
+
+- some desired official routes return `403`
+- current workaround is official status plus secondary coverage
+
+### 2. Source coverage is still intentionally narrow
+
+- implementation currently focuses on OpenAI, Anthropic, and Google
+- xAI and Chinese companies are still future expansion targets
+
+### 3. Summaries depend on extraction quality
+
+- fetch and extraction quality differs by source
+- source-specific parser improvement remains a likely future task
+
+### 4. Notifications are still lightweight
+
+- the product is web-based and notification-aware
+- richer push strategy may still evolve later
+
+### 5. Alerting and scoring are still calibrating
+
+- current thresholds are directionally correct
+- future tuning should come from real usage rather than premature complexity
+
+## Current Success Definition
+
+At this stage, the product is successful if it reliably helps the user:
+
+- notice important updates earlier
+- read them comfortably in Japanese on a phone
+- distinguish official from secondary information
+- act quickly on workflow-changing updates
+- build a more consistent habit of AI product catch-up
+
+## Near-Term Next-Step Themes
+
+Likely future work, if usage reveals the need:
+
+- better OpenAI official acquisition paths
+- more source-specific extraction rules
+- lower token usage by skipping unnecessary re-analysis
+- richer notification behavior
+- expansion to xAI and major Chinese AI companies
+- continued tuning of alert strictness based on actual daily use
+
+## Important Implementation Principle
+
+Even as the product becomes more capable, it should continue to preserve the original intent:
+
+- prioritize interpretation over volume
+- favor primary sources where possible
+- make Japanese reading friction low
+- optimize for mobile use
+- stay low-cost and low-ops
+- detect updates that change how the user should work
 
 ## Future Expansion Ideas
 
-Items intentionally deprioritized for the first version but potentially useful later:
+Items intentionally deprioritized for the first version but still relevant later:
 
 - a specialized media product around capability expansion
 - automated influence content derived from product changes

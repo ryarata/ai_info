@@ -44,6 +44,17 @@
     "enabled": true
   },
   {
+    "id": "anthropic-claude-code-changelog",
+    "company": "Anthropic",
+    "label": "Claude Code changelog",
+    "type": "docs",
+    "url": "https://docs.claude.com/en/release-notes/claude-code",
+    "pollIntervalHours": 4,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
     "id": "google-gemini-updates",
     "company": "Google",
     "label": "Gemini updates",

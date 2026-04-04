@@ -195,6 +195,12 @@ h3 {
   line-height: 1.7;
   font-size: 14px;
 }
+.published-at {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.5;
+}
 .translation {
   margin-top: 12px;
 }
