@@ -5,7 +5,7 @@
   "label": "Claude Code changelog",
   "url": "https://github.com/anthropics/claude-code/commits/main/CHANGELOG.md.atom",
   "trustLevel": "official",
-  "fetchedAt": "2026-04-04T08:14:51.185Z",
+  "fetchedAt": "2026-04-04T08:21:11.651Z",
   "status": "ok",
   "title": "chore: Update CHANGELOG.md",
   "description": "chore: Update CHANGELOG.md",
@@ -13,8 +13,8 @@
   "itemUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
   "excerpt": "chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md",
   "hash": "fd364cad7fecb8253fd77cd73ac0a335240b2cd65c4df4017d811c98f3f42698",
-  "previousHash": "421fc038917bd0f045507d50823f309a4d66e4f76498a3f7777424fec4fe356a",
-  "changed": true,
+  "previousHash": "fd364cad7fecb8253fd77cd73ac0a335240b2cd65c4df4017d811c98f3f42698",
+  "changed": false,
   "changedAt": "2026-04-04T08:14:51.185Z",
-  "changeSummary": "タイトルまたは説明文に差分あり"
+  "changeSummary": "目立つ差分なし"
 }

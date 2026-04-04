@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-04T08:14:52.653Z",
+  "generatedAt": "2026-04-04T08:21:13.209Z",
   "summary": {
     "urgentCount": 1,
     "digestCount": 2,
@@ -8,25 +8,34 @@
   },
   "alerts": [
     {
-      "id": "anthropic-claude-code-changelog-alert",
-      "sourceId": "anthropic-claude-code-changelog",
-      "company": "Anthropic",
-      "product": "Claude Code changelog",
+      "id": "openai-release-notes-alert",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "product": "API changelog",
       "action": "今すぐ試す",
-      "titleEn": "chore: Update CHANGELOG.md",
-      "titleJa": "Anthropic の更新を検知: chore: Update CHANGELOG.md",
-      "summaryJa": "Anthropic の一次情報から抽出した要点: chore: Update CHANGELOG.md",
-      "whyNow": "一次情報に変化があり、今後の作業体験の変化につながる可能性があるためです。",
+      "titleEn": "Changelog | OpenAI API",
+      "titleJa": "OpenAI の更新を検知: | OpenAI API",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: See all of the latest features and updates to the OpenAI API.",
+      "whyNow": "性能そのものより、現実的な継続利用のしやすさに影響する可能性があるためです。",
       "scores": {
-        "contextUx": 4,
+        "contextUx": 2,
         "workUx": 2,
-        "workflow": 2
+        "workflow": 4
       },
-      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
-      "publishedAt": "2026-04-04T00:41:56.000Z"
+      "sourceUrl": "https://developers.openai.com/api/docs/changelog",
+      "publishedAt": "2025-12-15T00:00:00.000Z"
     }
   ],
   "digest": [
+    {
+      "id": "openai-release-notes-digest",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "titleJa": "OpenAI の一次情報更新: | OpenAI API",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: See all of the latest features and updates to the OpenAI API.",
+      "action": "監視",
+      "publishedAt": "2025-12-15T00:00:00.000Z"
+    },
     {
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
@@ -35,15 +44,6 @@
       "summaryJa": "OpenAI の一次情報から抽出した要点: Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
       "action": "定点観測",
       "publishedAt": "2026-04-02T17:49:44.404Z"
-    },
-    {
-      "id": "openai-testingcatalog-chatgpt-digest",
-      "sourceId": "openai-testingcatalog-chatgpt",
-      "company": "OpenAI",
-      "titleJa": "OpenAI の一次情報更新: OpenAI launches visual product discovery in ChatGPT for all users",
-      "summaryJa": "OpenAI の一次情報から抽出した要点: OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
-      "action": "定点観測",
-      "publishedAt": "2026-03-25T10:47:48.000Z"
     }
   ],
   "weeklyThemes": [
@@ -57,7 +57,7 @@
     },
     {
       "title": "一部ソースは取得失敗時のフォールバックを保持",
-      "body": "2 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
+      "body": "1 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
     }
   ],
   "sourceHealth": [
@@ -66,11 +66,11 @@
       "company": "OpenAI",
       "label": "API changelog",
       "trustLevel": "official",
-      "status": "error",
-      "fetchedAt": "2026-04-04T08:14:47.751Z",
-      "publishedAt": null,
-      "changed": false,
-      "error": "HTTP 403"
+      "status": "ok",
+      "fetchedAt": "2026-04-04T08:21:06.293Z",
+      "publishedAt": "2025-12-15T00:00:00.000Z",
+      "changed": true,
+      "error": null
     },
     {
       "sourceId": "openai-status-history",
@@ -78,7 +78,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:14:47.935Z",
+      "fetchedAt": "2026-04-04T08:21:06.508Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -89,7 +89,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:14:48.062Z",
+      "fetchedAt": "2026-04-04T08:21:06.615Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -100,7 +100,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:14:48.312Z",
+      "fetchedAt": "2026-04-04T08:21:06.761Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -111,9 +111,9 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:14:51.185Z",
+      "fetchedAt": "2026-04-04T08:21:11.651Z",
       "publishedAt": "2026-04-04T00:41:56.000Z",
-      "changed": true,
+      "changed": false,
       "error": null
     },
     {
@@ -122,7 +122,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:14:51.510Z",
+      "fetchedAt": "2026-04-04T08:21:12.004Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -133,7 +133,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:14:51.564Z",
+      "fetchedAt": "2026-04-04T08:21:12.144Z",
       "publishedAt": null,
       "changed": false,
       "error": null

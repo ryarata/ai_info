@@ -4,7 +4,7 @@
     "company": "OpenAI",
     "label": "API changelog",
     "type": "release_notes",
-    "url": "https://platform.openai.com/docs/changelog",
+    "url": "https://developers.openai.com/api/docs/changelog",
     "pollIntervalHours": 6,
     "priority": "high",
     "trustLevel": "official",

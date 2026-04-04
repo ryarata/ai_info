@@ -384,7 +384,7 @@ source is equally available.
 
 ### Current active monitored sources
 
-- OpenAI API changelog or release-note route: configured, but currently blocked by `403`
+- OpenAI API changelog route on developers.openai.com: official and fetchable
 - OpenAI ChatGPT release notes help route: configured, but currently blocked by `403`
 - OpenAI status history feed: official and fetchable
 - OpenAI TestingCatalog ChatGPT RSS: secondary support source
@@ -410,6 +410,7 @@ this execution environment, while other OpenAI-owned routes remain accessible.
 Observed behavior:
 
 - `platform.openai.com/docs/changelog`: blocked
+- `developers.openai.com/api/docs/changelog`: accessible
 - `help.openai.com/ja-jp/articles/6825453-chatgpt-release-notes`: blocked
 - product release-note or help-style routes: blocked
 - `status.openai.com/history.atom`: accessible
