@@ -120,6 +120,27 @@ const renderHealth = (item) => `
   </article>
 `;
 
+const renderSourceItem = (item) => `
+  <article class="card source-result-card ${item.status === "ok" ? "" : "health-error"}">
+    <div class="card-top">
+      <div class="badge-row">
+        ${renderBadge(item.company)}
+        ${renderBadge(item.label)}
+        ${renderBadge(item.classification)}
+        ${renderBadge((item.trustLevel ?? "official").toUpperCase())}
+      </div>
+      <a class="link" href="${escapeHtml(item.sourceUrl)}">原文</a>
+    </div>
+    <h3>${escapeHtml(item.title ?? item.label)}</h3>
+    ${renderPublishedAt(item.publishedAt)}
+    <p class="summary">${escapeHtml(item.description ?? "抽出本文なし")}</p>
+    <div class="why-now">
+      <strong>今回の分類</strong>
+      <p>${escapeHtml(item.classificationReason ?? "分類理由なし")}</p>
+    </div>
+  </article>
+`;
+
 const html = `<!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -203,6 +224,14 @@ const html = `<!DOCTYPE html>
         <div class="source-list">
           ${sources.map(renderSource).join("")}
         </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>取得できた内容と分類</h2>
+          <span class="subtle">取得結果をすべて表示し、今回の採否を明示</span>
+        </div>
+        ${renderGroupedItems(data.sourceItems ?? [], renderSourceItem, { defaultOpen: true })}
       </section>
 
       <section class="section-block">

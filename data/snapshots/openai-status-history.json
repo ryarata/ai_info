@@ -5,7 +5,7 @@
   "label": "Status history feed",
   "url": "https://status.openai.com/history.atom",
   "trustLevel": "official",
-  "fetchedAt": "2026-04-04T08:27:29.027Z",
+  "fetchedAt": "2026-04-05T16:21:59.081Z",
   "status": "ok",
   "title": "ChatGPT Dictation Elevated Error Rate",
   "description": "Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",

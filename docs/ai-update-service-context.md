@@ -501,6 +501,136 @@ The generated site already includes several design choices that reflect the user
 - basic PWA-style assets exist
 - lightweight browser notification behavior exists for urgent items on open
 
+## Recent Changes To Preserve
+
+The implementation changed materially during the most recent round of work and the next chat
+should assume these are intentional, current behaviors.
+
+### 1. Primary-source post datetime is now part of the product
+
+The UI and data pipeline now attempt to show the post datetime for each content item.
+
+Important behavior:
+
+- `publishedAt` is stored in snapshots, generated updates, analyzed updates, and rendered HTML
+- the system should prioritize the datetime of the latest update item on the page, not only the
+  page-level publication date
+- feed-based sources already use the latest entry date directly
+- if a source exposes no usable date, the UI currently shows that the datetime could not be
+  extracted rather than pretending certainty
+
+Current observed examples from the latest successful run:
+
+- OpenAI API changelog latest entry date is being interpreted as `2026-03-17`
+- Anthropic Claude product updates latest visible item date is being interpreted as `2026-03-18`
+- Claude Code changelog latest commit date is being interpreted as `2026-04-04`
+
+### 2. OpenAI API changelog source was migrated
+
+The old official OpenAI changelog route on `platform.openai.com` is still blocked, but the
+developers site route is now reachable and should be treated as the primary official source.
+
+Current intended source:
+
+- `https://developers.openai.com/api/docs/changelog`
+
+This means future work should not assume the OpenAI API changelog is fundamentally inaccessible.
+The previous blockage was route-specific.
+
+### 3. Claude Code changelog monitoring now uses a file-history feed
+
+Monitoring Claude Code changelog through the docs route was not sufficient for reliable datetime
+extraction. The implementation now monitors the official `CHANGELOG.md` commit Atom feed instead.
+
+Current intended source:
+
+- `https://github.com/anthropics/claude-code/commits/main/CHANGELOG.md.atom`
+
+This is intentional because it provides:
+
+- official upstream data
+- reliable latest-change detection
+- reliable latest commit datetime
+- direct links to the commit that changed the changelog
+
+### 4. Current monitored-source count and shape
+
+As of the latest successful refresh, the active monitored source count is `7`.
+
+Current enabled sources are:
+
+- OpenAI API changelog on developers.openai.com
+- OpenAI status history Atom feed
+- OpenAI TestingCatalog ChatGPT RSS
+- Anthropic Claude product updates
+- Anthropic Claude Code changelog Atom feed
+- OpenAI ChatGPT release notes help page
+- Google Gemini updates
+
+### 5. The analyzed layer now preserves publishedAt
+
+An earlier bug allowed `publishedAt` to exist in generated data but be dropped from analyzed alert
+items. That has been fixed. Future work should preserve this behavior and avoid reintroducing a
+loss of datetime metadata between pipeline stages.
+
+## Current Operational Priorities
+
+The next chat should treat the following as the highest-signal unresolved priorities.
+
+### Priority 1. Improve source-specific extraction quality where dates or titles are still weak
+
+The generic extraction path is now better than before, but some sources still need tailored logic.
+
+Highest-value targets:
+
+- Google Gemini updates: still often has `publishedAt: null`
+- OpenAI API changelog: latest-entry date now works, but title extraction and item-level targeting
+  may still be improved
+- Anthropic news: title derivation is still imperfect in some cases
+
+### Priority 2. Revisit blocked official OpenAI help routes
+
+The ChatGPT release notes help page is configured but still returns `403` from this environment.
+
+Implication:
+
+- the source should remain configured and visible in health/status
+- future work can explore alternate official acquisition methods
+- the system should remain truthful and never claim successful extraction where the route is still
+  blocked
+
+### Priority 3. Keep "latest update item date" as the default interpretation rule
+
+This is now a product decision, not only a parser detail.
+
+Future modifications should preserve:
+
+- latest entry date beats page-level date when both are available
+- feed entries should map to latest item dates
+- the UI should expose uncertainty when no trustworthy date exists
+
+### Priority 4. Tune alert selection using real usage, not only heuristics
+
+The user has now started to interact with the working product.
+
+Implication:
+
+- prioritize practical tuning based on what the user actually finds useful or noisy
+- especially watch whether official but operationally minor updates are being over-promoted
+- preserve the original emphasis on context UX, work UX, and workflow compression
+
+## Latest Verified State
+
+The latest known successful refresh before this handoff produced:
+
+- `activeSources = 7`
+- `urgentCount = 2`
+- `digestCount = 2`
+- `analysis.mode = openai`
+- official OpenAI API changelog fetchable
+- official OpenAI ChatGPT help release notes still blocked by `403`
+- Claude Code changelog fetchable with reliable latest-change datetime
+
 ## Current Deployment Model
 
 The production path now exists and is active through GitHub.

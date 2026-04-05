@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-04T08:27:35.319Z",
+  "generatedAt": "2026-04-05T16:22:02.689Z",
   "summary": {
     "urgentCount": 2,
     "digestCount": 2,
@@ -72,6 +72,118 @@
       "body": "1 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。"
     }
   ],
+  "sourceItems": [
+    {
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "label": "API changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:58.808Z",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "title": "Changelog | OpenAI API",
+      "description": "See all of the latest features and updates to the OpenAI API.",
+      "excerpt": "Changelog March, 2026 Mar 17 Feature gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions Released GPT-5.4 mini and GPT-5.4 nano to the Chat Completions and Responses API. GPT-5.4 mini brings GPT-5.4-class capabilities to a faster, more efficient model for high-volume workloads, while GPT-5.4 nano is optimized for simple high-volume tasks where speed and cost matter most. GPT-5.4 mini supports tool search , built-in computer use , and compaction . GPT-5.4 nano supports compaction, but does not support tool search or computer use. Mar 16 Update gpt-5.3-chat-latest Updated the gpt-5.3-chat-latest slug to point to the latest model currently used in ChatGPT. Mar 13 Fix gpt-5.4 v1/responses v1/chat/completions Updated our image encoder to fix a small bug with input_image inputs in GPT-5.4. Some image understanding use cases may now see improved quality. No action is required. Mar 12 Feature sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Expanded the Sora API with reusable character references, longer generations up to 20 seconds, 1080p output for sora-2-pro , video extensions, and Batch API support for POST /v1/videos . 1080p generations on sora-2-pro are billed at $0.70 per second. Learn more here . Mar 12 Update sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix Added POST /v1/videos/edits for editing existing videos. This will replace POST /v1/videos/{video_id}/remix , which will be deprecated in 6 months. Learn more here . Mar 5 Feature gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions Released GPT-5.4 , our newest frontier ",
+      "sourceUrl": "https://developers.openai.com/api/docs/changelog",
+      "changed": false,
+      "classification": "アラート表示(サンプル維持)",
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+    },
+    {
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "label": "Status history feed",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.081Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "title": "ChatGPT Dictation Elevated Error Rate",
+      "description": "Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
+      "excerpt": "ChatGPT Dictation Elevated Error Rate Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational) High error rate for completionsapi-gpt-5-nano Status: Resolved The issue is now resolved. Affected components Chat Completions (Operational) Elevated failures for some users joining ChatGPT Enterprise and ChatGPT Edu workspaces via SSO. Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Account creation and login are unstable across all surfaces Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Responses API and Sora Increased Error Rates Status: Resolved All impacted services have now fully recovered. Affected components Responses (Operational)",
+      "sourceUrl": "https://status.openai.com//incidents/01KN78XN18M5VB6DSRTCWMJRYN",
+      "changed": false,
+      "classification": "Digest表示(定点観測)",
+      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
+    },
+    {
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "label": "TestingCatalog ChatGPT feed",
+      "trustLevel": "secondary",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.242Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "title": "OpenAI launches visual product discovery in ChatGPT for all users",
+      "description": "OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
+      "excerpt": "OpenAI launches visual product discovery in ChatGPT for all users OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat. OpenAI launches GPT-5.4 mini and GPT-5.4 nano on APIs OpenAI introduces GPT-5.4 mini for faster, cost-efficient coding copilots, automation, and agent systems, now available in API, Codex, and ChatGPT. GPT-5.4 nano is now available via the API as well. ICYMI: OpenAI adds interactive math & science tools to ChatGPT OpenAI is adding interactive math and science modules to ChatGPT, letting users adjust variables and visualize equations across 70+ core topics worldwide. OpenAI releases GPT-5.4 model on ChatGPT and Codex OpenAI launches GPT-5.4, a powerful AI model with improved reasoning, coding, and multimodal skills, now integrated in ChatGPT and the API. OpenAI launches Codex app for Windows on Microsoft Store OpenAI launches its native Codex app for Windows, tailored for agentic coding with PowerShell integration and robust sandboxing, available via Microsoft Store.",
+      "sourceUrl": "https://www.testingcatalog.com/openai-launches-visual-product-discovery-in-chatgpt-for-all-users/",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+    },
+    {
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "label": "Claude product updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.425Z",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "title": "people want from AI",
+      "description": "Anthropic is an AI safety and research company that&#x27;s working to build reliable, interpretable, and steerable AI systems.",
+      "excerpt": "Newsroom Press inquires press@anthropic.com Non-media inquiries support@anthropic.com Media assets Download press kit What 81,000 people want from AI Mar 18, 2026 We invited Claude.ai users to share how they use AI, what they dream it could make possible, and what they fear it might do. Nearly 81,000 people participated—the largest and most multilingual qualitative study of its kind. Here's what we found. Product Feb 17, 2026 Introducing Claude Sonnet 4.6 Sonnet 4.6 delivers frontier performance across coding, agents, and professional work at scale. Announcements Feb 5, 2026 Introducing Claude Opus 4.6 We’re upgrading our smartest model. Across agentic coding, computer use, tool use, search, and finance, Opus 4.6 is an industry-leading model, often by wide margin. Announcements Feb 4, 2026 Claude is a space to think We’ve made a choice: Claude will remain ad-free. We explain why advertising incentives are incompatible with a genuinely helpful AI assistant, and how we plan to expand access without compromising user trust. Announcements Jan 30, 2026 Claude on Mars The first AI-assisted drive on another planet. Claude helped NASA’s Perseverance rover travel four hundred meters on Mars. News Search Date Category Title Mar 31, 2026 Announcements Australian government and Anthropic sign MOU for AI safety and research Mar 12, 2026 Announcements Anthropic invests $100 million into the Claude Partner Network Mar 11, 2026 Announcements Introducing The Anthropic Institute Mar 10, 2026 Announcements Sydney will become Anthropic’s fourth office in Asia-Pacific Mar 6, 2026 Policy Partner",
+      "sourceUrl": "https://www.anthropic.com/news",
+      "changed": false,
+      "classification": "アラート表示(サンプル維持)",
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+    },
+    {
+      "sourceId": "anthropic-claude-code-changelog",
+      "company": "Anthropic",
+      "label": "Claude Code changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:22:01.213Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "title": "chore: Update CHANGELOG.md",
+      "description": "chore: Update CHANGELOG.md",
+      "excerpt": "chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md",
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-05T16:22:01.605Z",
+      "publishedAt": null,
+      "title": "ChatGPT release notes",
+      "description": "OpenAI の取得に失敗しました。次回再試行します。",
+      "sourceUrl": "https://help.openai.com/ja-jp/articles/6825453-chatgpt-release-notes",
+      "classification": "取得失敗",
+      "classificationReason": "取得エラー: HTTP 403"
+    },
+    {
+      "sourceId": "google-gemini-updates",
+      "company": "Google",
+      "label": "Gemini updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:22:01.687Z",
+      "publishedAt": null,
+      "title": "Gemini 3: Our most intelligent AI model that brings any idea to life",
+      "description": "Gemini 3 Our most intelligent AI model that brings any idea to life Gemini 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Best for modern challenges across science, research and engineering Learn more Gemini 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more Gemini 3 Flash Our latest Gemini 3 model that helps you bring any idea to life - faster Learn more Explore the latest Introducing our most intelligent model yet.",
+      "excerpt": "Gemini 3 Our most intelligent AI model that brings any idea to life Gemini 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Best for modern challenges across science, research and engineering Learn more Gemini 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more Gemini 3 Flash Our latest Gemini 3 model that helps you bring any idea to life - faster Learn more Explore the latest Introducing our most intelligent model yet. With state-of-the-art reasoning to help you learn, build, and plan anything. Models Capabilities Hands-on Showcase Performance Safety Try Gemini Models Completing everyday tasks, or solving complex problems. Discover the right model for what you need 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more 3 Flash Best for frontier intelligence at speed Learn more 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Pushes the boundaries of intelligence, delivering a significant upgrade to Gemini 3.1's specialized reasoning mode to help you solve the most complex technical problems. Gemini 3.1 Deep Think mode can better help tackle real world problems that require rigor, breakthrough creativity and intelligence. Available for Google AI Ultra subscribers . Try Deep Think Learn more Capabilities Reasoning with unprecedented depth and nuance Smart, concise, direct responses – with genuine insight over cliche and flattery. Advanced multimodal understanding Text, images, video, audio – eve",
+      "sourceUrl": "https://deepmind.google/technologies/gemini/",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+    }
+  ],
   "sourceHealth": [
     {
       "sourceId": "openai-release-notes",
@@ -79,7 +191,7 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:28.881Z",
+      "fetchedAt": "2026-04-05T16:21:58.808Z",
       "publishedAt": "2026-03-16T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -90,7 +202,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.027Z",
+      "fetchedAt": "2026-04-05T16:21:59.081Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -101,7 +213,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.113Z",
+      "fetchedAt": "2026-04-05T16:21:59.242Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -112,7 +224,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.186Z",
+      "fetchedAt": "2026-04-05T16:21:59.425Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -123,7 +235,7 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:33.841Z",
+      "fetchedAt": "2026-04-05T16:22:01.213Z",
       "publishedAt": "2026-04-04T00:41:56.000Z",
       "changed": false,
       "error": null
@@ -134,7 +246,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:27:34.210Z",
+      "fetchedAt": "2026-04-05T16:22:01.605Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -145,7 +257,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:34.301Z",
+      "fetchedAt": "2026-04-05T16:22:01.687Z",
       "publishedAt": null,
       "changed": false,
       "error": null

@@ -1,0 +1,180 @@
+{
+  "generatedAt": "2026-04-05T15:58:40.507Z",
+  "summary": {
+    "urgentCount": 2,
+    "digestCount": 2,
+    "monitoredCompanies": 3,
+    "activeSources": 7
+  },
+  "alerts": [
+    {
+      "id": "anthropic-context-memory",
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "product": "Claude Cowork",
+      "action": "監視",
+      "titleEn": "Cross-session project memory expanded in workspace UI",
+      "titleJa": "ClaudeのワークスペースUIで、セッションをまたぐプロジェクト記憶の扱いが拡張",
+      "summaryJa": "前回までの作業内容や文脈をまたいで扱いやすくする方向の更新と読めます。再開時の説明や確認の手間を減らし、継続作業の流れを保ちやすくなる可能性があります。ただし、提供文面には具体的な機能詳細は見当たりません。",
+      "whyNow": "継続案件の再開効率や文脈の引き継ぎに直結しやすく、日々の対話ベース作業の負担を下げる可能性があるためです。一方で、今回の出典本文はAnthropic全体のニュース一覧中心で、当該更新の仕様詳細は確認できません。",
+      "scores": {
+        "contextUx": 5,
+        "workUx": 4,
+        "workflow": 4
+      },
+      "sourceUrl": "https://www.anthropic.com/news",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "trustLevel": "official"
+    },
+    {
+      "id": "openai-project-workflow",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "product": "ChatGPT Workspace",
+      "action": "今週理解",
+      "titleEn": "Project-oriented task flow for long-running agent collaboration",
+      "titleJa": "長期的なAI協働を前提にした、プロジェクト単位の作業フローへの移行",
+      "summaryJa": "今回の更新文面からは、ChatGPT Workspaceそのものの詳細仕様は確認できませんが、単発チャットではなく、継続中の作業をまとめて扱う「プロジェクト志向」の体験に寄っていることが示唆されています。実務では、長く続く案件で文脈を保ちやすくなり、作業の切り替えや引き継ぎの負担が下がる方向の変化として見るのが自然です。",
+      "whyNow": "公式ソース自体はAPI更新一覧で、Workspaceの具体機能説明は乏しいものの、長時間のエージェント協働や継続セッション前提のUIは、今後の作業UX・ワークフロー設計の基準になりやすいためです。",
+      "scores": {
+        "contextUx": 4,
+        "workUx": 4,
+        "workflow": 4
+      },
+      "sourceUrl": "https://openai.com/news/",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "trustLevel": "official"
+    }
+  ],
+  "digest": [
+    {
+      "id": "openai-release-notes-digest",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "titleJa": "OpenAI API更新: GPT-5.4 mini/nano公開、Sora API拡張",
+      "summaryJa": "OpenAI APIの2026年3月更新では、まずGPT-5.4 miniとGPT-5.4 nanoがResponses APIとChat Completions APIで利用可能になりました。miniはGPT-5.4級の性能を高スループット向けに高速・効率化したモデルで、tool search・組み込みcomputer use・compactionに対応。nanoは速度とコスト重視の単純な大量処理向けで、compactionのみ対応です。あわせてgpt-5.3-chat-latestはChatGPTで現在使われている最新モデルを指すよう更新されました。Sora APIでは、再利用可能なキャラクター参照、最長20秒生成、sora-2-proの1080p出力、動画延長、POST /v1/videosのBatch API対応が追加。さらに既存動画編集用のPOST /v1/videos/editsが追加され、POST /v1/videos/{video_id}/remixは6か月後に非推奨予定です。GPT-5.4ではinput_image入力の小さな不具合が修正され、一部の画像理解品質が改善しています。",
+      "action": "今週理解",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "whyNow": "高頻度API利用では、用途ごとにGPT-5.4/mini/nanoを使い分けることで性能・速度・コストの最適化余地が広がります。動画系ではSora APIの編集・延長・Batch対応により、制作から再処理までの運用が組みやすくなりました。特に/remix利用中ならedits移行の検討を早める価値があります。",
+      "scores": {
+        "contextUx": 4,
+        "workUx": 5,
+        "workflow": 5
+      },
+      "trustLevel": "official"
+    },
+    {
+      "id": "openai-status-history-digest",
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "titleJa": "OpenAI一次情報: ChatGPT音声入力などの障害は解消済み",
+      "summaryJa": "OpenAIの公式ステータスでは、ChatGPTの音声入力（Dictation）のエラー率上昇を含む複数の障害がいずれも解消済みです。対象にはVoice mode、Chat Completions、SSO経由のEnterprise/Edu参加、ログイン、Responses API、Soraが含まれ、現在はOperationalとされています。",
+      "action": "定点観測",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "whyNow": "現在の実務上の意味は、新機能追加ではなく安定性の回復確認です。音声入力、ログイン、API利用、Sora利用で直前まで不安定さがあった可能性があるため、再試行や運用再開の判断材料になります。",
+      "scores": {
+        "contextUx": 2,
+        "workUx": 2,
+        "workflow": 2
+      },
+      "trustLevel": "official"
+    }
+  ],
+  "weeklyThemes": [
+    {
+      "title": "高頻度業務は「軽量モデル前提」の設計が進む",
+      "body": "OpenAIでGPT-5.4 mini/nano、GoogleでGemini 3.1 Flash-Liteが出ており、今後3〜6か月は大量処理・低コスト・低遅延を前提にした使い分けが実務で重要。要約、分類、定型返信、監視、一次仕分けは軽量モデル寄りに寄せやすい。複雑判断だけ上位モデルに回す二段構成のUXが現実的。"
+    },
+    {
+      "title": "ツール利用込みの文脈UXが差別化要因になる",
+      "body": "OpenAIのGPT-5.4 miniはtool search、built-in computer use、compactionをサポート。単なるチャット品質より、検索・操作・長文脈圧縮を含む作業導線の設計が重要になる。実務では『調べる→要点圧縮→実行』を1フロー化できるかが効く。一方、nanoはtool searchやcomputer use非対応なので、単純処理専用として切り分けが必要。"
+    },
+    {
+      "title": "長い会話・継続案件では compaction 前提の運用が現実化",
+      "body": "OpenAIでmini/nanoともcompaction対応。今後は長いスレッドをそのまま維持するより、要点圧縮しながら引き継ぐ運用が増えそう。案件管理、調査ログ、反復する指示では、どの情報を圧縮して残すかが品質に直結する。会話の完全保持より、引き継ぎ用サマリー設計が実務上の制約対応になる。"
+    }
+  ],
+  "sourceHealth": [
+    {
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "label": "API changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.239Z",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "label": "Status history feed",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.528Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "label": "TestingCatalog ChatGPT feed",
+      "trustLevel": "secondary",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.666Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "label": "Claude product updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:45.141Z",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-code-changelog",
+      "company": "Anthropic",
+      "label": "Claude Code changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:45.971Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-05T15:56:46.274Z",
+      "publishedAt": null,
+      "changed": false,
+      "error": "HTTP 403"
+    },
+    {
+      "sourceId": "google-gemini-updates",
+      "company": "Google",
+      "label": "Gemini updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:46.358Z",
+      "publishedAt": null,
+      "changed": false,
+      "error": null
+    }
+  ],
+  "analysis": {
+    "mode": "openai",
+    "model": "gpt-5.4"
+  }
+}

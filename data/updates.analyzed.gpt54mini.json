@@ -1,0 +1,180 @@
+{
+  "generatedAt": "2026-04-05T16:00:34.491Z",
+  "summary": {
+    "urgentCount": 2,
+    "digestCount": 2,
+    "monitoredCompanies": 3,
+    "activeSources": 7
+  },
+  "alerts": [
+    {
+      "id": "anthropic-context-memory",
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "product": "Claude Cowork",
+      "action": "今すぐ試す",
+      "titleEn": "Cross-session project memory expanded in workspace UI",
+      "titleJa": "ワークスペースUIで、セッションをまたいだプロジェクト記憶が拡張",
+      "summaryJa": "Claudeのプロジェクト記憶がセッションをまたいで使いやすくなり、ワークスペースUI上で前回の状態を引き継ぎやすくなります。再開時の状況説明ややり直しの手間を減らし、継続作業のコンテキスト維持に役立つ変更です。",
+      "whyNow": "セッションを跨いだ文脈保持は、毎回の説明コストを下げるためコンテキストUXへの影響が大きいです。特にワークスペースUIで扱いやすくなったことで、日々の再開・継続作業の実務インパクトが出やすい更新です。",
+      "scores": {
+        "contextUx": 5,
+        "workUx": 4,
+        "workflow": 4
+      },
+      "sourceUrl": "https://www.anthropic.com/news",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "trustLevel": "official"
+    },
+    {
+      "id": "openai-project-workflow",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "product": "ChatGPT Workspace",
+      "action": "今すぐ試す",
+      "titleEn": "Project-oriented task flow for long-running agent collaboration",
+      "titleJa": "GPT-5.4 mini/nano が追加され、長時間作業向けの圧縮・補助機能が強化",
+      "summaryJa": "OpenAI API に GPT-5.4 mini と GPT-5.4 nano が追加されました。mini は高速・高効率で高ボリューム用途向け、tool search・built-in computer use・compaction に対応します。nano はさらに軽量で、速度とコストを重視した単純な大量処理向けです。nano は compaction のみ対応で、tool search と computer use は非対応です。",
+      "whyNow": "高頻度・大量処理の実運用で、モデル選択の幅とコスト最適化の余地が広がる更新です。特に compaction 対応は長いセッションやエージェント協働の継続性に効き、ChatGPT Workspace のような作業フロー設計にも影響します。",
+      "scores": {
+        "contextUx": 4,
+        "workUx": 4,
+        "workflow": 5
+      },
+      "sourceUrl": "https://openai.com/news/",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "trustLevel": "official"
+    }
+  ],
+  "digest": [
+    {
+      "id": "openai-release-notes-digest",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "titleJa": "OpenAI API更新: GPT-5.4 mini/nano と Sora API 拡張",
+      "summaryJa": "OpenAI API に GPT-5.4 mini と GPT-5.4 nano が追加され、Chat Completions / Responses API で利用可能になりました。mini は高スループット向けに、nano は速度とコスト重視の単純な大量処理向けに最適化されています。mini は tool search、built-in computer use、compaction に対応し、nano は compaction のみ対応です。あわせて、Sora API ではキャラクター参照、最長20秒の生成、sora-2-pro の1080p出力、video extensions、Batch API 対応、さらに動画編集用の新しいエンドポイントが追加され、旧 remix は6か月後に非推奨予定です。",
+      "action": "今すぐ試す",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "whyNow": "高頻度・大量処理向けのモデル選択肢が増え、動画生成・編集のAPIも拡張されたため、運用設計やコスト最適化の見直しに直結します。",
+      "scores": {
+        "contextUx": 4,
+        "workUx": 4,
+        "workflow": 5
+      },
+      "trustLevel": "official"
+    },
+    {
+      "id": "openai-status-history-digest",
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "titleJa": "OpenAIの障害情報：複数機能でのエラー増加はすべて解消",
+      "summaryJa": "ChatGPTの音声入力（Dictation）でのエラー率上昇、completionsapi-gpt-5-nanoの高エラー率、一部ユーザーのChatGPT Enterprise / EduワークスペースへのSSO参加失敗、全体的なアカウント作成・ログイン不安定、Responses APIとSoraのエラー増加が報告されましたが、いずれもStatus: Resolvedとなり、影響を受けたサービスはすべて復旧しています。",
+      "action": "定点観測",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "whyNow": "複数のログイン・API・音声関連の不具合が一括で解消されており、利用再開や運用確認の必要性があるため。",
+      "scores": {
+        "contextUx": 4,
+        "workUx": 3,
+        "workflow": 4
+      },
+      "trustLevel": "official"
+    }
+  ],
+  "weeklyThemes": [
+    {
+      "title": "OpenAI: 高頻度業務向けに小型モデルが実用ラインへ",
+      "body": "GPT-5.4 mini / nano がAPI（Responses、Chat Completions）で利用可能に。mini は tool search・built-in computer use・compaction 対応、nano は compaction のみで軽量高頻度タスク向け。今後3〜6か月は、要約・分類・定型応答・簡易自動化を mini/nano に振り分け、コストと速度を最適化する設計が有効。"
+    },
+    {
+      "title": "OpenAI: モデル指定とUI前提が少し動く",
+      "body": "gpt-5.3-chat-latest は ChatGPT の現行モデルに追随するよう更新。モデル名を固定前提にした運用はずれやすく、UI/品質の再現性を重視する場合は、実際の追随先の確認が必要。画像入力の encoder 修正も入っており、マルチモーダル処理は挙動差の検証を継続したい。"
+    },
+    {
+      "title": "OpenAI: 障害は収束したが、音声・ログイン・Responses は要監視",
+      "body": "Dictation、Enterprise/Edu SSO、アカウント作成/ログイン、Responses API と Sora で一時的なエラー増加が報告され、いずれも解消済み。とはいえ、業務フロー上は音声入力・SSO・API依存のステップが単一障害点になりやすい。重要業務は代替手段を用意し、障害時の切り替え手順を明文化しておくとよい。"
+    }
+  ],
+  "sourceHealth": [
+    {
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "label": "API changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.239Z",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "label": "Status history feed",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.528Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "label": "TestingCatalog ChatGPT feed",
+      "trustLevel": "secondary",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:44.666Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "label": "Claude product updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:45.141Z",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "anthropic-claude-code-changelog",
+      "company": "Anthropic",
+      "label": "Claude Code changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:45.971Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "changed": false,
+      "error": null
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-05T15:56:46.274Z",
+      "publishedAt": null,
+      "changed": false,
+      "error": "HTTP 403"
+    },
+    {
+      "sourceId": "google-gemini-updates",
+      "company": "Google",
+      "label": "Gemini updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T15:56:46.358Z",
+      "publishedAt": null,
+      "changed": false,
+      "error": null
+    }
+  ],
+  "analysis": {
+    "mode": "openai",
+    "model": "gpt-5.4-mini"
+  }
+}

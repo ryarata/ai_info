@@ -143,11 +143,13 @@ function buildGeneratedData(snapshotResults, sampleData) {
   const rankedItems = rankChangedItems(changedItems);
   const alertCandidates = rankedItems.filter(shouldPromoteToAlert);
   const alerts = alertCandidates.slice(0, 2).map((item, index) => toAlert(item, index));
+  const usedSampleAlerts = alerts.length === 0;
 
   const alertIds = new Set(alertCandidates.slice(0, 2).map((item) => item.source.id));
   const digest = rankedItems
     .filter((item) => !alertIds.has(item.source.id))
     .map(toDigest);
+  const usedFallbackDigest = digest.length === 0;
 
   if (digest.length === 0) {
     for (const item of snapshotResults.filter((entry) => entry.current.status === "ok").slice(0, 2)) {
@@ -159,6 +161,8 @@ function buildGeneratedData(snapshotResults, sampleData) {
   const finalDigest = digest.length > 0 ? digest : sampleData.digest;
   const weeklyThemes = buildThemes(snapshotResults, failedItems);
   const finalThemes = weeklyThemes.length > 0 ? weeklyThemes : sampleData.weeklyThemes;
+  const finalAlertIds = new Set((finalAlerts ?? []).map((item) => item.sourceId));
+  const finalDigestIds = new Set((finalDigest ?? []).map((item) => item.sourceId));
 
   return {
     generatedAt,
@@ -171,6 +175,14 @@ function buildGeneratedData(snapshotResults, sampleData) {
     alerts: finalAlerts,
     digest: finalDigest,
     weeklyThemes: finalThemes,
+    sourceItems: snapshotResults.map((item) =>
+      toSourceItem(item, {
+        finalAlertIds,
+        finalDigestIds,
+        usedSampleAlerts,
+        usedFallbackDigest
+      })
+    ),
     sourceHealth: snapshotResults.map((item) => ({
       sourceId: item.source.id,
       company: item.source.company,
@@ -182,6 +194,62 @@ function buildGeneratedData(snapshotResults, sampleData) {
       changed: item.change.changed,
       error: item.current.error ?? null
     }))
+  };
+}
+
+function toSourceItem(item, options) {
+  const { finalAlertIds, finalDigestIds, usedSampleAlerts, usedFallbackDigest } = options;
+
+  if (item.current.status !== "ok") {
+    return {
+      sourceId: item.source.id,
+      company: item.source.company,
+      label: item.source.label,
+      trustLevel: item.source.trustLevel ?? "official",
+      status: "error",
+      fetchedAt: item.current.fetchedAt,
+      publishedAt: item.current.publishedAt ?? null,
+      title: item.current.title,
+      description: item.current.description,
+      sourceUrl: item.current.itemUrl ?? item.source.url,
+      classification: "取得失敗",
+      classificationReason: `取得エラー: ${item.current.error ?? "unknown"}`
+    };
+  }
+
+  let classification = "非選定";
+  let classificationReason = item.change.changed
+    ? "差分は検出されたが、今回の表示優先度では本文表示対象になりませんでした。"
+    : "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。";
+
+  if (finalAlertIds.has(item.source.id)) {
+    classification = usedSampleAlerts ? "アラート表示(サンプル維持)" : "アラート表示";
+    classificationReason = usedSampleAlerts
+      ? "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+      : "今回の実行で重要度が高い更新としてアラートに分類されました。";
+  } else if (finalDigestIds.has(item.source.id)) {
+    classification = usedFallbackDigest && !item.change.changed ? "Digest表示(定点観測)" : "Digest表示";
+    classificationReason =
+      usedFallbackDigest && !item.change.changed
+        ? "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
+        : "今回の実行で非緊急だが追うべき更新としてDigestに分類されました。";
+  }
+
+  return {
+    sourceId: item.source.id,
+    company: item.source.company,
+    label: item.source.label,
+    trustLevel: item.source.trustLevel ?? "official",
+    status: "ok",
+    fetchedAt: item.current.fetchedAt,
+    publishedAt: item.current.publishedAt ?? null,
+    title: item.current.title,
+    description: item.current.description,
+    excerpt: item.current.excerpt,
+    sourceUrl: item.current.itemUrl ?? item.source.url,
+    changed: item.change.changed,
+    classification,
+    classificationReason
   };
 }
 

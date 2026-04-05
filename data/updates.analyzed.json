@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-04T08:27:45.296Z",
+  "generatedAt": "2026-04-05T16:22:24.280Z",
   "summary": {
     "urgentCount": 2,
     "digestCount": 2,
@@ -14,13 +14,13 @@
       "product": "Claude Cowork",
       "action": "今すぐ試す",
       "titleEn": "Cross-session project memory expanded in workspace UI",
-      "titleJa": "セッションをまたいだプロジェクト記憶がワークスペースUIで拡張",
-      "summaryJa": "Claude CoworkのワークスペースUIで、複数のセッションにまたがるプロジェクトの記憶が強化されました。これにより、前回の作業内容をそのまま引き継ぎやすくなり、作業の再開や継続がより簡単かつスムーズになります。ユーザーは追加説明にかかる手間を省き、効率よくプロジェクトの進行が可能になります。",
-      "whyNow": "プロジェクトを複数回に分けて進める場合でも、AIが過去のやりとりや作業内容をしっかり記憶し、再開時にスムーズにつながるようになったため、特に業務効率や体験向上につながるアップデートです。",
+      "titleJa": "ワークスペースUIでセッションを超えたプロジェクト記憶が拡張",
+      "summaryJa": "Claude CoworkのワークスペースUIにおいて、セッションをまたいでプロジェクトの記憶が拡張され、前回の作業内容や状況を引き継ぎやすくなりました。これにより作業の再開時に説明や文脈の再設定が少なくなり、業務の連続性が向上します。",
+      "whyNow": "コンテキストUXへの影響が大きく、継続的な作業効率の向上が期待できるため、日々の業務に直接的なメリットがあります。",
       "scores": {
         "contextUx": 5,
-        "workUx": 5,
-        "workflow": 5
+        "workUx": 4,
+        "workflow": 4
       },
       "sourceUrl": "https://www.anthropic.com/news",
       "publishedAt": "2026-03-17T15:00:00.000Z",
@@ -31,11 +31,11 @@
       "sourceId": "openai-release-notes",
       "company": "OpenAI",
       "product": "ChatGPT Workspace",
-      "action": "今週理解",
+      "action": "今すぐ試す",
       "titleEn": "Project-oriented task flow for long-running agent collaboration",
-      "titleJa": "プロジェクト指向タスクフローで長期間のAIエージェント協働が可能に",
-      "summaryJa": "ChatGPT Workspaceにおいて、単発のチャットではなくプロジェクト単位で作業を進めるフローが導入されました。これにより、長期間かつ継続的なAI協働やタスク管理がしやすくなり、複雑な業務や複数ステップにわたる作業の効率化が期待できます。従来の一問一答型から、連続して状況や進捗を維持したまま作業を進める体験が強化されます。",
-      "whyNow": "AIを使った業務や共同作業の現場では、単発チャットを超えた持続的な支援・自動化が強く求められており、作業効率や成果物品質を高めるための最新機能として注目されています。今後のUIや作業スタイルの標準化にもつながる重要な更新です。",
+      "titleJa": "ChatGPT Workspaceにプロジェクト単位のタスクフロー導入",
+      "summaryJa": "ChatGPT Workspaceが、長期間にわたるAIエージェント協働を想定したプロジェクト単位のタスク管理に対応しました。従来の単発チャットから、継続的な作業や複数タスクを進行・管理しやすい体験へと進化しています。これにより、複雑な作業や長期的プロジェクトを効率的に進めやすくなります。",
+      "whyNow": "従来型チャットだけでなく、AIを活用した業務やプロジェクト全体のワークフロー圧縮・効率化への関心が高まっており、実務活用への大きなステップとなるため。",
       "scores": {
         "contextUx": 5,
         "workUx": 5,
@@ -51,13 +51,13 @@
       "id": "openai-release-notes-digest",
       "sourceId": "openai-release-notes",
       "company": "OpenAI",
-      "titleJa": "OpenAI API: GPT-5.4 mini/nanoおよびSora APIの最新アップデート",
-      "summaryJa": "OpenAIは、GPT-5.4 miniとGPT-5.4 nanoをChat CompletionsやResponses API向けにリリースしました。GPT-5.4 miniは高性能かつ効率的でツール検索やコンピューター操作にも対応し、大量処理業務に好適です。GPT-5.4 nanoは処理速度とコスト重視のシンプルなタスクに最適化されています（ツール検索やPC利用は未対応）。また、画像入力の処理品質向上や、Sora APIの高精細動画生成（1080p/20秒）、動画編集エンドポイントの新設など実務活用を後押しする進化が進んでいます。",
-      "action": "今すぐ試す",
+      "titleJa": "OpenAI API 最新アップデート概要（2026年3月）",
+      "summaryJa": "OpenAIは2026年3月に複数のAPIアップデートを発表しました。注目点は、Chat CompletionsおよびResponses API向けに省リソースで高速な「GPT-5.4 mini」と、さらに軽量かつコスト効率に優れた「GPT-5.4 nano」のリリースです。miniは高機能を維持しつつツール検索や組み込み計算機機能、圧縮などをサポートし、大規模なワークロード向けの効率を強化。nanoは圧縮のみ対応で、極めて高速かつ安価な処理が必要な用途に最適化されています。また、Sora APIでは動画の長尺生成やフルHD（1080p）対応、バッチAPIサポート、キャラクターリファレンスの再利用など生成や編集の機能強化が進みました。既存の動画編集APIは半年後に非推奨となります。さらに、GPT-5.4 向けイメージエンコーダのバグ修正も行われました。",
+      "action": "今週理解",
       "publishedAt": "2026-03-16T15:00:00.000Z",
-      "whyNow": "GPT-5.4シリーズやSora 2系の新機能拡充により、AI活用現場での処理速度・コスト効率・出力品質が改善され、直近ニーズに即した業務改善が可能です。",
+      "whyNow": "東京でもプロダクション用AIワークロードが増大するなか、効率型モデルや高度な生成系APIの進化は実務インパクトが大きく、今後の開発・運用業務に直結する重要なアップデートです。",
       "scores": {
-        "contextUx": 5,
+        "contextUx": 4,
         "workUx": 5,
         "workflow": 5
       },
@@ -67,31 +67,143 @@
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
       "company": "OpenAI",
-      "titleJa": "OpenAIの各種サービスにおける障害の復旧報告",
-      "summaryJa": "ChatGPTの音声入力（ディクテーション）や完成API（completionsapi-gpt-5-nano）、ログイン、アカウント作成、一部ワークスペース（Enterprise/Edu）へのSSOログイン、レスポンスAPIやSoraで発生していたエラー率増加・障害がすべて解消し、全サービスで通常稼働に戻ったことが公式に報告されています。",
+      "titleJa": "OpenAI サービス障害の復旧状況（音声モード・API・ログイン等）",
+      "summaryJa": "一時的にChatGPTの音声モードやAPI応答、ログイン機能など複数のサービスでエラー率が上昇していましたが、現在は全て復旧し正常に利用可能となっています。",
       "action": "今週理解",
       "publishedAt": "2026-04-02T17:49:44.404Z",
-      "whyNow": "複数の主要機能に影響する障害が発生していましたが、現在は全て復旧したため、安心して利用を再開できます。",
+      "whyNow": "障害が発生していたサービスがすべて復旧し、影響を受けたユーザーが通常通り利用できるようになったため、情報共有の意味合いが強い更新です。",
       "scores": {
         "contextUx": 2,
         "workUx": 2,
-        "workflow": 2
+        "workflow": 1
       },
       "trustLevel": "official"
     }
   ],
   "weeklyThemes": [
     {
-      "title": "GPT-5.4 mini・nano APIリリースによるワークフロー最適化",
-      "body": "OpenAIはGPT-5.4 miniとnanoをAPIで提供開始。miniはコーディング支援やエージェント系の高速大量処理に適し、ツール検索や内蔵PC利用も可能。nanoはさらに軽量・安価で、シンプルな大量タスク処理向き。今後3～6ヶ月は高速処理・APIコスト最適化が可能なプロジェクト設計が重要になる。"
+      "title": "APIにおけるモデル選定とコスト最適化",
+      "body": "OpenAIがGPT-5.4 miniとnanoをAPIに追加。miniは高速・省コストで高度な業務に、nanoはシンプル・大量処理向け。用途や予算に応じてモデルを使い分ける設計が、今後のワークフロー最適化に必要。tool searchやPC利用が重要ならmini推奨。"
     },
     {
-      "title": "ChatGPTのショッピング体験・可視化モジュール拡充",
-      "body": "OpenAIはChatGPTでビジュアルプロダクト発見機能を展開、複数小売の製品比較・情報取得が1画面で完結するUXが実現。これによりビジネスでの情報収集効率や顧客体験の設計が変化、今後は可視化機能の業務転用やインタラクティブな数理・科学モジュール導入による新サービス展開が期待できる。"
+      "title": "ChatGPT新機能：ビジュアル商品探索",
+      "body": "ChatGPTに商品比較・閲覧のビジュアルUXが全ユーザー向けに追加。消費者向けサービス構築や業務用リサーチが直感的に行いやすくなり、情報整理の工数削減・意思決定の迅速化へ期待。"
     },
     {
-      "title": "主要AIモデルの選択幅拡大と用途特化",
-      "body": "Google Gemini 3.1シリーズやAnthropic Claude Sonnet/Opusなど最新モデルは、研究開発から高効率大量処理・クリエイティブタスクまで役割が明確化。ワークスタイルに適したAI選定・API活用、マルチモデル連携によるUX改善が、今後6ヶ月の競争力となる。"
+      "title": "データ取得時のSSO・ログイン周り安定性",
+      "body": "直近までSSOやログイン、Responses APIに高エラー率が見られたが、復旧済み。法人/教育向けアカウント運用、データ接続部分のワークフロー見直しが推奨される。リスク管理体制やバックアップ運用も検討を。"
+    }
+  ],
+  "sourceItems": [
+    {
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "label": "API changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:58.808Z",
+      "publishedAt": "2026-03-16T15:00:00.000Z",
+      "title": "Changelog | OpenAI API",
+      "description": "See all of the latest features and updates to the OpenAI API.",
+      "excerpt": "Changelog March, 2026 Mar 17 Feature gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions Released GPT-5.4 mini and GPT-5.4 nano to the Chat Completions and Responses API. GPT-5.4 mini brings GPT-5.4-class capabilities to a faster, more efficient model for high-volume workloads, while GPT-5.4 nano is optimized for simple high-volume tasks where speed and cost matter most. GPT-5.4 mini supports tool search , built-in computer use , and compaction . GPT-5.4 nano supports compaction, but does not support tool search or computer use. Mar 16 Update gpt-5.3-chat-latest Updated the gpt-5.3-chat-latest slug to point to the latest model currently used in ChatGPT. Mar 13 Fix gpt-5.4 v1/responses v1/chat/completions Updated our image encoder to fix a small bug with input_image inputs in GPT-5.4. Some image understanding use cases may now see improved quality. No action is required. Mar 12 Feature sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Expanded the Sora API with reusable character references, longer generations up to 20 seconds, 1080p output for sora-2-pro , video extensions, and Batch API support for POST /v1/videos . 1080p generations on sora-2-pro are billed at $0.70 per second. Learn more here . Mar 12 Update sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix Added POST /v1/videos/edits for editing existing videos. This will replace POST /v1/videos/{video_id}/remix , which will be deprecated in 6 months. Learn more here . Mar 5 Feature gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions Released GPT-5.4 , our newest frontier ",
+      "sourceUrl": "https://developers.openai.com/api/docs/changelog",
+      "changed": false,
+      "classification": "アラート表示(サンプル維持)",
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+    },
+    {
+      "sourceId": "openai-status-history",
+      "company": "OpenAI",
+      "label": "Status history feed",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.081Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "title": "ChatGPT Dictation Elevated Error Rate",
+      "description": "Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
+      "excerpt": "ChatGPT Dictation Elevated Error Rate Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational) High error rate for completionsapi-gpt-5-nano Status: Resolved The issue is now resolved. Affected components Chat Completions (Operational) Elevated failures for some users joining ChatGPT Enterprise and ChatGPT Edu workspaces via SSO. Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Account creation and login are unstable across all surfaces Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Responses API and Sora Increased Error Rates Status: Resolved All impacted services have now fully recovered. Affected components Responses (Operational)",
+      "sourceUrl": "https://status.openai.com//incidents/01KN78XN18M5VB6DSRTCWMJRYN",
+      "changed": false,
+      "classification": "Digest表示(定点観測)",
+      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
+    },
+    {
+      "sourceId": "openai-testingcatalog-chatgpt",
+      "company": "OpenAI",
+      "label": "TestingCatalog ChatGPT feed",
+      "trustLevel": "secondary",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.242Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "title": "OpenAI launches visual product discovery in ChatGPT for all users",
+      "description": "OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
+      "excerpt": "OpenAI launches visual product discovery in ChatGPT for all users OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat. OpenAI launches GPT-5.4 mini and GPT-5.4 nano on APIs OpenAI introduces GPT-5.4 mini for faster, cost-efficient coding copilots, automation, and agent systems, now available in API, Codex, and ChatGPT. GPT-5.4 nano is now available via the API as well. ICYMI: OpenAI adds interactive math & science tools to ChatGPT OpenAI is adding interactive math and science modules to ChatGPT, letting users adjust variables and visualize equations across 70+ core topics worldwide. OpenAI releases GPT-5.4 model on ChatGPT and Codex OpenAI launches GPT-5.4, a powerful AI model with improved reasoning, coding, and multimodal skills, now integrated in ChatGPT and the API. OpenAI launches Codex app for Windows on Microsoft Store OpenAI launches its native Codex app for Windows, tailored for agentic coding with PowerShell integration and robust sandboxing, available via Microsoft Store.",
+      "sourceUrl": "https://www.testingcatalog.com/openai-launches-visual-product-discovery-in-chatgpt-for-all-users/",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+    },
+    {
+      "sourceId": "anthropic-claude-updates",
+      "company": "Anthropic",
+      "label": "Claude product updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:21:59.425Z",
+      "publishedAt": "2026-03-17T15:00:00.000Z",
+      "title": "people want from AI",
+      "description": "Anthropic is an AI safety and research company that&#x27;s working to build reliable, interpretable, and steerable AI systems.",
+      "excerpt": "Newsroom Press inquires press@anthropic.com Non-media inquiries support@anthropic.com Media assets Download press kit What 81,000 people want from AI Mar 18, 2026 We invited Claude.ai users to share how they use AI, what they dream it could make possible, and what they fear it might do. Nearly 81,000 people participated—the largest and most multilingual qualitative study of its kind. Here's what we found. Product Feb 17, 2026 Introducing Claude Sonnet 4.6 Sonnet 4.6 delivers frontier performance across coding, agents, and professional work at scale. Announcements Feb 5, 2026 Introducing Claude Opus 4.6 We’re upgrading our smartest model. Across agentic coding, computer use, tool use, search, and finance, Opus 4.6 is an industry-leading model, often by wide margin. Announcements Feb 4, 2026 Claude is a space to think We’ve made a choice: Claude will remain ad-free. We explain why advertising incentives are incompatible with a genuinely helpful AI assistant, and how we plan to expand access without compromising user trust. Announcements Jan 30, 2026 Claude on Mars The first AI-assisted drive on another planet. Claude helped NASA’s Perseverance rover travel four hundred meters on Mars. News Search Date Category Title Mar 31, 2026 Announcements Australian government and Anthropic sign MOU for AI safety and research Mar 12, 2026 Announcements Anthropic invests $100 million into the Claude Partner Network Mar 11, 2026 Announcements Introducing The Anthropic Institute Mar 10, 2026 Announcements Sydney will become Anthropic’s fourth office in Asia-Pacific Mar 6, 2026 Policy Partner",
+      "sourceUrl": "https://www.anthropic.com/news",
+      "changed": false,
+      "classification": "アラート表示(サンプル維持)",
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+    },
+    {
+      "sourceId": "anthropic-claude-code-changelog",
+      "company": "Anthropic",
+      "label": "Claude Code changelog",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:22:01.213Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "title": "chore: Update CHANGELOG.md",
+      "description": "chore: Update CHANGELOG.md",
+      "excerpt": "chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md chore: Update CHANGELOG.md",
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+    },
+    {
+      "sourceId": "openai-chatgpt-release-notes",
+      "company": "OpenAI",
+      "label": "ChatGPT release notes",
+      "trustLevel": "official",
+      "status": "error",
+      "fetchedAt": "2026-04-05T16:22:01.605Z",
+      "publishedAt": null,
+      "title": "ChatGPT release notes",
+      "description": "OpenAI の取得に失敗しました。次回再試行します。",
+      "sourceUrl": "https://help.openai.com/ja-jp/articles/6825453-chatgpt-release-notes",
+      "classification": "取得失敗",
+      "classificationReason": "取得エラー: HTTP 403"
+    },
+    {
+      "sourceId": "google-gemini-updates",
+      "company": "Google",
+      "label": "Gemini updates",
+      "trustLevel": "official",
+      "status": "ok",
+      "fetchedAt": "2026-04-05T16:22:01.687Z",
+      "publishedAt": null,
+      "title": "Gemini 3: Our most intelligent AI model that brings any idea to life",
+      "description": "Gemini 3 Our most intelligent AI model that brings any idea to life Gemini 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Best for modern challenges across science, research and engineering Learn more Gemini 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more Gemini 3 Flash Our latest Gemini 3 model that helps you bring any idea to life - faster Learn more Explore the latest Introducing our most intelligent model yet.",
+      "excerpt": "Gemini 3 Our most intelligent AI model that brings any idea to life Gemini 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Best for modern challenges across science, research and engineering Learn more Gemini 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more Gemini 3 Flash Our latest Gemini 3 model that helps you bring any idea to life - faster Learn more Explore the latest Introducing our most intelligent model yet. With state-of-the-art reasoning to help you learn, build, and plan anything. Models Capabilities Hands-on Showcase Performance Safety Try Gemini Models Completing everyday tasks, or solving complex problems. Discover the right model for what you need 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more 3 Flash Best for frontier intelligence at speed Learn more 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Pushes the boundaries of intelligence, delivering a significant upgrade to Gemini 3.1's specialized reasoning mode to help you solve the most complex technical problems. Gemini 3.1 Deep Think mode can better help tackle real world problems that require rigor, breakthrough creativity and intelligence. Available for Google AI Ultra subscribers . Try Deep Think Learn more Capabilities Reasoning with unprecedented depth and nuance Smart, concise, direct responses – with genuine insight over cliche and flattery. Advanced multimodal understanding Text, images, video, audio – eve",
+      "sourceUrl": "https://deepmind.google/technologies/gemini/",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
     }
   ],
   "sourceHealth": [
@@ -101,7 +213,7 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:28.881Z",
+      "fetchedAt": "2026-04-05T16:21:58.808Z",
       "publishedAt": "2026-03-16T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -112,7 +224,7 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.027Z",
+      "fetchedAt": "2026-04-05T16:21:59.081Z",
       "publishedAt": "2026-04-02T17:49:44.404Z",
       "changed": false,
       "error": null
@@ -123,7 +235,7 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.113Z",
+      "fetchedAt": "2026-04-05T16:21:59.242Z",
       "publishedAt": "2026-03-25T10:47:48.000Z",
       "changed": false,
       "error": null
@@ -134,7 +246,7 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:29.186Z",
+      "fetchedAt": "2026-04-05T16:21:59.425Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -145,7 +257,7 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:33.841Z",
+      "fetchedAt": "2026-04-05T16:22:01.213Z",
       "publishedAt": "2026-04-04T00:41:56.000Z",
       "changed": false,
       "error": null
@@ -156,7 +268,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-04T08:27:34.210Z",
+      "fetchedAt": "2026-04-05T16:22:01.605Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -167,7 +279,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-04T08:27:34.301Z",
+      "fetchedAt": "2026-04-05T16:22:01.687Z",
       "publishedAt": null,
       "changed": false,
       "error": null
