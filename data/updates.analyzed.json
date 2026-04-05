@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-05T16:22:24.280Z",
+  "generatedAt": "2026-04-05T16:28:12.582Z",
   "summary": {
     "urgentCount": 2,
     "digestCount": 2,
@@ -14,9 +14,9 @@
       "product": "Claude Cowork",
       "action": "今すぐ試す",
       "titleEn": "Cross-session project memory expanded in workspace UI",
-      "titleJa": "ワークスペースUIでセッションを超えたプロジェクト記憶が拡張",
-      "summaryJa": "Claude CoworkのワークスペースUIにおいて、セッションをまたいでプロジェクトの記憶が拡張され、前回の作業内容や状況を引き継ぎやすくなりました。これにより作業の再開時に説明や文脈の再設定が少なくなり、業務の連続性が向上します。",
-      "whyNow": "コンテキストUXへの影響が大きく、継続的な作業効率の向上が期待できるため、日々の業務に直接的なメリットがあります。",
+      "titleJa": "ワークスペースUIでセッションを超えたプロジェクト記憶が拡充",
+      "summaryJa": "Claude CoworkのワークスペースUIで、複数セッションにまたがるプロジェクトの記憶保持機能が強化されました。これにより、前回までの作業状況をスムーズに引き継ぐことができ、再開時の説明や情報整理の手間が大幅に軽減されます。",
+      "whyNow": "セッションをまたいで情報を保持できることで、ユーザーは都度プロジェクト内容を説明する必要が減るため、コンテキストの継続性が大きく向上します。日々の作業効率やワークフロー短縮にも繋がる重要なアップデートです。",
       "scores": {
         "contextUx": 5,
         "workUx": 4,
@@ -33,9 +33,9 @@
       "product": "ChatGPT Workspace",
       "action": "今すぐ試す",
       "titleEn": "Project-oriented task flow for long-running agent collaboration",
-      "titleJa": "ChatGPT Workspaceにプロジェクト単位のタスクフロー導入",
-      "summaryJa": "ChatGPT Workspaceが、長期間にわたるAIエージェント協働を想定したプロジェクト単位のタスク管理に対応しました。従来の単発チャットから、継続的な作業や複数タスクを進行・管理しやすい体験へと進化しています。これにより、複雑な作業や長期的プロジェクトを効率的に進めやすくなります。",
-      "whyNow": "従来型チャットだけでなく、AIを活用した業務やプロジェクト全体のワークフロー圧縮・効率化への関心が高まっており、実務活用への大きなステップとなるため。",
+      "titleJa": "長時間プロジェクトのためのエージェント協働タスクフロー",
+      "summaryJa": "ChatGPT Workspaceにおいて、従来の単発チャット型から、プロジェクト単位で継続的に作業を進めるためのワークフロー機能が強化されました。これによりAIエージェントと協働しながら、長時間・複数タスクの一貫した管理や進行が可能になります。",
+      "whyNow": "AIとの協働が単発作業から長期間のプロジェクト遂行へと広がる中、業務効率化やUIパターンの進化を大きく後押しする重要な転換だからです。",
       "scores": {
         "contextUx": 5,
         "workUx": 5,
@@ -51,13 +51,13 @@
       "id": "openai-release-notes-digest",
       "sourceId": "openai-release-notes",
       "company": "OpenAI",
-      "titleJa": "OpenAI API 最新アップデート概要（2026年3月）",
-      "summaryJa": "OpenAIは2026年3月に複数のAPIアップデートを発表しました。注目点は、Chat CompletionsおよびResponses API向けに省リソースで高速な「GPT-5.4 mini」と、さらに軽量かつコスト効率に優れた「GPT-5.4 nano」のリリースです。miniは高機能を維持しつつツール検索や組み込み計算機機能、圧縮などをサポートし、大規模なワークロード向けの効率を強化。nanoは圧縮のみ対応で、極めて高速かつ安価な処理が必要な用途に最適化されています。また、Sora APIでは動画の長尺生成やフルHD（1080p）対応、バッチAPIサポート、キャラクターリファレンスの再利用など生成や編集の機能強化が進みました。既存の動画編集APIは半年後に非推奨となります。さらに、GPT-5.4 向けイメージエンコーダのバグ修正も行われました。",
-      "action": "今週理解",
+      "titleJa": "OpenAI API 最新アップデートまとめ（2026年3月）",
+      "summaryJa": "OpenAIは2026年3月に主要なAPIアップデートを発表しました。主な内容は次の通りです。①Chat CompletionsとResponses API向けに、GPT-5.4 miniとGPT-5.4 nanoをリリース。miniは高効率かつ多量処理対応、Nanoは速度とコスト重視で簡易タスク向け。miniはツール検索やPC利用に対応、nanoは圧縮のみ。②Sora APIが拡張され、再利用可能なキャラクター参照、最大20秒の動画生成、sora-2-proで1080p出力（1秒0.70ドル）、動画拡張機能、バッチAPI対応を実現。③動画編集API（POST /v1/videos/edits）新設、6か月後に既存のリミックスAPIは非推奨へ。④GPT-5.4系モデルの画像認識で細かな不具合修正が入り品質向上。各API利用者は高効率・新機能の恩恵を即座に受けられます。",
+      "action": "今すぐ試す",
       "publishedAt": "2026-03-16T15:00:00.000Z",
-      "whyNow": "東京でもプロダクション用AIワークロードが増大するなか、効率型モデルや高度な生成系APIの進化は実務インパクトが大きく、今後の開発・運用業務に直結する重要なアップデートです。",
+      "whyNow": "最新モデルとSora APIの高解像度・長尺化、API操作性アップデートにより、作業効率や表現力が大幅に拡張。大規模処理や動画生成ニーズへの対応度が高まったため、注目が集まっています。",
       "scores": {
-        "contextUx": 4,
+        "contextUx": 5,
         "workUx": 5,
         "workflow": 5
       },
@@ -67,31 +67,31 @@
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
       "company": "OpenAI",
-      "titleJa": "OpenAI サービス障害の復旧状況（音声モード・API・ログイン等）",
-      "summaryJa": "一時的にChatGPTの音声モードやAPI応答、ログイン機能など複数のサービスでエラー率が上昇していましたが、現在は全て復旧し正常に利用可能となっています。",
+      "titleJa": "OpenAI サービス障害の復旧状況",
+      "summaryJa": "ChatGPT の音声入力やAPI、ログイン機能、一部のエンタープライズ機能などで一時的な障害やエラー率の上昇が発生しましたが、現在はすべてのサービスが完全に復旧し、正常に利用できる状態になっています。",
       "action": "今週理解",
       "publishedAt": "2026-04-02T17:49:44.404Z",
-      "whyNow": "障害が発生していたサービスがすべて復旧し、影響を受けたユーザーが通常通り利用できるようになったため、情報共有の意味合いが強い更新です。",
+      "whyNow": "最近発生した一連の OpenAI サービス障害が解決し、安心して業務や利用を再開できるため。",
       "scores": {
         "contextUx": 2,
         "workUx": 2,
-        "workflow": 1
+        "workflow": 2
       },
       "trustLevel": "official"
     }
   ],
   "weeklyThemes": [
     {
-      "title": "APIにおけるモデル選定とコスト最適化",
-      "body": "OpenAIがGPT-5.4 miniとnanoをAPIに追加。miniは高速・省コストで高度な業務に、nanoはシンプル・大量処理向け。用途や予算に応じてモデルを使い分ける設計が、今後のワークフロー最適化に必要。tool searchやPC利用が重要ならmini推奨。"
+      "title": "APIモデルの進化と業務効率化",
+      "body": "OpenAIがGPT-5.4 miniおよびnanoモデルをAPIでリリース。miniは高い能力を高速・効率的に提供し、大量処理や自動化、コーディング補助、エージェント業務に最適。nanoはコスト・スピード重視で単純な反復タスク向け。ツール連携やPC操作はminiのみ対応。次の3〜6ヶ月でワークフローの見直しや、モデル選択による業務の最適化が重要です。"
     },
     {
-      "title": "ChatGPT新機能：ビジュアル商品探索",
-      "body": "ChatGPTに商品比較・閲覧のビジュアルUXが全ユーザー向けに追加。消費者向けサービス構築や業務用リサーチが直感的に行いやすくなり、情報整理の工数削減・意思決定の迅速化へ期待。"
+      "title": "マルチベンダーAIのプロフェッショナル活用",
+      "body": "AnthropicのClaude Sonnet 4.6やOpus 4.6、GoogleのGemini 3.1 Proなど、各社が高性能・高効率モデルを展開。エージェント化、複雑課題解決、プロフェッショナル用途での選定余地が拡大。業務要件とモデル特性を見極めた活用が成果を左右します。"
     },
     {
-      "title": "データ取得時のSSO・ログイン周り安定性",
-      "body": "直近までSSOやログイン、Responses APIに高エラー率が見られたが、復旧済み。法人/教育向けアカウント運用、データ接続部分のワークフロー見直しが推奨される。リスク管理体制やバックアップ運用も検討を。"
+      "title": "ChatGPTの新インタラクティブ機能・安定化",
+      "body": "ChatGPTにビジュアルプロダクト発見（ショッピング体験）やインタラクティブな数理・科学ツールが追加。初期障害対応も改善傾向。新機能導入時は用途特化・安定性を確認し、既存のフロー・体験への影響評価が必須です。"
     }
   ],
   "sourceItems": [
@@ -109,7 +109,12 @@
       "sourceUrl": "https://developers.openai.com/api/docs/changelog",
       "changed": false,
       "classification": "アラート表示(サンプル維持)",
-      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。",
+      "translated": {
+        "titleJa": "チェンジログ | OpenAI API",
+        "descriptionJa": "OpenAI APIの最新機能やアップデート一覧をご覧いただけます。",
+        "excerptJa": "チェンジログ 2026年3月 3月17日 機能 gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions GPT-5.4 miniとGPT-5.4 nanoをChat CompletionsおよびResponses APIでリリースしました。GPT-5.4 miniは、より高速かつ効率的なモデルで高負荷ワークロード向けにGPT-5.4クラスの能力を提供します。一方、GPT-5.4 nanoは、速度とコストが最重視される単純な高負荷タスク向けに最適化されています。GPT-5.4 miniはツール検索、内蔵コンピュータ利用、圧縮をサポートします。GPT-5.4 nanoは圧縮のみサポートし、ツール検索やコンピュータ利用はサポートされません。3月16日 アップデート gpt-5.3-chat-latest gpt-5.3-chat-latestのスラグを、現在ChatGPTで使用されている最新版モデルを指すよう更新しました。3月13日 修正 gpt-5.4 v1/responses v1/chat/completions GPT-5.4のinput_image入力に関する小さなバグを修正するため、画像エンコーダを更新しました。一部の画像認識ユースケースで品質向上が見込まれますが、対応は不要です。3月12日 機能 sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Sora APIを拡張し、使い回し可能なキャラクター参照、最長20秒までの生成、sora-2-proの1080p出力、ビデオ拡張、および/v1/videosのPOST用Batch APIサポートを追加しました。sora-2-proの1080p生成は1秒あたり0.70ドルで課金されます。詳細はこちらをご覧ください。3月12日 アップデート sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix 既存のビデオ編集のためのPOST /v1/videos/editsを追加しました。これはPOST /v1/videos/{video_id}/remixに取って代わり、6ヶ月以内に廃止されます。詳細はこちらをご覧ください。3月5日 機能 gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions GPT-5.4、最新のフロンティアをリリースしました。"
+      }
     },
     {
       "sourceId": "openai-status-history",
@@ -125,7 +130,12 @@
       "sourceUrl": "https://status.openai.com//incidents/01KN78XN18M5VB6DSRTCWMJRYN",
       "changed": false,
       "classification": "Digest表示(定点観測)",
-      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
+      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。",
+      "translated": {
+        "titleJa": "ChatGPTディクテーションのエラー率増加",
+        "descriptionJa": "ステータス：解決済み　影響を受けたすべてのサービスは完全に回復しました。影響を受けたコンポーネント：ボイスモード（稼働中）",
+        "excerptJa": "ChatGPTディクテーションのエラー率増加 ステータス：解決済み　影響を受けたすべてのサービスは完全に回復しました。影響を受けたコンポーネント：ボイスモード（稼働中） completionsapi-gpt-5-nanoで高いエラー率 ステータス：解決済み　この問題は解決されました。影響を受けたコンポーネント：Chat Completions（稼働中） ChatGPT EnterpriseとChatGPT EduのワークスペースにSSOで参加する一部ユーザーで失敗が多発 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：ログイン（稼働中） すべての面でアカウント作成とログインが不安定 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：ログイン（稼働中） Responses APIとSoraのエラー率増加 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：Responses（稼働中）"
+      }
     },
     {
       "sourceId": "openai-testingcatalog-chatgpt",
@@ -141,7 +151,12 @@
       "sourceUrl": "https://www.testingcatalog.com/openai-launches-visual-product-discovery-in-chatgpt-for-all-users/",
       "changed": false,
       "classification": "非選定",
-      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。",
+      "translated": {
+        "titleJa": "OpenAIがChatGPTで全ユーザー向けにビジュアル商品探索を開始",
+        "descriptionJa": "OpenAIは、新たなChatGPTのショッピング体験を展開しています。これによりユーザーは、主要小売業者の商品をひとつのビジュアルチャット内で閲覧、比較、インサイトを得ることができます。",
+        "excerptJa": "OpenAIがChatGPTで全ユーザー向けにビジュアル商品探索を開始 OpenAIは、新たなChatGPTのショッピング体験を展開しており、ユーザーは主要小売業者の商品を1つのビジュアルチャットで閲覧、比較、インサイトを得ることができます。OpenAIはAPIで利用可能なGPT-5.4 miniとGPT-5.4 nanoもリリースしました。GPT-5.4 miniは、高速かつコスト効率の高いコーディングコパイロット、オートメーション、エージェントシステム向けに設計されています。GPT-5.4 nanoもAPI経由で利用可能です。参考：OpenAIはChatGPTに対話型の数学・理科ツールを追加し、70以上の主要トピックで変数調整や式の可視化ができます。OpenAIは、ChatGPTとCodexにより推論力、コーディング、マルチモーダル機能が強化されたGPT-5.4モデルをリリースしました。また、OpenAIはPowerShell連携や安全なサンドボックス機能を備えたWindows向けCodexアプリもMicrosoft Storeで発表しました。"
+      }
     },
     {
       "sourceId": "anthropic-claude-updates",
@@ -157,7 +172,12 @@
       "sourceUrl": "https://www.anthropic.com/news",
       "changed": false,
       "classification": "アラート表示(サンプル維持)",
-      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
+      "classificationReason": "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。",
+      "translated": {
+        "titleJa": "人々がAIに求めるもの",
+        "descriptionJa": "Anthropicは、信頼性が高く、解釈可能で、操作可能なAIシステムの構築に取り組むAIの安全性と研究の会社です。",
+        "excerptJa": "ニュースルーム　プレスお問い合わせ press@anthropic.com　メディア以外のお問い合わせ support@anthropic.com　メディア関連資料 プレスキットをダウンロード　81,000人がAIに求めるもの 2026年3月18日　Claude.aiのユーザーに、AIをどのように使っているか、AIが実現できると夢見ること、そしてAIがもたらすかもしれない懸念について意見を募りました。約81,000人が参加し、同種の調査としては最大かつ最多言語の定性的研究となりました。私たちが発見したことをお伝えします。製品　2026年2月17日　Claude Sonnet 4.6の紹介　Sonnet 4.6は、コーディング、エージェント、プロフェッショナルワーク全般で最先端のパフォーマンスを実現します。アナウンス　2026年2月5日　Claude Opus 4.6の紹介　私たちの最もスマートなモデルをアップグレードします。エージェント的なコーディング、コンピュータ利用、ツール利用、検索、金融において、Opus 4.6は業界をリードするモデルであり、多くの場合大きな差をつけています。アナウンス　2026年2月4日　Claudeは考えるための空間です　私たちは選択しました：Claudeは広告なしで提供され続けます。広告によるインセンティブは本当に役に立つAIアシスタントとは相容れない理由と、ユーザーの信頼を損なうことなく利用拡大を目指す方針を説明しています。アナウンス　2026年1月30日　火星上のClaude　他の惑星で初となるAI支援走行。NASAのパーシビアランス・ローバーがClaudeの支援で火星上を400メートル移動しました。ニュース　検索　日付　カテゴリ　タイトル　2026年3月31日　アナウンス　オーストラリア政府とAnthropicがAIの安全性と研究のためのMOUを締結　2026年3月12日　アナウンス　AnthropicがClaudeパートナーネットワークに1億ドル投資　2026年3月11日　アナウンス　Anthropic Instituteの設立　2026年3月10日　アナウンス　シドニーがAnthropicのアジア太平洋地域で4番目の拠点に　2026年3月6日　ポリシーパートナー"
+      }
     },
     {
       "sourceId": "anthropic-claude-code-changelog",
@@ -173,7 +193,12 @@
       "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
       "changed": false,
       "classification": "非選定",
-      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。",
+      "translated": {
+        "titleJa": "chore: CHANGELOG.mdを更新",
+        "descriptionJa": "chore: CHANGELOG.mdを更新",
+        "excerptJa": "chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新"
+      }
     },
     {
       "sourceId": "openai-chatgpt-release-notes",
@@ -203,7 +228,12 @@
       "sourceUrl": "https://deepmind.google/technologies/gemini/",
       "changed": false,
       "classification": "非選定",
-      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。",
+      "translated": {
+        "titleJa": "Gemini 3：あらゆるアイデアを実現する、これまでで最も知的なAIモデル",
+        "descriptionJa": "Gemini 3 あらゆるアイデアを実現する、当社最高の知的AIモデル Gemini 3.1 Flash-Lite 高効率かつ知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think 科学・研究・工学分野の現代的課題に最適 詳細はこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの具現化に最適 詳細はこちら Gemini 3 Flash あらゆるアイデアをより速く実現する最新のGemini 3モデル 詳細はこちら 最新情報を見る これまでで最も知的なモデルを紹介します。",
+        "excerptJa": "Gemini 3 あらゆるアイデアを実現する、当社最高の知的AIモデル Gemini 3.1 Flash-Lite 高効率かつ知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think 科学・研究・工学分野の現代的課題に最適 詳細はこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの具現化に最適 詳細はこちら Gemini 3 Flash あらゆるアイデアをより速く実現する最新のGemini 3モデル 詳細はこちら 最新情報を見る これまでで最も知的なモデルを紹介。最先端の推論で学び、構築し、あらゆる計画が可能に。 モデル 機能 ハンズオン ショーケース 性能 セキュリティ Geminiモデルを試す 日常業務から複雑な課題まで対応。ニーズに合った最適なモデルを見つけよう 3.1 Pro 複雑なタスクや創造的なアイデアの具現化に最適 詳細はこちら 3 Flash 高速な知的作業に最適 詳細はこちら 3.1 Flash-Lite 高効率・知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think Gemini 3.1の専門的推論モードを大幅に強化し、最も複雑な技術課題の解決をサポート。Deep Thinkモードは、厳密性、革新的な創造力、知性が求められる現実世界の課題により適切に対応します。Google AI Ultraサブスクライバー向けに提供中。Deep Thinkを試す 詳細はこちら 機能 かつてない深みとニュアンスを持つ推論 スマートで簡潔、率直かつ洞察に満ちたレスポンス — 陳腐やお世辞ではなく本質を捉える。高度なマルチモーダル理解 テキスト、画像、ビデオ、オーディオ — eve"
+      }
     }
   ],
   "sourceHealth": [

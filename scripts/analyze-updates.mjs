@@ -69,6 +69,9 @@ async function enrichGeneratedDataWithModel(base, snapshotMap, options) {
   next.digest = await Promise.all(
     (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, options))
   );
+  next.sourceItems = await Promise.all(
+    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, options))
+  );
 
   next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, options);
 
@@ -207,6 +210,50 @@ async function buildWeeklyThemes(base, snapshotMap, options) {
   return result.themes?.length ? result.themes : base.weeklyThemes ?? [];
 }
 
+async function enrichSourceItem(item, options) {
+  if (!item || item.status !== "ok") {
+    return item;
+  }
+
+  const schema = {
+    name: "source_item_translation",
+    strict: true,
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        title_ja: { type: "string" },
+        description_ja: { type: "string" },
+        excerpt_ja: { type: "string" }
+      },
+      required: ["title_ja", "description_ja", "excerpt_ja"]
+    }
+  };
+
+  const prompt = [
+    "You translate extracted AI product source text into natural Japanese for a single user.",
+    "Translate faithfully.",
+    "Do not add interpretation, scoring, recommendations, or extra facts.",
+    "If the source text is noisy or partial, preserve that uncertainty rather than filling gaps.",
+    `Company: ${item.company}`,
+    `Source label: ${item.label}`,
+    `Original title: ${item.title ?? ""}`,
+    `Original description: ${item.description ?? ""}`,
+    `Original excerpt: ${String(item.excerpt ?? "").slice(0, 2400)}`
+  ].join("\n");
+
+  const result = await callOpenAIJson(prompt, schema, options);
+
+  return {
+    ...item,
+    translated: {
+      titleJa: result.title_ja || "",
+      descriptionJa: result.description_ja || "",
+      excerptJa: result.excerpt_ja || ""
+    }
+  };
+}
+
 async function callOpenAIJson(prompt, schema, options) {
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -279,6 +326,17 @@ function applyFallbackAnalysis(base, snapshotMap, reason) {
     ...item,
     publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
+  }));
+  next.sourceItems = (base.sourceItems ?? []).map((item) => ({
+    ...item,
+    translated:
+      item?.status === "ok"
+        ? {
+            titleJa: item.title ?? "",
+            descriptionJa: item.description ?? "",
+            excerptJa: item.excerpt ?? ""
+          }
+        : undefined
   }));
 
   next.weeklyThemes = [

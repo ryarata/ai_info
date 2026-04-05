@@ -134,6 +134,18 @@ const renderSourceItem = (item) => `
     <h3>${escapeHtml(item.title ?? item.label)}</h3>
     ${renderPublishedAt(item.publishedAt)}
     <p class="summary">${escapeHtml(item.description ?? "抽出本文なし")}</p>
+    ${
+      item.translated
+        ? `
+    <details class="translation">
+      <summary>抽出内容の日本語訳</summary>
+      <p><strong>タイトル訳:</strong> ${escapeHtml(item.translated.titleJa ?? "")}</p>
+      <p><strong>要約訳:</strong> ${escapeHtml(item.translated.descriptionJa ?? "")}</p>
+      <p><strong>抽出本文訳:</strong> ${escapeHtml(item.translated.excerptJa ?? "")}</p>
+    </details>
+    `
+        : ""
+    }
     <div class="why-now">
       <strong>今回の分類</strong>
       <p>${escapeHtml(item.classificationReason ?? "分類理由なし")}</p>
