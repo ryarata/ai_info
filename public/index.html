@@ -14,7 +14,7 @@
         <div>
           <p class="eyebrow">Personal dashboard</p>
           <h1>AI Update Intel</h1>
-          <p class="subtle">更新日時: 2026/04/06 01:28</p>
+          <p class="subtle">更新日時: 2026/04/06 01:37</p>
         </div>
         <button class="notify-button" type="button">通知を有効化</button>
       </header>
@@ -22,7 +22,7 @@
       <section class="hero-grid">
         <article class="metric-card">
           <span>緊急アラート</span>
-          <strong>2</strong>
+          <strong>1</strong>
         </article>
         <article class="metric-card">
           <span>今日のDigest</span>
@@ -58,68 +58,27 @@
     <div class="card-top">
       <div class="badge-row">
         <span class="badge">Anthropic</span>
-        <span class="badge">Claude Cowork</span>
+        <span class="badge">Claude Code changelog</span>
         <span class="badge">今すぐ試す</span>
         <span class="badge">OFFICIAL</span>
       </div>
-      <a class="link" href="https://www.anthropic.com/news">原文</a>
+      <a class="link" href="https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98">原文</a>
     </div>
-    <h3>ワークスペースUIでセッションを超えたプロジェクト記憶が拡充</h3>
-    <p class="published-at">一次情報の投稿日時: 2026/03/18 00:00</p>
-    <p class="summary">Claude CoworkのワークスペースUIで、複数セッションにまたがるプロジェクトの記憶保持機能が強化されました。これにより、前回までの作業状況をスムーズに引き継ぐことができ、再開時の説明や情報整理の手間が大幅に軽減されます。</p>
+    <h3>Claude Code v2.1.92 アップデート内容</h3>
+    <p class="published-at">一次情報の投稿日時: 2026/04/04 09:41</p>
+    <p class="summary">CLI起動時にリモート設定の強制リフレッシュを行うオプションを追加し、取得失敗時は起動せず終了します。ログイン画面からAWS Bedrockの設定を案内するウィザードを新設し、AWS認証やモデル固定の設定が容易になりました。サブスク利用者向けに/costでモデルごとの利用費・キャッシュヒット割合が見えるようになりました。/release-notesでのバージョン選択を対話式に、リモートセッション名はデフォルトでホスト名を反映（上書き可能）。プロユーザーにはキャッシュ切れ時、次回送信されるトークン数の目安が表示されます。その他多数の不具合修正と操作性改善を実施。</p>
     <details class="translation">
       <summary>英語原文タイトル</summary>
-      <p>Cross-session project memory expanded in workspace UI</p>
+      <p>2.1.92</p>
     </details>
     <div class="score-row">
-      <span class="badge">Context UX 5</span>
-      <span class="badge">Work UX 4</span>
+      <span class="badge">Context UX 4</span>
+      <span class="badge">Work UX 5</span>
       <span class="badge">Workflow 4</span>
     </div>
     <div class="why-now">
       <strong>今見る理由</strong>
-      <p>セッションをまたいで情報を保持できることで、ユーザーは都度プロジェクト内容を説明する必要が減るため、コンテキストの継続性が大きく向上します。日々の作業効率やワークフロー短縮にも繋がる重要なアップデートです。</p>
-    </div>
-  </article>
-
-          </div>
-        </details>
-      
-        <details class="company-group" open>
-          <summary class="company-group-head">
-            <span class="company-group-title">OpenAI</span>
-            <span class="company-group-meta">
-              <span class="subtle">1件</span>
-              <span class="group-toggle">表示</span>
-            </span>
-          </summary>
-          <div class="stack company-group-body">
-            
-  <article class="card alert-card">
-    <div class="card-top">
-      <div class="badge-row">
-        <span class="badge">OpenAI</span>
-        <span class="badge">ChatGPT Workspace</span>
-        <span class="badge">今すぐ試す</span>
-        <span class="badge">OFFICIAL</span>
-      </div>
-      <a class="link" href="https://openai.com/news/">原文</a>
-    </div>
-    <h3>長時間プロジェクトのためのエージェント協働タスクフロー</h3>
-    <p class="published-at">一次情報の投稿日時: 2026/03/17 00:00</p>
-    <p class="summary">ChatGPT Workspaceにおいて、従来の単発チャット型から、プロジェクト単位で継続的に作業を進めるためのワークフロー機能が強化されました。これによりAIエージェントと協働しながら、長時間・複数タスクの一貫した管理や進行が可能になります。</p>
-    <details class="translation">
-      <summary>英語原文タイトル</summary>
-      <p>Project-oriented task flow for long-running agent collaboration</p>
-    </details>
-    <div class="score-row">
-      <span class="badge">Context UX 5</span>
-      <span class="badge">Work UX 5</span>
-      <span class="badge">Workflow 5</span>
-    </div>
-    <div class="why-now">
-      <strong>今見る理由</strong>
-      <p>AIとの協働が単発作業から長期間のプロジェクト遂行へと広がる中、業務効率化やUIパターンの進化を大きく後押しする重要な転換だからです。</p>
+      <p>CLIやBedrock連携時の導入や運用トラブルの低減、コスト監視、セッション操作性の向上など、日々の運用体験を着実に改善するアップデートが加わったため。</p>
     </div>
   </article>
 
@@ -150,9 +109,14 @@
       <span class="badge">今すぐ試す</span>
       <span class="badge">OFFICIAL</span>
     </div>
-    <h3>OpenAI API 最新アップデートまとめ（2026年3月）</h3>
+    <h3>OpenAI API の最新アップデート（2026年3月）</h3>
     <p class="published-at">一次情報の投稿日時: 2026/03/17 00:00</p>
-    <p class="summary">OpenAIは2026年3月に主要なAPIアップデートを発表しました。主な内容は次の通りです。①Chat CompletionsとResponses API向けに、GPT-5.4 miniとGPT-5.4 nanoをリリース。miniは高効率かつ多量処理対応、Nanoは速度とコスト重視で簡易タスク向け。miniはツール検索やPC利用に対応、nanoは圧縮のみ。②Sora APIが拡張され、再利用可能なキャラクター参照、最大20秒の動画生成、sora-2-proで1080p出力（1秒0.70ドル）、動画拡張機能、バッチAPI対応を実現。③動画編集API（POST /v1/videos/edits）新設、6か月後に既存のリミックスAPIは非推奨へ。④GPT-5.4系モデルの画像認識で細かな不具合修正が入り品質向上。各API利用者は高効率・新機能の恩恵を即座に受けられます。</p>
+    <p class="summary">・GPT-5.4 miniとGPT-5.4 nanoがChat CompletionsおよびResponses APIで利用可能になりました。miniは高負荷ワークロード向けに高速・効率化され、nanoはさらにコスト・速度を重視したシンプルな処理用モデルです。
+・miniはツール検索・内蔵コンピュータ利用・データ圧縮に対応し、nanoはデータ圧縮のみ対応しています（ツール検索やコンピュータ利用は非対応）。
+・gpt-5.3-chat-latestはChatGPTで利用される最新モデルに更新されました。
+・GPT-5.4のimage encoderの小さなバグ修正が行われ、入力画像の認識精度が向上しました（ユーザー側での対応は不要）。
+・Sora API（sora-2, sora-2-pro）が拡張され、使い回し可能なキャラクター参照、最長20秒の動画生成、1080p出力（sora-2-pro）、動画拡張機能、バッチAPI対応が追加されました。
+・既存動画を編集できる新しいエンドポイント（POST /v1/videos/edits）が登場し、従来のremix機能は6か月後に廃止予定です。</p>
   </article>
 
   <article class="card digest-card">
@@ -161,9 +125,9 @@
       <span class="badge">今週理解</span>
       <span class="badge">OFFICIAL</span>
     </div>
-    <h3>OpenAI サービス障害の復旧状況</h3>
+    <h3>OpenAI サービスの一時的障害と復旧状況</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/03 02:49</p>
-    <p class="summary">ChatGPT の音声入力やAPI、ログイン機能、一部のエンタープライズ機能などで一時的な障害やエラー率の上昇が発生しましたが、現在はすべてのサービスが完全に復旧し、正常に利用できる状態になっています。</p>
+    <p class="summary">ChatGPT音声入力やAPI、エンタープライズ向けログイン、一部レスポンス関連で一時的に高いエラー率や不安定な状態が発生しましたが、現在は全て復旧し正常に利用できます。</p>
   </article>
 
           </div>
@@ -179,18 +143,18 @@
         <div class="stack">
           
             <article class="card theme-card">
-              <h3>APIモデルの進化と業務効率化</h3>
-              <p class="summary">OpenAIがGPT-5.4 miniおよびnanoモデルをAPIでリリース。miniは高い能力を高速・効率的に提供し、大量処理や自動化、コーディング補助、エージェント業務に最適。nanoはコスト・スピード重視で単純な反復タスク向け。ツール連携やPC操作はminiのみ対応。次の3〜6ヶ月でワークフローの見直しや、モデル選択による業務の最適化が重要です。</p>
+              <h3>AIモデルの進化とワークフロー最適化</h3>
+              <p class="summary">OpenAIはGPT-5.4 miniとnanoをAPI・チャットでリリース。miniは高機能・高速で、高ボリューム作業や自動化に最適。nanoはさらに軽量でコスト重視の用途向き。ワークフロー設計時、高速性・コスト・機能別にモデル選択が可能になり、運用効率化や業務ごと最適化が現実的。</p>
             </article>
           
             <article class="card theme-card">
-              <h3>マルチベンダーAIのプロフェッショナル活用</h3>
-              <p class="summary">AnthropicのClaude Sonnet 4.6やOpus 4.6、GoogleのGemini 3.1 Proなど、各社が高性能・高効率モデルを展開。エージェント化、複雑課題解決、プロフェッショナル用途での選定余地が拡大。業務要件とモデル特性を見極めた活用が成果を左右します。</p>
+              <h3>API・サービス安定性の最新状況</h3>
+              <p class="summary">チャットや音声認識、SSO連携などに一時障害があったが、すべて復旧済み。新機能導入時や大量アクセス時の一時的な不安定リスクは依然あり、運用現場では自動リトライや冗長化設計が推奨される。</p>
             </article>
           
             <article class="card theme-card">
-              <h3>ChatGPTの新インタラクティブ機能・安定化</h3>
-              <p class="summary">ChatGPTにビジュアルプロダクト発見（ショッピング体験）やインタラクティブな数理・科学ツールが追加。初期障害対応も改善傾向。新機能導入時は用途特化・安定性を確認し、既存のフロー・体験への影響評価が必須です。</p>
+              <h3>新しいUX：可視的商品探索・インタラクティブツール</h3>
+              <p class="summary">ChatGPTは製品比較・可視的検索UIや、インタラクティブな数理・科学ツールを順次搭載。社内ワークフローや自社のUX設計でも、AIによる「ビジュアルな比較・分析」「動的な変数調整」の利用検討余地が拡大。</p>
             </article>
           
         </div>
@@ -311,7 +275,7 @@
       <div class="badge-row">
         <span class="badge">OpenAI</span>
         <span class="badge">API changelog</span>
-        <span class="badge">アラート表示(サンプル維持)</span>
+        <span class="badge">Digest表示(定点観測)</span>
         <span class="badge">OFFICIAL</span>
       </div>
       <a class="link" href="https://developers.openai.com/api/docs/changelog">原文</a>
@@ -322,14 +286,14 @@
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> チェンジログ | OpenAI API</p>
-      <p><strong>要約訳:</strong> OpenAI APIの最新機能やアップデート一覧をご覧いただけます。</p>
-      <p><strong>抽出本文訳:</strong> チェンジログ 2026年3月 3月17日 機能 gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions GPT-5.4 miniとGPT-5.4 nanoをChat CompletionsおよびResponses APIでリリースしました。GPT-5.4 miniは、より高速かつ効率的なモデルで高負荷ワークロード向けにGPT-5.4クラスの能力を提供します。一方、GPT-5.4 nanoは、速度とコストが最重視される単純な高負荷タスク向けに最適化されています。GPT-5.4 miniはツール検索、内蔵コンピュータ利用、圧縮をサポートします。GPT-5.4 nanoは圧縮のみサポートし、ツール検索やコンピュータ利用はサポートされません。3月16日 アップデート gpt-5.3-chat-latest gpt-5.3-chat-latestのスラグを、現在ChatGPTで使用されている最新版モデルを指すよう更新しました。3月13日 修正 gpt-5.4 v1/responses v1/chat/completions GPT-5.4のinput_image入力に関する小さなバグを修正するため、画像エンコーダを更新しました。一部の画像認識ユースケースで品質向上が見込まれますが、対応は不要です。3月12日 機能 sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Sora APIを拡張し、使い回し可能なキャラクター参照、最長20秒までの生成、sora-2-proの1080p出力、ビデオ拡張、および/v1/videosのPOST用Batch APIサポートを追加しました。sora-2-proの1080p生成は1秒あたり0.70ドルで課金されます。詳細はこちらをご覧ください。3月12日 アップデート sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix 既存のビデオ編集のためのPOST /v1/videos/editsを追加しました。これはPOST /v1/videos/{video_id}/remixに取って代わり、6ヶ月以内に廃止されます。詳細はこちらをご覧ください。3月5日 機能 gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions GPT-5.4、最新のフロンティアをリリースしました。</p>
+      <p><strong>タイトル訳:</strong> 変更履歴 | OpenAI API</p>
+      <p><strong>要約訳:</strong> OpenAI APIの最新機能やアップデートをご覧いただけます。</p>
+      <p><strong>抽出本文訳:</strong> 変更履歴 2026年3月 3月17日 機能 gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions Chat CompletionsおよびResponses APIにGPT-5.4 miniとGPT-5.4 nanoをリリースしました。GPT-5.4 miniは、高い作業量に対応可能なより速く効率的なモデルとしてGPT-5.4クラスの性能を提供します。一方GPT-5.4 nanoは、スピードとコスト重視のシンプルな大量タスクに最適化されています。GPT-5.4 miniはツール検索、内蔵のコンピューター利用、データ圧縮に対応。GPT-5.4 nanoはデータ圧縮のみ対応し、ツール検索やコンピューター利用は非対応です。3月16日 アップデート gpt-5.3-chat-latest gpt-5.3-chat-latestのスラッグを、現在ChatGPTで使われている最新モデルに更新しました。3月13日 修正 gpt-5.4 v1/responses v1/chat/completions GPT-5.4のinput_image入力に関する小さなバグを修正するため、画像エンコーダを更新しました。一部の画像理解ユースケースで品質が向上している場合があります。追加対応は不要です。3月12日 機能 sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Sora APIを拡張し、再利用可能なキャラクター参照、最大20秒までの長い生成、sora-2-proでの1080p出力、ビデオ拡張機能、POST /v1/videos用のBatch APIを追加しました。sora-2-proで1080p生成は1秒あたり$0.70で課金されます。詳細はこちら。3月12日 アップデート sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix 既存のビデオ編集用にPOST /v1/videos/editsを追加しました。これは6ヶ月以内に非推奨となるPOST /v1/videos/{video_id}/remixに置き換わります。詳細はこちら。3月5日 機能 gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions GPT-5.4をリリースしました。</p>
     </details>
     
     <div class="why-now">
       <strong>今回の分類</strong>
-      <p>今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。</p>
+      <p>差分候補が少なかったため、定点観測用にDigestへ掲載しています。</p>
     </div>
   </article>
 
@@ -349,9 +313,9 @@
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> ChatGPTディクテーションのエラー率増加</p>
-      <p><strong>要約訳:</strong> ステータス：解決済み　影響を受けたすべてのサービスは完全に回復しました。影響を受けたコンポーネント：ボイスモード（稼働中）</p>
-      <p><strong>抽出本文訳:</strong> ChatGPTディクテーションのエラー率増加 ステータス：解決済み　影響を受けたすべてのサービスは完全に回復しました。影響を受けたコンポーネント：ボイスモード（稼働中） completionsapi-gpt-5-nanoで高いエラー率 ステータス：解決済み　この問題は解決されました。影響を受けたコンポーネント：Chat Completions（稼働中） ChatGPT EnterpriseとChatGPT EduのワークスペースにSSOで参加する一部ユーザーで失敗が多発 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：ログイン（稼働中） すべての面でアカウント作成とログインが不安定 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：ログイン（稼働中） Responses APIとSoraのエラー率増加 ステータス：解決済み　影響を受けたすべてのサービスが完全に回復しました。影響を受けたコンポーネント：Responses（稼働中）</p>
+      <p><strong>タイトル訳:</strong> ChatGPTディクテーションのエラー率上昇</p>
+      <p><strong>要約訳:</strong> ステータス：解決済み 影響を受けていたすべてのサービスは、現在完全に復旧しました。影響を受けたコンポーネント：ボイスモード（稼働中）</p>
+      <p><strong>抽出本文訳:</strong> ChatGPTディクテーションのエラー率上昇 ステータス：解決済み 影響を受けていたすべてのサービスは、現在完全に復旧しました。影響を受けたコンポーネント：ボイスモード（稼働中） completionsapi-gpt-5-nanoの高いエラー率 ステータス：解決済み 問題は解決しました。影響を受けたコンポーネント：Chat Completions（稼働中） 一部ユーザーがChatGPT EnterpriseやChatGPT EduワークスペースへSSOで参加する際のエラー増加 ステータス：解決済み 影響を受けていたすべてのサービスは、現在完全に復旧しました。影響を受けたコンポーネント：ログイン（稼働中） すべての画面でのアカウント作成とログインが不安定 ステータス：解決済み 影響を受けていたすべてのサービスは、現在完全に復旧しました。影響を受けたコンポーネント：ログイン（稼働中） Responses APIおよびSoraのエラー率増加 ステータス：解決済み 影響を受けていたすべてのサービスは、現在完全に復旧しました。影響を受けたコンポーネント：Responses（稼働中）</p>
     </details>
     
     <div class="why-now">
@@ -376,9 +340,9 @@
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> OpenAIがChatGPTで全ユーザー向けにビジュアル商品探索を開始</p>
-      <p><strong>要約訳:</strong> OpenAIは、新たなChatGPTのショッピング体験を展開しています。これによりユーザーは、主要小売業者の商品をひとつのビジュアルチャット内で閲覧、比較、インサイトを得ることができます。</p>
-      <p><strong>抽出本文訳:</strong> OpenAIがChatGPTで全ユーザー向けにビジュアル商品探索を開始 OpenAIは、新たなChatGPTのショッピング体験を展開しており、ユーザーは主要小売業者の商品を1つのビジュアルチャットで閲覧、比較、インサイトを得ることができます。OpenAIはAPIで利用可能なGPT-5.4 miniとGPT-5.4 nanoもリリースしました。GPT-5.4 miniは、高速かつコスト効率の高いコーディングコパイロット、オートメーション、エージェントシステム向けに設計されています。GPT-5.4 nanoもAPI経由で利用可能です。参考：OpenAIはChatGPTに対話型の数学・理科ツールを追加し、70以上の主要トピックで変数調整や式の可視化ができます。OpenAIは、ChatGPTとCodexにより推論力、コーディング、マルチモーダル機能が強化されたGPT-5.4モデルをリリースしました。また、OpenAIはPowerShell連携や安全なサンドボックス機能を備えたWindows向けCodexアプリもMicrosoft Storeで発表しました。</p>
+      <p><strong>タイトル訳:</strong> OpenAI、ChatGPTの全ユーザー向けにビジュアル商品発見機能を開始</p>
+      <p><strong>要約訳:</strong> OpenAIは、主要な小売業者の商品を、ひとつのビジュアルチャット内で閲覧・比較し、インサイトを得られる新しいChatGPTショッピング体験を展開しています。</p>
+      <p><strong>抽出本文訳:</strong> OpenAI、ChatGPTの全ユーザー向けにビジュアル商品発見機能を開始 OpenAIは、主要な小売業者の商品を、ひとつのビジュアルチャット内で閲覧・比較し、インサイトを得られる新しいChatGPTショッピング体験を展開しています。OpenAI、GPT-5.4 miniおよびGPT-5.4 nanoをAPIで提供開始 OpenAIは、より高速でコスト効率の高いコーディングコパイロットや自動化、エージェントシステム向けにGPT-5.4 miniを導入し、API、Codex、ChatGPTで利用可能としました。GPT-5.4 nanoもAPI経由で利用できるようになりました。最近の話題: OpenAI、ChatGPTにインタラクティブ数学＆科学ツールを追加 OpenAIは、世界中の70以上の主要トピックで変数の調整や方程式の可視化ができるインタラクティブな数学・科学モジュールをChatGPTに追加しています。OpenAI、ChatGPTおよびCodexでGPT-5.4モデルをリリース OpenAIは、推論力やコーディング、マルチモーダル機能が向上した強力なAIモデルGPT-5.4を、ChatGPTおよびAPIに統合しました。OpenAI、Microsoft StoreでWindows向けCodexアプリを開始 OpenAIは、PowerShell統合と堅牢なサンドボックスが特徴のエージェントコーディング向けネイティブWindows用Codexアプリを、Microsoft Storeで提供開始しました。</p>
     </details>
     
     <div class="why-now">
@@ -425,7 +389,7 @@
       <div class="badge-row">
         <span class="badge">Anthropic</span>
         <span class="badge">Claude product updates</span>
-        <span class="badge">アラート表示(サンプル維持)</span>
+        <span class="badge">非選定</span>
         <span class="badge">OFFICIAL</span>
       </div>
       <a class="link" href="https://www.anthropic.com/news">原文</a>
@@ -436,14 +400,14 @@
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> 人々がAIに求めるもの</p>
-      <p><strong>要約訳:</strong> Anthropicは、信頼性が高く、解釈可能で、操作可能なAIシステムの構築に取り組むAIの安全性と研究の会社です。</p>
-      <p><strong>抽出本文訳:</strong> ニュースルーム　プレスお問い合わせ press@anthropic.com　メディア以外のお問い合わせ support@anthropic.com　メディア関連資料 プレスキットをダウンロード　81,000人がAIに求めるもの 2026年3月18日　Claude.aiのユーザーに、AIをどのように使っているか、AIが実現できると夢見ること、そしてAIがもたらすかもしれない懸念について意見を募りました。約81,000人が参加し、同種の調査としては最大かつ最多言語の定性的研究となりました。私たちが発見したことをお伝えします。製品　2026年2月17日　Claude Sonnet 4.6の紹介　Sonnet 4.6は、コーディング、エージェント、プロフェッショナルワーク全般で最先端のパフォーマンスを実現します。アナウンス　2026年2月5日　Claude Opus 4.6の紹介　私たちの最もスマートなモデルをアップグレードします。エージェント的なコーディング、コンピュータ利用、ツール利用、検索、金融において、Opus 4.6は業界をリードするモデルであり、多くの場合大きな差をつけています。アナウンス　2026年2月4日　Claudeは考えるための空間です　私たちは選択しました：Claudeは広告なしで提供され続けます。広告によるインセンティブは本当に役に立つAIアシスタントとは相容れない理由と、ユーザーの信頼を損なうことなく利用拡大を目指す方針を説明しています。アナウンス　2026年1月30日　火星上のClaude　他の惑星で初となるAI支援走行。NASAのパーシビアランス・ローバーがClaudeの支援で火星上を400メートル移動しました。ニュース　検索　日付　カテゴリ　タイトル　2026年3月31日　アナウンス　オーストラリア政府とAnthropicがAIの安全性と研究のためのMOUを締結　2026年3月12日　アナウンス　AnthropicがClaudeパートナーネットワークに1億ドル投資　2026年3月11日　アナウンス　Anthropic Instituteの設立　2026年3月10日　アナウンス　シドニーがAnthropicのアジア太平洋地域で4番目の拠点に　2026年3月6日　ポリシーパートナー</p>
+      <p><strong>タイトル訳:</strong> AIに人々が求めるもの</p>
+      <p><strong>要約訳:</strong> Anthropicは、信頼性が高く、解釈可能で、操作可能なAIシステムの構築に取り組むAIセーフティおよび研究の企業です。</p>
+      <p><strong>抽出本文訳:</strong> ニュースルーム プレスお問い合わせ press@anthropic.com メディア以外のお問い合わせ support@anthropic.com メディア素材 プレスキットをダウンロード AIに人々が求めるもの 2026年3月18日 Claude.aiユーザーに、AIをどのように利用しているか、AIが実現できると夢見ること、そしてAIに対する不安について共有してもらいました。約81,000人が参加しました—これはこの種の定性的な調査としては最大かつ最も多言語にわたるものです。私たちが見つけたことはこちら。 製品 2026年2月17日 Claude Sonnet 4.6 のご紹介 Sonnet 4.6は、コーディング、エージェント、プロフェッショナルな業務全体において最先端のパフォーマンスを実現します。 アナウンスメント 2026年2月5日 Claude Opus 4.6 のご紹介 当社最先端モデルのアップグレード。エージェント的なコーディング、コンピュータ利用、ツール利用、検索、金融分野で、Opus 4.6は業界をリードするモデルであり、多くの場合大きな差をもって優れています。 アナウンスメント 2026年2月4日 Claudeは考える場です 当社は決断しました：Claudeには広告を表示しません。なぜ広告インセンティブが本当に役立つAIアシスタントと両立しないのか、そしてユーザーの信頼を損なうことなくアクセスを拡大する計画について説明します。 アナウンスメント 2026年1月30日 Claude on Mars 他の惑星で初めてAIが支援した走行。ClaudeはNASAのパーサビアランス・ローバーが火星で400メートルを移動するのをサポートしました。 ニュース 検索 日付 カテゴリ タイトル 2026年3月31日 アナウンスメント オーストラリア政府とAnthropic、AIの安全性と研究に関するMOUを締結 2026年3月12日 アナウンスメント AnthropicがClaudeパートナーネットワークに1億ドルを投資 2026年3月11日 アナウンスメント Anthropic Institute設立のご紹介 2026年3月10日 アナウンスメント シドニーがAnthropicのアジア太平洋地域4番目の拠点に 2026年3月6日 ポリシー パートナー</p>
     </details>
     
     <div class="why-now">
       <strong>今回の分類</strong>
-      <p>今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。</p>
+      <p>取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。</p>
     </div>
   </article>
 
@@ -452,25 +416,25 @@
       <div class="badge-row">
         <span class="badge">Anthropic</span>
         <span class="badge">Claude Code changelog</span>
-        <span class="badge">非選定</span>
+        <span class="badge">アラート表示</span>
         <span class="badge">OFFICIAL</span>
       </div>
       <a class="link" href="https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98">原文</a>
     </div>
-    <h3>chore: Update CHANGELOG.md</h3>
+    <h3>2.1.92</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/04 09:41</p>
-    <p class="summary">chore: Update CHANGELOG.md</p>
+    <p class="summary">## 2.1.92 - Added `forceRemoteSettingsRefresh` policy setting: when set, the CLI blocks startup until remote managed settings are freshly fetched, and exits if the fetch fails (fail-closed) - Added interactive Bedrock setup wizard accessible from the login screen when selecting &quot;3rd-party platform&quot; — guides you through AWS authentication, region configuration, credential verification, and model pinning - Added per-model and cache-hit breakdown to `/cost` for subscription users - `/release-notes` is now an interactive version picker - Remote Control session names now use your hostname as the default prefix (e.g.</p>
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> chore: CHANGELOG.mdを更新</p>
-      <p><strong>要約訳:</strong> chore: CHANGELOG.mdを更新</p>
-      <p><strong>抽出本文訳:</strong> chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新 chore: CHANGELOG.mdを更新</p>
+      <p><strong>タイトル訳:</strong> 2.1.92</p>
+      <p><strong>要約訳:</strong> ## 2.1.92 - `forceRemoteSettingsRefresh`ポリシー設定を追加：設定されている場合、CLIはリモート管理設定が新たに取得されるまで起動をブロックし、取得に失敗すると（fail-closed）終了します - ログイン画面で「3rd-party platform」を選択すると、Bedrockの設定ウィザードが対話式で利用可能に：AWS認証、リージョン設定、資格情報の検証、モデルのピン止めを案内します - サブスクリプションユーザー向けに`/cost`でモデルごとおよびキャッシュヒットごとの内訳を追加 - `/release-notes`がインタラクティブなバージョン選択機能になりました - リモートコントロールのセッション名はデフォルトでホスト名を接頭辞に使用するようになりました（例：`myhost-graceful-unicorn`）、`--remote-control-session-name-prefix`で上書き可能</p>
+      <p><strong>抽出本文訳:</strong> ## 2.1.92 - `forceRemoteSettingsRefresh`ポリシー設定を追加: 設定時、CLIはリモート管理設定が新規取得されるまで起動をブロックし、取得失敗時には終了(fail-closed) - ログイン画面で「3rd-party platform」選択時、Bedrock対話式セットアップウィザード追加: AWS認証、リージョン設定、認証情報確認、モデルピン止めの手順案内 - サブスクリプションユーザー向けに`/cost`へモデルごと・キャッシュヒットごとの内訳追加 - `/release-notes`がインタラクティブなバージョン選択に - リモートコントロールセッション名のデフォルト接頭辞がホスト名(例: `myhost-graceful-unicorn`)、`--remote-control-session-name-prefix`で変更可</p>
     </details>
     
     <div class="why-now">
       <strong>今回の分類</strong>
-      <p>取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。</p>
+      <p>今回の実行で重要度が高い更新としてアラートに分類されました。</p>
     </div>
   </article>
 
@@ -503,9 +467,9 @@
     
     <details class="translation">
       <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> Gemini 3：あらゆるアイデアを実現する、これまでで最も知的なAIモデル</p>
-      <p><strong>要約訳:</strong> Gemini 3 あらゆるアイデアを実現する、当社最高の知的AIモデル Gemini 3.1 Flash-Lite 高効率かつ知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think 科学・研究・工学分野の現代的課題に最適 詳細はこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの具現化に最適 詳細はこちら Gemini 3 Flash あらゆるアイデアをより速く実現する最新のGemini 3モデル 詳細はこちら 最新情報を見る これまでで最も知的なモデルを紹介します。</p>
-      <p><strong>抽出本文訳:</strong> Gemini 3 あらゆるアイデアを実現する、当社最高の知的AIモデル Gemini 3.1 Flash-Lite 高効率かつ知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think 科学・研究・工学分野の現代的課題に最適 詳細はこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの具現化に最適 詳細はこちら Gemini 3 Flash あらゆるアイデアをより速く実現する最新のGemini 3モデル 詳細はこちら 最新情報を見る これまでで最も知的なモデルを紹介。最先端の推論で学び、構築し、あらゆる計画が可能に。 モデル 機能 ハンズオン ショーケース 性能 セキュリティ Geminiモデルを試す 日常業務から複雑な課題まで対応。ニーズに合った最適なモデルを見つけよう 3.1 Pro 複雑なタスクや創造的なアイデアの具現化に最適 詳細はこちら 3 Flash 高速な知的作業に最適 詳細はこちら 3.1 Flash-Lite 高効率・知的処理が求められる大量タスクに最適 詳細はこちら Gemini 3.1 Deep Think Gemini 3.1の専門的推論モードを大幅に強化し、最も複雑な技術課題の解決をサポート。Deep Thinkモードは、厳密性、革新的な創造力、知性が求められる現実世界の課題により適切に対応します。Google AI Ultraサブスクライバー向けに提供中。Deep Thinkを試す 詳細はこちら 機能 かつてない深みとニュアンスを持つ推論 スマートで簡潔、率直かつ洞察に満ちたレスポンス — 陳腐やお世辞ではなく本質を捉える。高度なマルチモーダル理解 テキスト、画像、ビデオ、オーディオ — eve</p>
+      <p><strong>タイトル訳:</strong> Gemini 3：あらゆるアイデアを実現する私たちで最も知的なAIモデル</p>
+      <p><strong>要約訳:</strong> Gemini 3 あらゆるアイデアを実現する私たちで最も知的なAIモデル Gemini 3.1 Flash-Lite 効率性と知性が求められる大量タスクに最適 詳しくはこちら Gemini 3.1 Deep Think 科学、研究、エンジニアリングにおける現代の課題に最適 詳しくはこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの実現に最適 詳しくはこちら Gemini 3 Flash あらゆるアイデアをより早く実現する最新のGemini 3モデル 詳しくはこちら 最新情報を見る これまでで最も知的なモデルを紹介します。</p>
+      <p><strong>抽出本文訳:</strong> Gemini 3 あらゆるアイデアを実現する私たちで最も知的なAIモデル Gemini 3.1 Flash-Lite 効率性と知性が求められる大量タスクに最適 詳しくはこちら Gemini 3.1 Deep Think 科学、研究、エンジニアリングにおける現代の課題に最適 詳しくはこちら Gemini 3.1 Pro 複雑なタスクや創造的なコンセプトの実現に最適 詳しくはこちら Gemini 3 Flash あらゆるアイデアをより早く実現する最新のGemini 3モデル 詳しくはこちら 最新情報を見る これまでで最も知的なモデルを紹介します。最先端の推論力で、学習・構築・計画のあらゆる場面をサポートします。 モデル 機能 ハンズオンショーケース パフォーマンス セーフティ Geminiモデルを試す 日常的な作業の完了や複雑な問題の解決に。あなたに合ったモデルを見つけてください 3.1 Pro 複雑なタスクや創造的なコンセプトの実現に最適 詳しくはこちら 3 Flash 最前線の知性をスピードで 詳しくはこちら 3.1 Flash-Lite 効率性と知性が求められる大量タスクに最適 詳しくはこちら Gemini 3.1 Deep Think 知性の限界を押し広げ、Gemini 3.1専用推論モードを大幅にアップグレードし、最も複雑な技術的課題の解決をサポートします。Deep Thinkモードは、厳密さと革新的な創造力、知性を要する現実世界の問題に取り組むのに適しています。Google AI Ultraサブスクライバー向けに利用可能です。 Deep Think を試す 詳しくはこちら 機能 前例のない深さとニュアンスで推論 スマートで簡潔、直接的な応答（クリシェやお世辞を避けた真の洞察）。 高度なマルチモーダル理解 テキスト、画像、動画、音声 — eve</p>
     </details>
     
     <div class="why-now">
@@ -533,7 +497,7 @@
         <span class="badge">取得成功</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:21</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>API changelog</h3>
     <p class="published-at">一次情報の投稿日時: 2026/03/17 00:00</p>
@@ -547,7 +511,7 @@
         <span class="badge">取得成功</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:21</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>Status history feed</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/03 02:49</p>
@@ -561,7 +525,7 @@
         <span class="badge">取得成功</span>
         <span class="badge">secondary</span>
       </div>
-      <span class="subtle">2026/04/06 01:21</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>TestingCatalog ChatGPT feed</h3>
     <p class="published-at">一次情報の投稿日時: 2026/03/25 19:47</p>
@@ -575,7 +539,7 @@
         <span class="badge">取得成功</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:21</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>Claude product updates</h3>
     <p class="published-at">一次情報の投稿日時: 2026/03/18 00:00</p>
@@ -589,11 +553,11 @@
         <span class="badge">取得成功</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:22</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>Claude Code changelog</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/04 09:41</p>
-    <p class="summary">現時点では大きな差分はありません。</p>
+    <p class="summary">前回取得との差分を検出しました。</p>
   </article>
 
   <article class="card health-card health-error">
@@ -603,7 +567,7 @@
         <span class="badge">取得失敗</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:22</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>ChatGPT release notes</h3>
     <p class="published-at">一次情報の投稿日時: 取得元から抽出できず</p>
@@ -617,7 +581,7 @@
         <span class="badge">取得成功</span>
         <span class="badge">official</span>
       </div>
-      <span class="subtle">2026/04/06 01:22</span>
+      <span class="subtle">2026/04/06 01:37</span>
     </div>
     <h3>Gemini updates</h3>
     <p class="published-at">一次情報の投稿日時: 取得元から抽出できず</p>
@@ -632,7 +596,7 @@
         navigator.serviceWorker.register("./sw.js").catch(() => {});
       }
 
-      const alertIds = ["anthropic-context-memory","openai-project-workflow"];
+      const alertIds = ["anthropic-claude-code-changelog-alert"];
       const button = document.querySelector(".notify-button");
       if (button && "Notification" in window) {
         button.addEventListener("click", async () => {

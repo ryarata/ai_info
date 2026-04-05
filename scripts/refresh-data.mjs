@@ -61,7 +61,7 @@ async function fetchSourceSnapshot(source) {
 
     const rawText = await response.text();
     if (source.type === "atom" || source.type === "rss") {
-      return buildFeedSnapshot(source, rawText, fetchedAt);
+      return await buildFeedSnapshot(source, rawText, fetchedAt);
     }
 
     const html = rawText;
@@ -106,7 +106,7 @@ async function fetchSourceSnapshot(source) {
   }
 }
 
-function buildFeedSnapshot(source, xml, fetchedAt) {
+async function buildFeedSnapshot(source, xml, fetchedAt) {
   const items = extractFeedItems(xml, source.type);
   const latest = items[0] ?? {};
   const title = latest.title || source.label;
@@ -114,10 +114,9 @@ function buildFeedSnapshot(source, xml, fetchedAt) {
   const excerptParts = items
     .slice(0, 5)
     .map((item) => `${item.title || ""} ${normalizeText(stripTags(item.description || item.summary || ""))}`.trim())
-    .filter(Boolean);
+      .filter(Boolean);
   const excerpt = excerptParts.join(" ").slice(0, 2000);
-
-  return {
+  const snapshot = {
     id: source.id,
     sourceId: source.id,
     company: source.company,
@@ -133,6 +132,54 @@ function buildFeedSnapshot(source, xml, fetchedAt) {
     excerpt,
     hash: hashText(`${title}\n${description}\n${excerpt}`)
   };
+
+  if (source.id === "anthropic-claude-code-changelog") {
+    return await enrichClaudeCodeSnapshot(snapshot);
+  }
+
+  return snapshot;
+}
+
+async function enrichClaudeCodeSnapshot(snapshot) {
+  const sha = extractGitHubCommitSha(snapshot.itemUrl);
+  if (!sha) {
+    return snapshot;
+  }
+
+  const rawUrl = `https://raw.githubusercontent.com/anthropics/claude-code/${sha}/CHANGELOG.md`;
+
+  try {
+    const response = await fetch(rawUrl, {
+      headers: {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0 Safari/537.36",
+        accept: "text/plain,*/*;q=0.8",
+        "cache-control": "no-cache"
+      }
+    });
+
+    if (!response.ok) {
+      return snapshot;
+    }
+
+    const markdown = await response.text();
+    const relevantSection = extractLatestMarkdownSection(markdown);
+    const normalizedSection = normalizeText(relevantSection);
+    if (!normalizedSection) {
+      return snapshot;
+    }
+
+    const derivedTitle = extractFirstMarkdownHeading(relevantSection) ?? snapshot.title;
+
+    return {
+      ...snapshot,
+      title: derivedTitle,
+      description: firstMeaningfulSentence(normalizedSection),
+      excerpt: normalizedSection.slice(0, 2000),
+      hash: hashText(`${derivedTitle}\n${firstMeaningfulSentence(normalizedSection)}\n${normalizedSection.slice(0, 4000)}`)
+    };
+  } catch {
+    return snapshot;
+  }
 }
 
 function buildGeneratedData(snapshotResults, sampleData) {
@@ -630,6 +677,42 @@ function stripCdata(text) {
   return text
     .replace(/<!\[CDATA\[/g, "")
     .replace(/\]\]>/g, "");
+}
+
+function extractGitHubCommitSha(url) {
+  if (!url) {
+    return null;
+  }
+
+  const match = url.match(/\/commit\/([0-9a-f]{7,40})/i);
+  return match ? match[1] : null;
+}
+
+function extractLatestMarkdownSection(markdown) {
+  const normalized = markdown.replace(/\r\n/g, "\n");
+  const lines = normalized.split("\n");
+  let start = lines.findIndex((line) => /^##\s+/.test(line.trim()));
+  if (start === -1) {
+    start = lines.findIndex((line) => /^#\s+/.test(line.trim()));
+  }
+  if (start === -1) {
+    return normalized.slice(0, 2000);
+  }
+
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i += 1) {
+    if (/^##\s+/.test(lines[i].trim())) {
+      end = i;
+      break;
+    }
+  }
+
+  return lines.slice(start, end).join("\n").trim();
+}
+
+function extractFirstMarkdownHeading(markdown) {
+  const match = markdown.match(/^#{1,3}\s+(.+)$/m);
+  return match ? normalizeText(match[1]) : null;
 }
 
 function normalizeText(text) {
