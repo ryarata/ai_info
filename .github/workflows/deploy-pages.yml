@@ -42,11 +42,33 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Restore analysis cache
+        id: analysis-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/updates.analyzed.json
+            data/updates.generated.json
+            data/snapshots
+          key: ai-update-cache-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ai-update-cache-
+
       - name: Refresh data and build static site
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}
         run: npm run refresh
+
+      - name: Save analysis cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/updates.analyzed.json
+            data/updates.generated.json
+            data/snapshots
+          key: ai-update-cache-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
