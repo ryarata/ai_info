@@ -525,7 +525,7 @@ function getCachedTranslationForSourceItem(item, cache) {
     return { hit: false, reason: "no_previous_translation" };
   }
 
-  const fingerprintDiff = diffSourceFingerprint(sourceFingerprintPartsFromSourceItem(previous), sourceFingerprintPartsFromSourceItem(item));
+  const fingerprintDiff = diffSourceIdentity(sourceIdentityPartsFromSourceItem(previous), sourceIdentityPartsFromSourceItem(item));
   if (fingerprintDiff) {
     return { hit: false, reason: fingerprintDiff };
   }
@@ -539,9 +539,9 @@ function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
     return { hit: false, reason: "no_previous_source_item" };
   }
 
-  const fingerprintDiff = diffSourceFingerprint(
-    sourceFingerprintPartsFromSourceItem(previousSourceItem),
-    sourceFingerprintPartsFromSnapshot(snapshot)
+  const fingerprintDiff = diffSourceIdentity(
+    sourceIdentityPartsFromSourceItem(previousSourceItem),
+    sourceIdentityPartsFromSnapshot(snapshot)
   );
   if (fingerprintDiff) {
     return { hit: false, reason: fingerprintDiff };
@@ -561,35 +561,33 @@ function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
 }
 
 function sourceFingerprintFromSnapshot(snapshot) {
-  return Object.values(sourceFingerprintPartsFromSnapshot(snapshot)).join("\n@@\n");
+  return Object.values(sourceIdentityPartsFromSnapshot(snapshot)).join("\n@@\n");
 }
 
 function sourceFingerprintFromSourceItem(item) {
-  return Object.values(sourceFingerprintPartsFromSourceItem(item)).join("\n@@\n");
+  return Object.values(sourceIdentityPartsFromSourceItem(item)).join("\n@@\n");
 }
 
 function fingerprintWeeklyThemes(okSnapshots) {
   return JSON.stringify(okSnapshots);
 }
 
-function sourceFingerprintPartsFromSnapshot(snapshot) {
+function sourceIdentityPartsFromSnapshot(snapshot) {
   return {
     title: normalizeFingerprintText(snapshot?.title ?? ""),
-    description: normalizeFingerprintText(snapshot?.description ?? ""),
-    excerpt: normalizeFingerprintText(snapshot?.excerpt ?? "")
+    publishedAt: normalizeIdentityDate(snapshot?.publishedAt ?? "")
   };
 }
 
-function sourceFingerprintPartsFromSourceItem(item) {
+function sourceIdentityPartsFromSourceItem(item) {
   return {
     title: normalizeFingerprintText(item?.title ?? ""),
-    description: normalizeFingerprintText(item?.description ?? ""),
-    excerpt: normalizeFingerprintText(item?.excerpt ?? "")
+    publishedAt: normalizeIdentityDate(item?.publishedAt ?? "")
   };
 }
 
-function diffSourceFingerprint(previous, current) {
-  for (const key of ["title", "description", "excerpt"]) {
+function diffSourceIdentity(previous, current) {
+  for (const key of ["title", "publishedAt"]) {
     if ((previous?.[key] ?? "") !== (current?.[key] ?? "")) {
       return `${key}_changed`;
     }
@@ -607,6 +605,20 @@ function normalizeFingerprintText(value) {
     .replace(/[‐‑‒–—]/g, "-")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function normalizeIdentityDate(value) {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return "";
+  }
+
+  const parsed = Date.parse(text);
+  if (Number.isNaN(parsed)) {
+    return text;
+  }
+
+  return new Date(parsed).toISOString();
 }
 
 function createAnalysisTrace() {
