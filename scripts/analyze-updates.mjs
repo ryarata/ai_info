@@ -29,13 +29,16 @@ for (const sourceId of snapshotFiles) {
   }
 }
 
+const previousAnalyzed = await readJsonIfExists(analyzedPath);
+const analysisCache = buildAnalysisCache(previousAnalyzed);
+
 let analyzed = structuredClone(generated);
 let analysisMode = "fallback";
 
 if (apiKey) {
   try {
-    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, { apiKey, model });
-    analysisMode = "openai";
+    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, { apiKey, model });
+    analysisMode = analysisCache.hasReusableEntries ? "openai_with_cache" : "openai";
   } catch (error) {
     analyzed = applyFallbackAnalysis(generated, snapshots, `LLM analysis failed: ${toErrorMessage(error)}`);
     analysisMode = "fallback_after_error";
@@ -60,30 +63,44 @@ await writeFile(analyzedPath, JSON.stringify(analyzed, null, 2), "utf8");
 
 console.log(`Wrote analyzed updates to ${analyzedPath} using mode=${analysisMode}`);
 
-async function enrichGeneratedDataWithModel(base, snapshotMap, options) {
+async function enrichGeneratedDataWithModel(base, snapshotMap, cache, options) {
   const next = structuredClone(base);
 
   next.alerts = await Promise.all(
-    (base.alerts ?? []).map(async (item) => enrichItem(item, "alert", snapshotMap, options))
+    (base.alerts ?? []).map(async (item) => enrichItem(item, "alert", snapshotMap, cache, options))
   );
   next.digest = await Promise.all(
-    (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, options))
+    (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, cache, options))
   );
   next.sourceItems = await Promise.all(
-    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, options))
+    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, cache, options))
   );
 
-  next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, options);
+  next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, cache, options);
 
   return next;
 }
 
-async function enrichItem(item, kind, snapshotMap, options) {
+async function enrichItem(item, kind, snapshotMap, cache, options) {
   const sourceId = item.sourceId ?? item.id.replace(/-(alert|digest)$/, "");
   const snapshot = snapshotMap.get(sourceId);
 
   if (!snapshot || snapshot.status !== "ok") {
     return item;
+  }
+
+  const cached = getCachedAnalysisForItem(sourceId, kind, snapshot, cache);
+  if (cached) {
+    return {
+      ...item,
+      titleJa: cached.titleJa ?? item.titleJa,
+      summaryJa: cached.summaryJa ?? item.summaryJa,
+      whyNow: cached.whyNow ?? item.whyNow,
+      action: kind === "alert" ? item.action : cached.action ?? item.action,
+      scores: cached.scores ?? item.scores,
+      publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
+      trustLevel: cached.trustLevel ?? findTrustLevel(baseLikeItem(item), snapshot)
+    };
   }
 
   const schema = {
@@ -157,7 +174,7 @@ async function enrichItem(item, kind, snapshotMap, options) {
   };
 }
 
-async function buildWeeklyThemes(base, snapshotMap, options) {
+async function buildWeeklyThemes(base, snapshotMap, cache, options) {
   const okSnapshots = [...snapshotMap.values()]
     .filter((snapshot) => snapshot.status === "ok")
     .map((snapshot) => ({
@@ -170,6 +187,10 @@ async function buildWeeklyThemes(base, snapshotMap, options) {
 
   if (okSnapshots.length === 0) {
     return base.weeklyThemes ?? [];
+  }
+
+  if (cache.weeklyThemesFingerprint && cache.weeklyThemesFingerprint === fingerprintWeeklyThemes(okSnapshots)) {
+    return cache.weeklyThemes;
   }
 
   const schema = {
@@ -210,9 +231,17 @@ async function buildWeeklyThemes(base, snapshotMap, options) {
   return result.themes?.length ? result.themes : base.weeklyThemes ?? [];
 }
 
-async function enrichSourceItem(item, options) {
+async function enrichSourceItem(item, cache, options) {
   if (!item || item.status !== "ok") {
     return item;
+  }
+
+  const cached = getCachedTranslationForSourceItem(item, cache);
+  if (cached) {
+    return {
+      ...item,
+      translated: cached
+    };
   }
 
   const schema = {
@@ -409,6 +438,111 @@ function findTrustLevel(item, snapshot) {
 
 function baseLikeItem(item) {
   return item ?? {};
+}
+
+async function readJsonIfExists(filePath) {
+  try {
+    return JSON.parse(await readFile(filePath, "utf8"));
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function buildAnalysisCache(previousAnalyzed) {
+  const sourceItems = new Map();
+  const itemAnalyses = new Map();
+
+  for (const item of previousAnalyzed?.sourceItems ?? []) {
+    if (item?.sourceId) {
+      sourceItems.set(item.sourceId, item);
+    }
+  }
+
+  for (const item of previousAnalyzed?.alerts ?? []) {
+    if (item?.sourceId) {
+      itemAnalyses.set(`alert:${item.sourceId}`, item);
+    }
+  }
+
+  for (const item of previousAnalyzed?.digest ?? []) {
+    if (item?.sourceId && !itemAnalyses.has(`digest:${item.sourceId}`)) {
+      itemAnalyses.set(`digest:${item.sourceId}`, item);
+    }
+  }
+
+  const okSnapshots = (previousAnalyzed?.sourceItems ?? [])
+    .filter((item) => item?.status === "ok")
+    .map((item) => ({
+      company: item.company,
+      label: item.label,
+      title: item.title,
+      description: item.description,
+      excerpt: String(item.excerpt ?? "").slice(0, 800)
+    }));
+
+  return {
+    hasReusableEntries: sourceItems.size > 0 || itemAnalyses.size > 0,
+    sourceItems,
+    itemAnalyses,
+    weeklyThemes: previousAnalyzed?.weeklyThemes ?? [],
+    weeklyThemesFingerprint: okSnapshots.length > 0 ? fingerprintWeeklyThemes(okSnapshots) : null
+  };
+}
+
+function getCachedTranslationForSourceItem(item, cache) {
+  const previous = cache.sourceItems.get(item.sourceId);
+  if (!previous?.translated) {
+    return null;
+  }
+
+  return sourceFingerprintFromSourceItem(previous) === sourceFingerprintFromSourceItem(item)
+    ? previous.translated
+    : null;
+}
+
+function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
+  const previousSourceItem = cache.sourceItems.get(sourceId);
+  if (!previousSourceItem) {
+    return null;
+  }
+
+  if (sourceFingerprintFromSourceItem(previousSourceItem) !== sourceFingerprintFromSnapshot(snapshot)) {
+    return null;
+  }
+
+  return (
+    cache.itemAnalyses.get(`${kind}:${sourceId}`) ??
+    cache.itemAnalyses.get(`alert:${sourceId}`) ??
+    cache.itemAnalyses.get(`digest:${sourceId}`) ??
+    null
+  );
+}
+
+function sourceFingerprintFromSnapshot(snapshot) {
+  return [
+    snapshot?.title ?? "",
+    snapshot?.description ?? "",
+    snapshot?.excerpt ?? "",
+    snapshot?.publishedAt ?? "",
+    snapshot?.itemUrl ?? snapshot?.url ?? ""
+  ].join("\n@@\n");
+}
+
+function sourceFingerprintFromSourceItem(item) {
+  return [
+    item?.title ?? "",
+    item?.description ?? "",
+    item?.excerpt ?? "",
+    item?.publishedAt ?? "",
+    item?.sourceUrl ?? ""
+  ].join("\n@@\n");
+}
+
+function fingerprintWeeklyThemes(okSnapshots) {
+  return JSON.stringify(okSnapshots);
 }
 
 function splitTextForTranslation(text, maxChunkLength) {
