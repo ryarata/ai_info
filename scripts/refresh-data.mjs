@@ -84,7 +84,7 @@ async function fetchSourceSnapshot(source) {
       title,
       description,
       publishedAt,
-      excerpt: normalized.slice(0, 1600),
+      excerpt: normalized,
       hash: hashText(`${title}\n${description}\n${normalized.slice(0, 4000)}`)
     };
 
@@ -125,7 +125,7 @@ async function buildFeedSnapshot(source, xml, fetchedAt) {
     .slice(0, 5)
     .map((item) => `${item.title || ""} ${normalizeText(stripTags(item.description || item.summary || ""))}`.trim())
       .filter(Boolean);
-  const excerpt = excerptParts.join(" ").slice(0, 2000);
+  const excerpt = excerptParts.join(" ");
   const snapshot = {
     id: source.id,
     sourceId: source.id,
@@ -184,7 +184,7 @@ async function enrichClaudeCodeSnapshot(snapshot) {
       ...snapshot,
       title: derivedTitle,
       description: firstMeaningfulSentence(normalizedSection),
-      excerpt: normalizedSection.slice(0, 2000),
+      excerpt: normalizedSection,
       hash: hashText(`${derivedTitle}\n${firstMeaningfulSentence(normalizedSection)}\n${normalizedSection.slice(0, 4000)}`)
     };
   } catch {
@@ -241,7 +241,7 @@ async function enrichAnthropicNewsSnapshot(snapshot, context) {
       description: articleDescription,
       publishedAt: articlePublishedAt,
       itemUrl: latestArticle.url,
-      excerpt: articleNormalized.slice(0, 2000),
+      excerpt: articleNormalized,
       hash: hashText(`${articleTitle}\n${articleDescription}\n${articleNormalized.slice(0, 4000)}`)
     };
   } catch {

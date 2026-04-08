@@ -216,17 +216,16 @@ async function enrichSourceItem(item, options) {
   }
 
   const schema = {
-    name: "source_item_translation",
+    name: "source_item_translation_header",
     strict: true,
     schema: {
       type: "object",
       additionalProperties: false,
       properties: {
         title_ja: { type: "string" },
-        description_ja: { type: "string" },
-        excerpt_ja: { type: "string" }
+        description_ja: { type: "string" }
       },
-      required: ["title_ja", "description_ja", "excerpt_ja"]
+      required: ["title_ja", "description_ja"]
     }
   };
 
@@ -238,20 +237,62 @@ async function enrichSourceItem(item, options) {
     `Company: ${item.company}`,
     `Source label: ${item.label}`,
     `Original title: ${item.title ?? ""}`,
-    `Original description: ${item.description ?? ""}`,
-    `Original excerpt: ${String(item.excerpt ?? "").slice(0, 2400)}`
+    `Original description: ${item.description ?? ""}`
   ].join("\n");
 
   const result = await callOpenAIJson(prompt, schema, options);
+  const excerptJa = await translateLongExcerpt(item, options);
 
   return {
     ...item,
     translated: {
       titleJa: result.title_ja || "",
       descriptionJa: result.description_ja || "",
-      excerptJa: result.excerpt_ja || ""
+      excerptJa
     }
   };
+}
+
+async function translateLongExcerpt(item, options) {
+  const originalExcerpt = String(item.excerpt ?? "").trim();
+  if (!originalExcerpt) {
+    return "";
+  }
+
+  const chunks = splitTextForTranslation(originalExcerpt, 1800);
+  const translatedChunks = [];
+
+  for (const [index, chunk] of chunks.entries()) {
+    const schema = {
+      name: "source_excerpt_translation_chunk",
+      strict: true,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          excerpt_ja: { type: "string" }
+        },
+        required: ["excerpt_ja"]
+      }
+    };
+
+    const prompt = [
+      "You translate extracted AI product source text into natural Japanese for a single user.",
+      "Translate faithfully.",
+      "Do not add interpretation, scoring, recommendations, headings, or extra facts.",
+      "Translate only the provided excerpt chunk.",
+      "Keep the order and meaning intact.",
+      `Company: ${item.company}`,
+      `Source label: ${item.label}`,
+      `Chunk: ${index + 1}/${chunks.length}`,
+      `Original excerpt chunk: ${chunk}`
+    ].join("\n");
+
+    const result = await callOpenAIJson(prompt, schema, options);
+    translatedChunks.push(result.excerpt_ja || "");
+  }
+
+  return translatedChunks.join("\n\n").trim();
 }
 
 async function callOpenAIJson(prompt, schema, options) {
@@ -368,4 +409,47 @@ function findTrustLevel(item, snapshot) {
 
 function baseLikeItem(item) {
   return item ?? {};
+}
+
+function splitTextForTranslation(text, maxChunkLength) {
+  const normalized = String(text ?? "").trim();
+  if (!normalized) {
+    return [];
+  }
+
+  if (normalized.length <= maxChunkLength) {
+    return [normalized];
+  }
+
+  const chunks = [];
+  let remaining = normalized;
+
+  while (remaining.length > maxChunkLength) {
+    let splitIndex = Math.max(
+      remaining.lastIndexOf(". ", maxChunkLength),
+      remaining.lastIndexOf("! ", maxChunkLength),
+      remaining.lastIndexOf("? ", maxChunkLength),
+      remaining.lastIndexOf("。", maxChunkLength),
+      remaining.lastIndexOf("！", maxChunkLength),
+      remaining.lastIndexOf("？", maxChunkLength)
+    );
+
+    if (splitIndex < Math.floor(maxChunkLength * 0.6)) {
+      splitIndex = remaining.lastIndexOf(" ", maxChunkLength);
+    }
+
+    if (splitIndex < Math.floor(maxChunkLength * 0.4)) {
+      splitIndex = maxChunkLength;
+    }
+
+    const endIndex = splitIndex === maxChunkLength ? splitIndex : splitIndex + 1;
+    chunks.push(remaining.slice(0, endIndex).trim());
+    remaining = remaining.slice(endIndex).trim();
+  }
+
+  if (remaining) {
+    chunks.push(remaining);
+  }
+
+  return chunks.filter(Boolean);
 }

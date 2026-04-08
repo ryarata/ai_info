@@ -141,7 +141,10 @@ const renderSourceItem = (item) => `
       <summary>抽出内容の日本語訳</summary>
       <p><strong>タイトル訳:</strong> ${escapeHtml(item.translated.titleJa ?? "")}</p>
       <p><strong>要約訳:</strong> ${escapeHtml(item.translated.descriptionJa ?? "")}</p>
-      <p><strong>抽出本文訳:</strong> ${escapeHtml(item.translated.excerptJa ?? "")}</p>
+      <div class="translation-block">
+        <strong>抽出本文訳:</strong>
+        <p class="translation-long">${escapeHtml(item.translated.excerptJa ?? "")}</p>
+      </div>
     </details>
     `
         : ""
@@ -508,6 +511,18 @@ h3 {
   color: var(--muted);
   line-height: 1.7;
   font-size: 14px;
+}
+.translation-block {
+  margin-top: 10px;
+}
+.translation-long {
+  white-space: pre-wrap;
+  max-height: 48vh;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbf7f1;
 }
 .score-row {
   display: flex;
