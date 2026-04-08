@@ -72,7 +72,7 @@ async function fetchSourceSnapshot(source) {
     const description = extractMeaningfulDescription(html, normalized) ?? normalized.slice(0, 280);
     const publishedAt = extractPublishedAt({ html, normalizedText: normalized, source });
 
-    return {
+    const snapshot = {
       id: source.id,
       sourceId: source.id,
       company: source.company,
@@ -87,6 +87,8 @@ async function fetchSourceSnapshot(source) {
       excerpt: normalized.slice(0, 1600),
       hash: hashText(`${title}\n${description}\n${normalized.slice(0, 4000)}`)
     };
+
+    return await enrichHtmlSnapshot(snapshot, { source, html, fetchedAt });
   } catch (error) {
     return {
       id: source.id,
@@ -104,6 +106,14 @@ async function fetchSourceSnapshot(source) {
       hash: previousLikeHash(source.id, fetchedAt)
     };
   }
+}
+
+async function enrichHtmlSnapshot(snapshot, context) {
+  if (context.source.id === "anthropic-claude-updates") {
+    return await enrichAnthropicNewsSnapshot(snapshot, context);
+  }
+
+  return snapshot;
 }
 
 async function buildFeedSnapshot(source, xml, fetchedAt) {
@@ -179,6 +189,67 @@ async function enrichClaudeCodeSnapshot(snapshot) {
     };
   } catch {
     return snapshot;
+  }
+}
+
+async function enrichAnthropicNewsSnapshot(snapshot, context) {
+  const latestArticle = extractAnthropicLatestArticle(snapshot.url, context.html);
+  if (!latestArticle?.url) {
+    return snapshot;
+  }
+
+  try {
+    const response = await fetch(latestArticle.url, {
+      redirect: "follow",
+      headers: {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0 Safari/537.36",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "accept-language": "en-US,en;q=0.9,ja;q=0.8",
+        "cache-control": "no-cache"
+      }
+    });
+
+    if (!response.ok) {
+      return {
+        ...snapshot,
+        itemUrl: latestArticle.url,
+        publishedAt: latestArticle.publishedAt ?? snapshot.publishedAt
+      };
+    }
+
+    const articleHtml = await response.text();
+    const articleReadable = extractReadableText(articleHtml);
+    const articleNormalized = normalizeText(articleReadable);
+    const rawArticleTitle =
+      extractHeading(articleHtml, "h1") ??
+      extractTitle(articleHtml) ??
+      latestArticle.title ??
+      snapshot.title;
+    const articleTitle = chooseBestTitle(rawArticleTitle, articleNormalized, context.source);
+    const articleDescription =
+      extractAnthropicArticleDescription(articleHtml, articleNormalized) ??
+      latestArticle.summary ??
+      snapshot.description;
+    const articlePublishedAt =
+      latestArticle.publishedAt ??
+      extractPublishedAt({ html: articleHtml, normalizedText: articleNormalized, source: context.source }) ??
+      snapshot.publishedAt;
+
+    return {
+      ...snapshot,
+      title: articleTitle,
+      description: articleDescription,
+      publishedAt: articlePublishedAt,
+      itemUrl: latestArticle.url,
+      excerpt: articleNormalized.slice(0, 2000),
+      hash: hashText(`${articleTitle}\n${articleDescription}\n${articleNormalized.slice(0, 4000)}`)
+    };
+  } catch {
+    return {
+      ...snapshot,
+      itemUrl: latestArticle.url,
+      publishedAt: latestArticle.publishedAt ?? snapshot.publishedAt
+    };
   }
 }
 
@@ -620,6 +691,11 @@ function extractMetaDescription(html) {
   );
 }
 
+function extractHeading(html, tagName) {
+  const match = html.match(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "i"));
+  return match ? normalizeText(stripTags(match[1])) : null;
+}
+
 function matchTagContent(html, tagName) {
   const pattern = new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "i");
   const match = html.match(pattern);
@@ -853,6 +929,175 @@ function extractSourceSpecificSummary(excerpt, company) {
   }
 
   return null;
+}
+
+function extractAnthropicLatestArticle(baseUrl, html) {
+  const links = [...html.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>/gi)];
+  const deduped = new Map();
+
+  for (const match of links) {
+    const href = resolveUrl(baseUrl, match[1]);
+    if (!href || !isLikelyAnthropicArticleUrl(baseUrl, href)) {
+      continue;
+    }
+
+    const index = match.index ?? 0;
+    const context = html.slice(index, index + 1800);
+    const contextText = normalizeText(stripTags(context));
+    const publishedAt = normalizeDateString(
+      extractFirstFullDate(contextText) ??
+      extractDateFromText(contextText, { company: "Anthropic", id: "anthropic-claude-updates" })
+    );
+    const title = extractAnthropicContextTitle(context);
+    const summary = extractAnthropicContextSummary(context);
+    if (!publishedAt || (!title && !summary)) {
+      continue;
+    }
+
+    const previous = deduped.get(href);
+    const candidate = { url: href, title, summary, publishedAt };
+    if (!previous || scoreAnthropicArticleCandidate(candidate) > scoreAnthropicArticleCandidate(previous)) {
+      deduped.set(href, candidate);
+    }
+  }
+
+  const candidates = [...deduped.values()]
+    .filter((entry) => entry.publishedAt && (entry.title || entry.summary));
+
+  candidates.sort((left, right) => {
+    const timeLeft = Date.parse(left.publishedAt ?? "") || 0;
+    const timeRight = Date.parse(right.publishedAt ?? "") || 0;
+    return timeRight - timeLeft;
+  });
+
+  return candidates[0] ?? null;
+}
+
+function resolveUrl(baseUrl, href) {
+  try {
+    return new URL(href, baseUrl).toString();
+  } catch {
+    return null;
+  }
+}
+
+function isLikelyAnthropicArticleUrl(baseUrl, href) {
+  try {
+    const base = new URL(baseUrl);
+    const target = new URL(href);
+    if (target.origin !== base.origin) {
+      return false;
+    }
+
+    const pathName = target.pathname.replace(/\/+$/, "") || "/";
+    if (pathName === "/" || pathName === "/news") {
+      return false;
+    }
+
+    return !/\.(svg|png|jpg|jpeg|webp|gif|pdf)$/i.test(pathName);
+  } catch {
+    return false;
+  }
+}
+
+function extractAnthropicAnchorTitle(texts) {
+  const candidates = texts
+    .map((text) => normalizeText(text))
+    .filter((text) => {
+      if (!text || looksLikeNavigationNoise(text)) {
+        return false;
+      }
+
+      if (/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\b/i.test(text)) {
+        return false;
+      }
+
+      if (/^(Announcements|Product|Policy|Research)\b/i.test(text)) {
+        return false;
+      }
+
+      return text.length >= 6 && text.length <= 120;
+    })
+    .sort((left, right) => left.length - right.length);
+
+  return candidates[0] ?? null;
+}
+
+function extractAnthropicAnchorSummary(texts) {
+  for (const text of texts) {
+    const cleaned = normalizeText(text);
+    const summary = cleaned.replace(
+      /^(Announcements|Product|Policy|Research)\s+[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}\s+/,
+      ""
+    );
+    if (summary !== cleaned && summary.length >= 40) {
+      return summary;
+    }
+  }
+
+  return null;
+}
+
+function extractAnthropicContextTitle(context) {
+  const candidates = [
+    captureTagText(context, "h1"),
+    captureTagText(context, "h2"),
+    captureTagText(context, "h3"),
+    captureAttribute(context, "alt")
+  ]
+    .map((text) => normalizeText(text))
+    .filter((text) => {
+      if (!text || looksLikeNavigationNoise(text)) {
+        return false;
+      }
+
+      return text.length >= 6 && text.length <= 140;
+    })
+    .sort((left, right) => left.length - right.length);
+
+  return candidates[0] ?? null;
+}
+
+function extractAnthropicContextSummary(context) {
+  const paragraph = captureTagText(context, "p");
+  const cleaned = normalizeText(paragraph);
+  return cleaned && cleaned.length >= 40 ? cleaned : null;
+}
+
+function scoreAnthropicArticleCandidate(candidate) {
+  return Number(Boolean(candidate.title)) * 2 + Number(Boolean(candidate.summary));
+}
+
+function extractAnthropicArticleDescription(html, normalizedText) {
+  const heading = extractHeading(html, "h1");
+  const subheading = extractHeading(html, "h2");
+  const lead = firstMeaningfulSentence(normalizedText);
+  const candidates = [
+    extractMetaDescription(html),
+    subheading,
+    lead
+  ];
+
+  for (const candidate of candidates) {
+    const cleaned = normalizeText(candidate);
+    if (!cleaned || cleaned === heading || looksLikeNavigationNoise(cleaned)) {
+      continue;
+    }
+
+    return cleaned;
+  }
+
+  return null;
+}
+
+function captureTagText(html, tagName) {
+  const match = html.match(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "i"));
+  return match ? stripTags(match[1]) : null;
+}
+
+function captureAttribute(html, attributeName) {
+  const match = html.match(new RegExp(`\\b${attributeName}=["']([^"']+)["']`, "i"));
+  return match ? match[1] : null;
 }
 
 function looksLikeNavigationNoise(text) {
