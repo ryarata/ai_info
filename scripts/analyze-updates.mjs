@@ -574,32 +574,39 @@ function fingerprintWeeklyThemes(okSnapshots) {
 
 function sourceFingerprintPartsFromSnapshot(snapshot) {
   return {
-    title: snapshot?.title ?? "",
-    description: snapshot?.description ?? "",
-    excerpt: snapshot?.excerpt ?? "",
-    publishedAt: snapshot?.publishedAt ?? "",
-    sourceUrl: snapshot?.itemUrl ?? snapshot?.url ?? ""
+    title: normalizeFingerprintText(snapshot?.title ?? ""),
+    description: normalizeFingerprintText(snapshot?.description ?? ""),
+    excerpt: normalizeFingerprintText(snapshot?.excerpt ?? "")
   };
 }
 
 function sourceFingerprintPartsFromSourceItem(item) {
   return {
-    title: item?.title ?? "",
-    description: item?.description ?? "",
-    excerpt: item?.excerpt ?? "",
-    publishedAt: item?.publishedAt ?? "",
-    sourceUrl: item?.sourceUrl ?? ""
+    title: normalizeFingerprintText(item?.title ?? ""),
+    description: normalizeFingerprintText(item?.description ?? ""),
+    excerpt: normalizeFingerprintText(item?.excerpt ?? "")
   };
 }
 
 function diffSourceFingerprint(previous, current) {
-  for (const key of ["title", "description", "excerpt", "publishedAt", "sourceUrl"]) {
+  for (const key of ["title", "description", "excerpt"]) {
     if ((previous?.[key] ?? "") !== (current?.[key] ?? "")) {
       return `${key}_changed`;
     }
   }
 
   return null;
+}
+
+function normalizeFingerprintText(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\r\n/g, "\n")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[‐‑‒–—]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function createAnalysisTrace() {
