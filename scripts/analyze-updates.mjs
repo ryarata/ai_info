@@ -31,26 +31,28 @@ for (const sourceId of snapshotFiles) {
 
 const previousAnalyzed = await readJsonIfExists(analyzedPath);
 const analysisCache = buildAnalysisCache(previousAnalyzed);
+const analysisTrace = createAnalysisTrace();
 
 let analyzed = structuredClone(generated);
 let analysisMode = "fallback";
 
 if (apiKey) {
   try {
-    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, { apiKey, model });
+    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, analysisTrace, { apiKey, model });
     analysisMode = analysisCache.hasReusableEntries ? "openai_with_cache" : "openai";
   } catch (error) {
-    analyzed = applyFallbackAnalysis(generated, snapshots, `LLM analysis failed: ${toErrorMessage(error)}`);
+    analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, `LLM analysis failed: ${toErrorMessage(error)}`);
     analysisMode = "fallback_after_error";
   }
 } else {
-  analyzed = applyFallbackAnalysis(generated, snapshots, "OPENAI_API_KEY not set");
+  analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, "OPENAI_API_KEY not set");
 }
 
 analyzed.generatedAt = new Date().toISOString();
 analyzed.analysis = {
   mode: analysisMode,
-  model: apiKey ? model : null
+  model: apiKey ? model : null,
+  cache: finalizeAnalysisTrace(analysisTrace)
 };
 analyzed.summary = {
   ...(analyzed.summary ?? {}),
@@ -63,34 +65,36 @@ await writeFile(analyzedPath, JSON.stringify(analyzed, null, 2), "utf8");
 
 console.log(`Wrote analyzed updates to ${analyzedPath} using mode=${analysisMode}`);
 
-async function enrichGeneratedDataWithModel(base, snapshotMap, cache, options) {
+async function enrichGeneratedDataWithModel(base, snapshotMap, cache, trace, options) {
   const next = structuredClone(base);
 
   next.alerts = await Promise.all(
-    (base.alerts ?? []).map(async (item) => enrichItem(item, "alert", snapshotMap, cache, options))
+    (base.alerts ?? []).map(async (item) => enrichItem(item, "alert", snapshotMap, cache, trace, options))
   );
   next.digest = await Promise.all(
-    (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, cache, options))
+    (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, cache, trace, options))
   );
   next.sourceItems = await Promise.all(
-    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, cache, options))
+    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, cache, trace, options))
   );
 
-  next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, cache, options);
+  next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, cache, trace, options);
 
   return next;
 }
 
-async function enrichItem(item, kind, snapshotMap, cache, options) {
+async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
   const sourceId = item.sourceId ?? item.id.replace(/-(alert|digest)$/, "");
   const snapshot = snapshotMap.get(sourceId);
 
   if (!snapshot || snapshot.status !== "ok") {
+    markItemAnalysis(trace, sourceId, kind, "skipped_no_snapshot");
     return item;
   }
 
   const cached = getCachedAnalysisForItem(sourceId, kind, snapshot, cache);
   if (cached) {
+    markItemAnalysis(trace, sourceId, kind, "cache_hit");
     return {
       ...item,
       titleJa: cached.titleJa ?? item.titleJa,
@@ -161,6 +165,7 @@ async function enrichItem(item, kind, snapshotMap, cache, options) {
   ].join("\n");
 
   const result = await callOpenAIJson(prompt, schema, options);
+  markItemAnalysis(trace, sourceId, kind, "regenerated");
 
   return {
     ...item,
@@ -174,7 +179,7 @@ async function enrichItem(item, kind, snapshotMap, cache, options) {
   };
 }
 
-async function buildWeeklyThemes(base, snapshotMap, cache, options) {
+async function buildWeeklyThemes(base, snapshotMap, cache, trace, options) {
   const okSnapshots = [...snapshotMap.values()]
     .filter((snapshot) => snapshot.status === "ok")
     .map((snapshot) => ({
@@ -186,10 +191,12 @@ async function buildWeeklyThemes(base, snapshotMap, cache, options) {
     }));
 
   if (okSnapshots.length === 0) {
+    trace.weeklyThemes = { status: "skipped_no_snapshot" };
     return base.weeklyThemes ?? [];
   }
 
   if (cache.weeklyThemesFingerprint && cache.weeklyThemesFingerprint === fingerprintWeeklyThemes(okSnapshots)) {
+    trace.weeklyThemes = { status: "cache_hit" };
     return cache.weeklyThemes;
   }
 
@@ -228,16 +235,21 @@ async function buildWeeklyThemes(base, snapshotMap, cache, options) {
   ].join("\n");
 
   const result = await callOpenAIJson(prompt, schema, options);
+  trace.weeklyThemes = { status: "regenerated" };
   return result.themes?.length ? result.themes : base.weeklyThemes ?? [];
 }
 
-async function enrichSourceItem(item, cache, options) {
+async function enrichSourceItem(item, cache, trace, options) {
   if (!item || item.status !== "ok") {
+    if (item?.sourceId) {
+      markSourceTranslation(trace, item.sourceId, "skipped_non_ok");
+    }
     return item;
   }
 
   const cached = getCachedTranslationForSourceItem(item, cache);
   if (cached) {
+    markSourceTranslation(trace, item.sourceId, "cache_hit");
     return {
       ...item,
       translated: cached
@@ -271,6 +283,7 @@ async function enrichSourceItem(item, cache, options) {
 
   const result = await callOpenAIJson(prompt, schema, options);
   const excerptJa = await translateLongExcerpt(item, options);
+  markSourceTranslation(trace, item.sourceId, "regenerated");
 
   return {
     ...item,
@@ -382,7 +395,7 @@ function extractResponseText(body) {
   return null;
 }
 
-function applyFallbackAnalysis(base, snapshotMap, reason) {
+function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
   const next = structuredClone(base);
 
   next.alerts = (base.alerts ?? []).map((item) => ({
@@ -391,12 +404,22 @@ function applyFallbackAnalysis(base, snapshotMap, reason) {
     publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
+  for (const item of next.alerts) {
+    if (item?.sourceId) {
+      markItemAnalysis(trace, item.sourceId, "alert", "fallback");
+    }
+  }
 
   next.digest = (base.digest ?? []).map((item) => ({
     ...item,
     publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
+  for (const item of next.digest) {
+    if (item?.sourceId) {
+      markItemAnalysis(trace, item.sourceId, "digest", "fallback");
+    }
+  }
   next.sourceItems = (base.sourceItems ?? []).map((item) => ({
     ...item,
     translated:
@@ -408,10 +431,16 @@ function applyFallbackAnalysis(base, snapshotMap, reason) {
           }
         : undefined
   }));
+  for (const item of next.sourceItems) {
+    if (item?.sourceId) {
+      markSourceTranslation(trace, item.sourceId, item?.status === "ok" ? "fallback" : "skipped_non_ok");
+    }
+  }
 
   next.weeklyThemes = [
     ...(base.weeklyThemes ?? [])
   ];
+  trace.weeklyThemes = { status: "fallback" };
 
   next.analysisFallback = {
     reason
@@ -543,6 +572,56 @@ function sourceFingerprintFromSourceItem(item) {
 
 function fingerprintWeeklyThemes(okSnapshots) {
   return JSON.stringify(okSnapshots);
+}
+
+function createAnalysisTrace() {
+  return {
+    sourceItems: new Map(),
+    itemAnalyses: new Map(),
+    weeklyThemes: null
+  };
+}
+
+function markSourceTranslation(trace, sourceId, status) {
+  const current = trace.sourceItems.get(sourceId) ?? {};
+  trace.sourceItems.set(sourceId, {
+    ...current,
+    translation: status
+  });
+}
+
+function markItemAnalysis(trace, sourceId, kind, status) {
+  const current = trace.itemAnalyses.get(sourceId) ?? {};
+  trace.itemAnalyses.set(sourceId, {
+    ...current,
+    [kind]: status
+  });
+}
+
+function finalizeAnalysisTrace(trace) {
+  const bySource = {};
+  const sourceIds = new Set([...trace.sourceItems.keys(), ...trace.itemAnalyses.keys()]);
+
+  for (const sourceId of sourceIds) {
+    bySource[sourceId] = {
+      ...(trace.sourceItems.get(sourceId) ?? {}),
+      ...(trace.itemAnalyses.get(sourceId) ?? {})
+    };
+  }
+
+  const entries = Object.values(bySource);
+  return {
+    summary: {
+      translationCacheHits: entries.filter((entry) => entry.translation === "cache_hit").length,
+      translationRegenerated: entries.filter((entry) => entry.translation === "regenerated").length,
+      alertCacheHits: entries.filter((entry) => entry.alert === "cache_hit").length,
+      alertRegenerated: entries.filter((entry) => entry.alert === "regenerated").length,
+      digestCacheHits: entries.filter((entry) => entry.digest === "cache_hit").length,
+      digestRegenerated: entries.filter((entry) => entry.digest === "regenerated").length,
+      weeklyThemes: trace.weeklyThemes?.status ?? "unknown"
+    },
+    bySource
+  };
 }
 
 function splitTextForTranslation(text, maxChunkLength) {

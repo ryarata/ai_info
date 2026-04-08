@@ -16,6 +16,7 @@ const data = JSON.parse(await readFile(await resolveDataPath(), "utf8"));
 const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
 
 const renderBadge = (text) => `<span class="badge">${escapeHtml(text)}</span>`;
+const renderCacheBadge = (text) => `<span class="badge cache-badge">${escapeHtml(text)}</span>`;
 const renderPublishedAt = (value) =>
   `<p class="published-at">一次情報の投稿日時: ${
     value ? escapeHtml(formatDate(value)) : "取得元から抽出できず"
@@ -133,6 +134,7 @@ const renderSourceItem = (item) => `
     </div>
     <h3>${escapeHtml(item.title ?? item.label)}</h3>
     ${renderPublishedAt(item.publishedAt)}
+    ${renderCacheInfo(item.sourceId)}
     <p class="summary">${escapeHtml(item.description ?? "抽出本文なし")}</p>
     ${
       item.translated
@@ -155,6 +157,25 @@ const renderSourceItem = (item) => `
     </div>
   </article>
 `;
+
+const renderCacheInfo = (sourceId) => {
+  const cacheInfo = data.analysis?.cache?.bySource?.[sourceId];
+  if (!cacheInfo) {
+    return "";
+  }
+
+  const labels = [
+    cacheInfo.translation ? `翻訳 ${formatCacheStatus(cacheInfo.translation)}` : null,
+    cacheInfo.alert ? `Alert ${formatCacheStatus(cacheInfo.alert)}` : null,
+    cacheInfo.digest ? `Digest ${formatCacheStatus(cacheInfo.digest)}` : null
+  ].filter(Boolean);
+
+  if (labels.length === 0) {
+    return "";
+  }
+
+  return `<div class="cache-row">${labels.map(renderCacheBadge).join("")}</div>`;
+};
 
 const html = `<!DOCTYPE html>
 <html lang="ja">
@@ -193,6 +214,24 @@ const html = `<!DOCTYPE html>
         <article class="metric-card">
           <span>アクティブソース</span>
           <strong>${data.summary.activeSources}</strong>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-head">
+          <h2>今回の分析キャッシュ</h2>
+          <span class="subtle">再利用された項目と再生成された項目</span>
+        </div>
+        <article class="card">
+          <div class="badge-row">
+            ${renderCacheBadge(`翻訳 cache ${data.analysis?.cache?.summary?.translationCacheHits ?? 0}`)}
+            ${renderCacheBadge(`翻訳 regen ${data.analysis?.cache?.summary?.translationRegenerated ?? 0}`)}
+            ${renderCacheBadge(`Alert cache ${data.analysis?.cache?.summary?.alertCacheHits ?? 0}`)}
+            ${renderCacheBadge(`Alert regen ${data.analysis?.cache?.summary?.alertRegenerated ?? 0}`)}
+            ${renderCacheBadge(`Digest cache ${data.analysis?.cache?.summary?.digestCacheHits ?? 0}`)}
+            ${renderCacheBadge(`Digest regen ${data.analysis?.cache?.summary?.digestRegenerated ?? 0}`)}
+            ${renderCacheBadge(`Weekly ${formatCacheStatus(data.analysis?.cache?.summary?.weeklyThemes ?? "unknown")}`)}
+          </div>
         </article>
       </section>
 
@@ -473,6 +512,11 @@ h1 {
   color: var(--muted);
   font-size: 11px;
 }
+.cache-badge {
+  background: #eef6f2;
+  color: var(--accent);
+  border-color: #cfe2d8;
+}
 .badge:nth-child(4) {
   letter-spacing: 0.03em;
 }
@@ -514,6 +558,12 @@ h3 {
 }
 .translation-block {
   margin-top: 10px;
+}
+.cache-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
 }
 .translation-long {
   white-space: pre-wrap;
@@ -662,4 +712,17 @@ function shouldOpenGroup(items, options) {
     return true;
   }
   return items.length === 1 && (items[0].trustLevel ?? "official") === "official";
+}
+
+function formatCacheStatus(status) {
+  const labels = {
+    cache_hit: "cache",
+    regenerated: "regen",
+    fallback: "fallback",
+    skipped_no_snapshot: "skip",
+    skipped_non_ok: "skip",
+    unknown: "unknown"
+  };
+
+  return labels[status] ?? status;
 }
