@@ -1,73 +1,55 @@
 {
-  "generatedAt": "2026-04-08T06:07:56.170Z",
+  "generatedAt": "2026-04-05T16:37:30.562Z",
   "summary": {
-    "urgentCount": 2,
+    "urgentCount": 1,
     "digestCount": 2,
     "monitoredCompanies": 3,
     "activeSources": 7
   },
   "alerts": [
     {
-      "id": "anthropic-claude-updates-alert",
-      "sourceId": "anthropic-claude-updates",
-      "company": "Anthropic",
-      "product": "Claude product updates",
-      "action": "今すぐ試す",
-      "titleEn": "Linux Foundation, Microsoft, NVIDIA, and Palo Alto Networks in an effort to secure the world's most critical software",
-      "titleJa": "Anthropic の更新を検知: Linux Foundation, Microsoft, NVIDIA, and Palo Alto Networks in an effort to secure the wor",
-      "summaryJa": "Anthropic の一次情報から抽出した要点: Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.",
-      "whyNow": "コンテキストUXや継続作業のやり方に関わる可能性が高く、あなたの優先度に直結するためです。",
-      "scores": {
-        "contextUx": 5,
-        "workUx": 4,
-        "workflow": 4
-      },
-      "sourceUrl": "https://www.anthropic.com/news",
-      "publishedAt": "2026-03-17T15:00:00.000Z"
-    },
-    {
       "id": "anthropic-claude-code-changelog-alert",
       "sourceId": "anthropic-claude-code-changelog",
       "company": "Anthropic",
       "product": "Claude Code changelog",
-      "action": "今週理解",
-      "titleEn": "2.1.96",
-      "titleJa": "Anthropic の更新を検知: 2.1.96",
-      "summaryJa": "Anthropic の一次情報から抽出した要点: ## 2.1.96 - Fixed Bedrock requests failing with `403 \"Authorization header is missing\"` when using `AWS_BEARER_TOKEN_BEDROCK` or `CLAUDE_CODE_SKIP_BEDROCK_AUTH`",
+      "action": "今すぐ試す",
+      "titleEn": "2.1.92",
+      "titleJa": "Anthropic の更新を検知: 2.1.92",
+      "summaryJa": "Anthropic の一次情報から抽出した要点: ## 2.1.92 - Added `forceRemoteSettingsRefresh` policy setting: when set, the CLI blocks startup until remote managed settings are freshly fetched, and exits if ",
       "whyNow": "一次情報に変化があり、今後の作業体験の変化につながる可能性があるためです。",
       "scores": {
         "contextUx": 4,
         "workUx": 2,
-        "workflow": 2
+        "workflow": 4
       },
-      "sourceUrl": "https://github.com/anthropics/claude-code/commit/227817d0f2cae5536273e78422c49bb89af859ca",
-      "publishedAt": "2026-04-08T04:37:31.000Z"
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
+      "publishedAt": "2026-04-04T00:41:56.000Z"
     }
   ],
   "digest": [
     {
+      "id": "openai-release-notes-digest",
+      "sourceId": "openai-release-notes",
+      "company": "OpenAI",
+      "titleJa": "OpenAI の一次情報更新: | OpenAI API",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: See all of the latest features and updates to the OpenAI API.",
+      "action": "定点観測",
+      "publishedAt": "2026-03-16T15:00:00.000Z"
+    },
+    {
       "id": "openai-status-history-digest",
       "sourceId": "openai-status-history",
       "company": "OpenAI",
-      "titleJa": "OpenAI の一次情報更新: Some users may experience issues accessing the ChatGPT website on VPN",
-      "summaryJa": "OpenAI の一次情報から抽出した要点: Status: Resolved All impacted services have now fully recovered. Affected components GPTs (Operational) Agent (Operational) Deep Research (Operational) ChatGPT ",
-      "action": "監視",
-      "publishedAt": "2026-04-07T11:49:38.004Z"
-    },
-    {
-      "id": "openai-testingcatalog-chatgpt-digest",
-      "sourceId": "openai-testingcatalog-chatgpt",
-      "company": "OpenAI",
-      "titleJa": "OpenAI の一次情報更新: OpenAI tests next-gen Image V2 model on ChatGPT and LM Arena",
-      "summaryJa": "OpenAI の一次情報から抽出した要点: OpenAI is quietly testing its next-gen ImageV2 model on LM Arena, with early testers noting strong prompt accuracy and realistic UI rendering.",
-      "action": "監視",
-      "publishedAt": "2026-04-06T13:57:22.000Z"
+      "titleJa": "OpenAI の一次情報更新: ChatGPT Dictation Elevated Error Rate",
+      "summaryJa": "OpenAI の一次情報から抽出した要点: Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
+      "action": "定点観測",
+      "publishedAt": "2026-04-02T17:49:44.404Z"
     }
   ],
   "weeklyThemes": [
     {
       "title": "一次情報の差分を自動検知できる状態に入った",
-      "body": "4 件のソース更新を検出しました。今後はこの差分をもとに、日本語要約と重要度判定の精度を上げていく段階です。"
+      "body": "1 件のソース更新を検出しました。今後はこの差分をもとに、日本語要約と重要度判定の精度を上げていく段階です。"
     },
     {
       "title": "主要監視先の定点観測を開始",
@@ -85,15 +67,15 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:51.760Z",
+      "fetchedAt": "2026-04-05T16:37:26.882Z",
       "publishedAt": "2026-03-16T15:00:00.000Z",
       "title": "Changelog | OpenAI API",
       "description": "See all of the latest features and updates to the OpenAI API.",
       "excerpt": "Changelog March, 2026 Mar 17 Feature gpt-5.4-mini gpt-5.4-nano v1/responses v1/chat/completions Released GPT-5.4 mini and GPT-5.4 nano to the Chat Completions and Responses API. GPT-5.4 mini brings GPT-5.4-class capabilities to a faster, more efficient model for high-volume workloads, while GPT-5.4 nano is optimized for simple high-volume tasks where speed and cost matter most. GPT-5.4 mini supports tool search , built-in computer use , and compaction . GPT-5.4 nano supports compaction, but does not support tool search or computer use. Mar 16 Update gpt-5.3-chat-latest Updated the gpt-5.3-chat-latest slug to point to the latest model currently used in ChatGPT. Mar 13 Fix gpt-5.4 v1/responses v1/chat/completions Updated our image encoder to fix a small bug with input_image inputs in GPT-5.4. Some image understanding use cases may now see improved quality. No action is required. Mar 12 Feature sora-2 sora-2-pro v1/videos v1/videos/characters v1/videos/extensions v1/batch Expanded the Sora API with reusable character references, longer generations up to 20 seconds, 1080p output for sora-2-pro , video extensions, and Batch API support for POST /v1/videos . 1080p generations on sora-2-pro are billed at $0.70 per second. Learn more here . Mar 12 Update sora-2 sora-2-pro v1/videos/edits v1/videos/{video_id}/remix Added POST /v1/videos/edits for editing existing videos. This will replace POST /v1/videos/{video_id}/remix , which will be deprecated in 6 months. Learn more here . Mar 5 Feature gpt-5.4 gpt-5.4-pro v1/responses v1/chat/completions Released GPT-5.4 , our newest frontier ",
       "sourceUrl": "https://developers.openai.com/api/docs/changelog",
       "changed": false,
-      "classification": "非選定",
-      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
+      "classification": "Digest表示(定点観測)",
+      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
     },
     {
       "sourceId": "openai-status-history",
@@ -101,15 +83,15 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.149Z",
-      "publishedAt": "2026-04-07T11:49:38.004Z",
-      "title": "Some users may experience issues accessing the ChatGPT website on VPN",
-      "description": "Status: Resolved All impacted services have now fully recovered. Affected components GPTs (Operational) Agent (Operational) Deep Research (Operational) ChatGPT Atlas (Operational) Voice mode (Operational) Search (Operational) Conversations (Operational) Compliance API (Operational) Image Generation (Operational) Connectors/Apps (Operational) Login (Operational) File uploads (Operational)",
-      "excerpt": "Some users may experience issues accessing the ChatGPT website on VPN Status: Resolved All impacted services have now fully recovered. Affected components GPTs (Operational) Agent (Operational) Deep Research (Operational) ChatGPT Atlas (Operational) Voice mode (Operational) Search (Operational) Conversations (Operational) Compliance API (Operational) Image Generation (Operational) Connectors/Apps (Operational) Login (Operational) File uploads (Operational) GET /v1/responses endpoint is currently down and unable to serve requests Status: Resolved All impacted services have now fully recovered. Affected components Responses (Operational) Some users may experience empty response from ChatGPT in web Status: Resolved All impacted services have now fully recovered. Affected components Conversations (Operational) ChatGPT Dictation Elevated Error Rate Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational) High error rate for completionsapi-gpt-5-nano Status: Resolved The issue is now resolved. Affected components Chat Completions (Operational)",
-      "sourceUrl": "https://status.openai.com//incidents/01KNKQQ4R06K00RDTNXZVX7SFC",
-      "changed": true,
-      "classification": "Digest表示",
-      "classificationReason": "今回の実行で非緊急だが追うべき更新としてDigestに分類されました。"
+      "fetchedAt": "2026-04-05T16:37:27.058Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "title": "ChatGPT Dictation Elevated Error Rate",
+      "description": "Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational)",
+      "excerpt": "ChatGPT Dictation Elevated Error Rate Status: Resolved All impacted services have now fully recovered. Affected components Voice mode (Operational) High error rate for completionsapi-gpt-5-nano Status: Resolved The issue is now resolved. Affected components Chat Completions (Operational) Elevated failures for some users joining ChatGPT Enterprise and ChatGPT Edu workspaces via SSO. Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Account creation and login are unstable across all surfaces Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Responses API and Sora Increased Error Rates Status: Resolved All impacted services have now fully recovered. Affected components Responses (Operational)",
+      "sourceUrl": "https://status.openai.com//incidents/01KN78XN18M5VB6DSRTCWMJRYN",
+      "changed": false,
+      "classification": "Digest表示(定点観測)",
+      "classificationReason": "差分候補が少なかったため、定点観測用にDigestへ掲載しています。"
     },
     {
       "sourceId": "openai-testingcatalog-chatgpt",
@@ -117,15 +99,15 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.348Z",
-      "publishedAt": "2026-04-06T13:57:22.000Z",
-      "title": "OpenAI tests next-gen Image V2 model on ChatGPT and LM Arena",
-      "description": "OpenAI is quietly testing its next-gen ImageV2 model on LM Arena, with early testers noting strong prompt accuracy and realistic UI rendering.",
-      "excerpt": "OpenAI tests next-gen Image V2 model on ChatGPT and LM Arena OpenAI is quietly testing its next-gen ImageV2 model on LM Arena, with early testers noting strong prompt accuracy and realistic UI rendering. OpenAI launches visual product discovery in ChatGPT for all users OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat. OpenAI launches GPT-5.4 mini and GPT-5.4 nano on APIs OpenAI introduces GPT-5.4 mini for faster, cost-efficient coding copilots, automation, and agent systems, now available in API, Codex, and ChatGPT. GPT-5.4 nano is now available via the API as well. ICYMI: OpenAI adds interactive math & science tools to ChatGPT OpenAI is adding interactive math and science modules to ChatGPT, letting users adjust variables and visualize equations across 70+ core topics worldwide. OpenAI releases GPT-5.4 model on ChatGPT and Codex OpenAI launches GPT-5.4, a powerful AI model with improved reasoning, coding, and multimodal skills, now integrated in ChatGPT and the API.",
-      "sourceUrl": "https://www.testingcatalog.com/openai-tests-next-gen-image-v2-model-on-chatgpt-and-lm-arena/",
-      "changed": true,
-      "classification": "Digest表示",
-      "classificationReason": "今回の実行で非緊急だが追うべき更新としてDigestに分類されました。"
+      "fetchedAt": "2026-04-05T16:37:27.216Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "title": "OpenAI launches visual product discovery in ChatGPT for all users",
+      "description": "OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat.",
+      "excerpt": "OpenAI launches visual product discovery in ChatGPT for all users OpenAI is rolling out a new ChatGPT shopping experience that lets users browse, compare, and get product insights from major retailers in a single visual chat. OpenAI launches GPT-5.4 mini and GPT-5.4 nano on APIs OpenAI introduces GPT-5.4 mini for faster, cost-efficient coding copilots, automation, and agent systems, now available in API, Codex, and ChatGPT. GPT-5.4 nano is now available via the API as well. ICYMI: OpenAI adds interactive math & science tools to ChatGPT OpenAI is adding interactive math and science modules to ChatGPT, letting users adjust variables and visualize equations across 70+ core topics worldwide. OpenAI releases GPT-5.4 model on ChatGPT and Codex OpenAI launches GPT-5.4, a powerful AI model with improved reasoning, coding, and multimodal skills, now integrated in ChatGPT and the API. OpenAI launches Codex app for Windows on Microsoft Store OpenAI launches its native Codex app for Windows, tailored for agentic coding with PowerShell integration and robust sandboxing, available via Microsoft Store.",
+      "sourceUrl": "https://www.testingcatalog.com/openai-launches-visual-product-discovery-in-chatgpt-for-all-users/",
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
     },
     {
       "sourceId": "anthropic-claude-updates",
@@ -133,15 +115,15 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.858Z",
+      "fetchedAt": "2026-04-05T16:37:27.413Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
-      "title": "Linux Foundation, Microsoft, NVIDIA, and Palo Alto Networks in an effort to secure the world's most critical software",
+      "title": "people want from AI",
       "description": "Anthropic is an AI safety and research company that&#x27;s working to build reliable, interpretable, and steerable AI systems.",
-      "excerpt": "Newsroom Press inquires press@anthropic.com Non-media inquiries support@anthropic.com Media assets Download press kit Project Glasswing Announcements Apr 7, 2026 A new initiative that brings together Amazon Web Services, Anthropic, Apple, Broadcom, Cisco, CrowdStrike, Google, JPMorganChase, the Linux Foundation, Microsoft, NVIDIA, and Palo Alto Networks in an effort to secure the world's most critical software. Mar 18, 2026 What 81,000 people want from AI We invited Claude.ai users to share how they use AI, what they dream it could make possible, and what they fear it might do. Nearly 81,000 people participated—the largest and most multilingual qualitative study of its kind. Here's what we found. Product Feb 17, 2026 Introducing Claude Sonnet 4.6 Sonnet 4.6 delivers frontier performance across coding, agents, and professional work at scale. Announcements Feb 5, 2026 Introducing Claude Opus 4.6 We’re upgrading our smartest model. Across agentic coding, computer use, tool use, search, and finance, Opus 4.6 is an industry-leading model, often by wide margin. Announcements Feb 4, 2026 Claude is a space to think We’ve made a choice: Claude will remain ad-free. We explain why advertising incentives are incompatible with a genuinely helpful AI assistant, and how we plan to expand access without compromising user trust. News Search Date Category Title Apr 6, 2026 Announcements Anthropic expands partnership with Google and Broadcom for multiple gigawatts of next-generation compute Mar 31, 2026 Announcements Australian government and Anthropic sign MOU for AI safety and research Mar ",
+      "excerpt": "Newsroom Press inquires press@anthropic.com Non-media inquiries support@anthropic.com Media assets Download press kit What 81,000 people want from AI Mar 18, 2026 We invited Claude.ai users to share how they use AI, what they dream it could make possible, and what they fear it might do. Nearly 81,000 people participated—the largest and most multilingual qualitative study of its kind. Here's what we found. Product Feb 17, 2026 Introducing Claude Sonnet 4.6 Sonnet 4.6 delivers frontier performance across coding, agents, and professional work at scale. Announcements Feb 5, 2026 Introducing Claude Opus 4.6 We’re upgrading our smartest model. Across agentic coding, computer use, tool use, search, and finance, Opus 4.6 is an industry-leading model, often by wide margin. Announcements Feb 4, 2026 Claude is a space to think We’ve made a choice: Claude will remain ad-free. We explain why advertising incentives are incompatible with a genuinely helpful AI assistant, and how we plan to expand access without compromising user trust. Announcements Jan 30, 2026 Claude on Mars The first AI-assisted drive on another planet. Claude helped NASA’s Perseverance rover travel four hundred meters on Mars. News Search Date Category Title Mar 31, 2026 Announcements Australian government and Anthropic sign MOU for AI safety and research Mar 12, 2026 Announcements Anthropic invests $100 million into the Claude Partner Network Mar 11, 2026 Announcements Introducing The Anthropic Institute Mar 10, 2026 Announcements Sydney will become Anthropic’s fourth office in Asia-Pacific Mar 6, 2026 Policy Partner",
       "sourceUrl": "https://www.anthropic.com/news",
-      "changed": true,
-      "classification": "アラート表示",
-      "classificationReason": "今回の実行で重要度が高い更新としてアラートに分類されました。"
+      "changed": false,
+      "classification": "非選定",
+      "classificationReason": "取得は成功しましたが、今回の差分判定では新規の強い更新は検出されませんでした。"
     },
     {
       "sourceId": "anthropic-claude-code-changelog",
@@ -149,12 +131,12 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:53.870Z",
-      "publishedAt": "2026-04-08T04:37:31.000Z",
-      "title": "2.1.96",
-      "description": "## 2.1.96 - Fixed Bedrock requests failing with `403 \"Authorization header is missing\"` when using `AWS_BEARER_TOKEN_BEDROCK` or `CLAUDE_CODE_SKIP_BEDROCK_AUTH` (regression in 2.1.94)",
-      "excerpt": "## 2.1.96 - Fixed Bedrock requests failing with `403 \"Authorization header is missing\"` when using `AWS_BEARER_TOKEN_BEDROCK` or `CLAUDE_CODE_SKIP_BEDROCK_AUTH` (regression in 2.1.94)",
-      "sourceUrl": "https://github.com/anthropics/claude-code/commit/227817d0f2cae5536273e78422c49bb89af859ca",
+      "fetchedAt": "2026-04-05T16:37:28.921Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
+      "title": "2.1.92",
+      "description": "## 2.1.92 - Added `forceRemoteSettingsRefresh` policy setting: when set, the CLI blocks startup until remote managed settings are freshly fetched, and exits if the fetch fails (fail-closed) - Added interactive Bedrock setup wizard accessible from the login screen when selecting \"3rd-party platform\" — guides you through AWS authentication, region configuration, credential verification, and model pinning - Added per-model and cache-hit breakdown to `/cost` for subscription users - `/release-notes` is now an interactive version picker - Remote Control session names now use your hostname as the default prefix (e.g.",
+      "excerpt": "## 2.1.92 - Added `forceRemoteSettingsRefresh` policy setting: when set, the CLI blocks startup until remote managed settings are freshly fetched, and exits if the fetch fails (fail-closed) - Added interactive Bedrock setup wizard accessible from the login screen when selecting \"3rd-party platform\" — guides you through AWS authentication, region configuration, credential verification, and model pinning - Added per-model and cache-hit breakdown to `/cost` for subscription users - `/release-notes` is now an interactive version picker - Remote Control session names now use your hostname as the default prefix (e.g. `myhost-graceful-unicorn`), overridable with `--remote-control-session-name-prefix` - Pro users now see a footer hint when returning to a session after the prompt cache has expired, showing roughly how many tokens the next turn will send uncached - Fixed subagent spawning permanently failing with \"Could not determine pane count\" after tmux windows are killed or renumbered during a long-running session - Fixed prompt-type Stop hooks incorrectly failing when the small fast model returns `ok:false`, and restored `preventContinuation:true` semantics for non-Stop prompt-type hooks - Fixed tool input validation failures when streaming emits array/object fields as JSON-encoded strings - Fixed an API 400 error that could occur when extended thinking produced a whitespace-only text block alongside real content - Fixed accidental feedback survey submissions from auto-pilot keypresses and consecutive-prompt digit collisions - Fixed misleading \"esc to interrupt\" hint appearing alongside \"esc to clear\" when a text selection exists in fullscreen mode during processing - Fixed Homebrew install update prompts to use the cask's release channel (`claude-code` → stable, `claude-code@latest` → latest) - Fixed `ctrl+e` jumping to the end of the next line when already at end of line in multiline prompts - Fixed an issue where the same message could appear at two positions when scr",
+      "sourceUrl": "https://github.com/anthropics/claude-code/commit/b543a256248ce5ff98804b8dfef4cd6247423d98",
       "changed": true,
       "classification": "アラート表示",
       "classificationReason": "今回の実行で重要度が高い更新としてアラートに分類されました。"
@@ -165,7 +147,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-08T06:07:54.832Z",
+      "fetchedAt": "2026-04-05T16:37:29.494Z",
       "publishedAt": null,
       "title": "ChatGPT release notes",
       "description": "OpenAI の取得に失敗しました。次回再試行します。",
@@ -179,7 +161,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:55.054Z",
+      "fetchedAt": "2026-04-05T16:37:29.563Z",
       "publishedAt": null,
       "title": "Gemini 3: Our most intelligent AI model that brings any idea to life",
       "description": "Gemini 3 Our most intelligent AI model that brings any idea to life Gemini 3.1 Flash-Lite Best for high-volume tasks that need efficiency and intelligence Learn more Gemini 3.1 Deep Think Best for modern challenges across science, research and engineering Learn more Gemini 3.1 Pro Best for complex tasks and bringing creative concepts to life Learn more Gemini 3 Flash Our latest Gemini 3 model that helps you bring any idea to life - faster Learn more Explore the latest Introducing our most intelligent model yet.",
@@ -197,7 +179,7 @@
       "label": "API changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:51.760Z",
+      "fetchedAt": "2026-04-05T16:37:26.882Z",
       "publishedAt": "2026-03-16T15:00:00.000Z",
       "changed": false,
       "error": null
@@ -208,9 +190,9 @@
       "label": "Status history feed",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.149Z",
-      "publishedAt": "2026-04-07T11:49:38.004Z",
-      "changed": true,
+      "fetchedAt": "2026-04-05T16:37:27.058Z",
+      "publishedAt": "2026-04-02T17:49:44.404Z",
+      "changed": false,
       "error": null
     },
     {
@@ -219,9 +201,9 @@
       "label": "TestingCatalog ChatGPT feed",
       "trustLevel": "secondary",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.348Z",
-      "publishedAt": "2026-04-06T13:57:22.000Z",
-      "changed": true,
+      "fetchedAt": "2026-04-05T16:37:27.216Z",
+      "publishedAt": "2026-03-25T10:47:48.000Z",
+      "changed": false,
       "error": null
     },
     {
@@ -230,9 +212,9 @@
       "label": "Claude product updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:52.858Z",
+      "fetchedAt": "2026-04-05T16:37:27.413Z",
       "publishedAt": "2026-03-17T15:00:00.000Z",
-      "changed": true,
+      "changed": false,
       "error": null
     },
     {
@@ -241,8 +223,8 @@
       "label": "Claude Code changelog",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:53.870Z",
-      "publishedAt": "2026-04-08T04:37:31.000Z",
+      "fetchedAt": "2026-04-05T16:37:28.921Z",
+      "publishedAt": "2026-04-04T00:41:56.000Z",
       "changed": true,
       "error": null
     },
@@ -252,7 +234,7 @@
       "label": "ChatGPT release notes",
       "trustLevel": "official",
       "status": "error",
-      "fetchedAt": "2026-04-08T06:07:54.832Z",
+      "fetchedAt": "2026-04-05T16:37:29.494Z",
       "publishedAt": null,
       "changed": false,
       "error": "HTTP 403"
@@ -263,7 +245,7 @@
       "label": "Gemini updates",
       "trustLevel": "official",
       "status": "ok",
-      "fetchedAt": "2026-04-08T06:07:55.054Z",
+      "fetchedAt": "2026-04-05T16:37:29.563Z",
       "publishedAt": null,
       "changed": false,
       "error": null
