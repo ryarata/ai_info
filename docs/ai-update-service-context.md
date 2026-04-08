@@ -501,6 +501,135 @@ The generated site already includes several design choices that reflect the user
 - basic PWA-style assets exist
 - lightweight browser notification behavior exists for urgent items on open
 
+## Latest Review-Driven Product Decisions
+
+The most recent review clarified an important product requirement:
+
+- the system must not hide what it successfully fetched
+- the user wants to inspect both accepted and rejected items
+- classification should be visible as a judgment layer on top of fetched content, not a black box
+
+This is not a minor UI preference. It is now part of the product philosophy.
+
+### Why this matters
+
+Earlier behavior made it too hard to answer:
+
+- what content was actually fetched
+- whether a source was successfully parsed
+- whether a source was excluded because of ranking or because extraction failed
+- whether a model-level interpretation problem was actually an extraction problem
+
+The user explicitly wants the product to support review of the system's own judgment.
+
+Implication:
+
+- every active source should expose its fetched result when possible
+- the UI should clearly distinguish fetch success, extraction result, and final classification
+- the product should make it easy to inspect what the system saw before deciding importance
+
+## Latest Transparency Layer Added
+
+The product now includes an explicit per-source review surface for all active monitored sources.
+
+Current intended behavior:
+
+- every source is shown in a dedicated "fetched content and classification" section
+- each source card shows the extracted title
+- each source card shows the extracted description or source-derived summary text
+- each source card shows the latest extracted source datetime when available
+- each source card shows a classification label
+- each source card shows a short explanation for why it was classified that way
+
+Current classification states include:
+
+- alert display
+- digest display
+- digest display for steady-state monitoring
+- not selected
+- fetch failed
+- sample alert retained
+
+This transparency layer exists so the user can evaluate:
+
+- whether extraction quality is good enough
+- whether ranking logic is correct
+- whether model analysis is over- or under-interpreting the source
+
+## Latest Translation Inspection Layer Added
+
+The user requested the ability to inspect not only summaries and classifications, but also a direct
+Japanese reading layer for the extracted source content itself.
+
+Current intended behavior:
+
+- each successfully fetched source card includes a collapsible translation section
+- the translation section shows:
+  - translated title
+  - translated extracted description
+  - translated extracted excerpt
+- the translation should be faithful and should not add interpretation
+- the translation layer exists to help the user personally judge what the source means
+
+Important product principle:
+
+- translated extracted source content is distinct from analysis
+- translation should preserve ambiguity and noisiness where the source is noisy
+- analysis and prioritization should remain separate from raw translation
+
+This is now an intentional design principle and should be preserved.
+
+## Latest Claude Code Changelog Fix
+
+An important issue was discovered during review:
+
+- the Claude Code changelog source was previously only surfacing the commit feed title such as
+  `chore: Update CHANGELOG.md`
+- this exposed the fact that the system knew a changelog file changed, but not what changed in the
+  changelog itself
+
+This was considered insufficient.
+
+### Current intended behavior
+
+The Claude Code changelog source now uses a hybrid strategy:
+
+- latest commit datetime still comes from the official commit Atom feed
+- the commit SHA is extracted from the latest feed entry link
+- the system then fetches the corresponding `CHANGELOG.md` raw file at that exact commit
+- the system extracts the latest changelog section from the markdown body
+- the extracted markdown section becomes the source title, description, and excerpt basis
+
+This preserves:
+
+- official upstream provenance
+- reliable latest-change datetime
+- direct mapping to the changelog-changing commit
+- real update content rather than only commit metadata
+
+This is an important implementation improvement and should not be reverted.
+
+## Current Interpretation Of Selection Output
+
+The latest review also clarified how to interpret the current `alert` and `digest` sections.
+
+Important current caveat:
+
+- when no new alert candidates are detected, the generated layer can still retain sample alert
+  content
+- this means the top-of-page alert section may not always be a direct reflection of newly fetched
+  items from the current run
+
+Because of this, the per-source transparency section is now especially important.
+
+Implication:
+
+- when reviewing whether the system is making good judgments, the user should inspect per-source
+  fetched content and classification reasons, not only the top-level alert cards
+
+Future work may reduce or remove sample-data fallback behavior, but for now the context document
+should preserve that this was identified as a real source of confusion.
+
 ## Recent Changes To Preserve
 
 The implementation changed materially during the most recent round of work and the next chat
@@ -573,6 +702,34 @@ An earlier bug allowed `publishedAt` to exist in generated data but be dropped f
 items. That has been fixed. Future work should preserve this behavior and avoid reintroducing a
 loss of datetime metadata between pipeline stages.
 
+### 6. All-source inspection is now part of the product
+
+The system no longer treats fetched-but-unselected content as invisible implementation detail.
+
+Current intended behavior:
+
+- all active sources should be reviewable in the UI when fetch succeeds
+- the UI should show classification labels and reasons alongside the extracted content
+- this inspection layer is a first-class tool for tuning extraction and ranking quality
+
+### 7. Source-content translation is now available for review
+
+Each successful source item now supports a collapsible Japanese translation view for the extracted
+content itself.
+
+This should remain separate from:
+
+- priority judgment
+- summary interpretation
+- strategic meaning generation
+
+### 8. Claude Code changelog now fetches actual changelog content
+
+The official feed remains the trigger and datetime source, but the content shown to the user now
+comes from the raw `CHANGELOG.md` file at the matching commit SHA.
+
+This change was made because commit titles alone were not enough for meaningful product review.
+
 ## Current Operational Priorities
 
 The next chat should treat the following as the highest-signal unresolved priorities.
@@ -618,6 +775,17 @@ Implication:
 - prioritize practical tuning based on what the user actually finds useful or noisy
 - especially watch whether official but operationally minor updates are being over-promoted
 - preserve the original emphasis on context UX, work UX, and workflow compression
+
+### Priority 5. Continue reducing black-box behavior
+
+The latest review established that the system should be auditable by the user.
+
+Implication:
+
+- prefer visible reasoning over hidden filtering
+- make it easy to compare extracted raw content, translation, and final classification
+- use this transparency to decide whether future improvements should target parsing, prompting, or
+  scoring
 
 ## Latest Verified State
 
@@ -746,3 +914,152 @@ Items intentionally deprioritized for the first version but still relevant later
 - a specialized media product around capability expansion
 - automated influence content derived from product changes
 - broader monitoring of smaller AI vendors once the interpretation pipeline is reliable
+
+## Latest Cache And Deployment Decisions
+
+Recent debugging and production review changed how refresh behavior should be understood.
+
+### 1. GitHub Actions cache is now part of the production design
+
+The deployment workflow now restores and saves the following across runs:
+
+- `data/updates.analyzed.json`
+- `data/updates.generated.json`
+- `data/snapshots`
+
+This was added because relying only on the repository-committed JSON caused unnecessary full
+re-analysis whenever code changed but the previously analyzed state was not aligned with the
+currently deployed logic.
+
+Current intended effect:
+
+- unchanged source items should avoid unnecessary re-translation and re-analysis
+- rerunning the same workflow should be materially cheaper than a cold run
+- production deploy behavior should depend on the latest cached analyzed state, not only on what is
+  committed in Git
+
+### 2. Partial debug runs currently share the same cache lineage
+
+This is an important current caveat.
+
+If a manual run is executed with only a subset of sources, the saved Actions cache for that run can
+become the restore point for the next normal run.
+
+Implication:
+
+- a partial debug run is useful for investigation
+- but it can temporarily reduce cache coverage for sources not included in that run
+
+This is acceptable for now because partial forced runs are expected to be rare, but future work may
+separate debug cache and production cache if this becomes operationally noisy.
+
+## Latest Analysis Identity Rules
+
+The most recent rounds of debugging clarified what should count as "the same article."
+
+### 1. Translation and analysis cache identity is article-based
+
+Current intended rule:
+
+- same article detection should be based on source-level raw title and published datetime
+
+The current implementation normalizes those values for comparison, but the product-level intent is:
+
+- do not retranslate or reanalyze just because extracted excerpt text changed slightly
+- do not invalidate cache because of small body-level parsing differences when the article itself is
+  the same
+
+This decision was made specifically to reduce wasteful API cost.
+
+### 2. "Why regenerated" visibility is now part of the system
+
+The analyzed layer and UI now expose cache status and regeneration reasons such as:
+
+- cache hit
+- regenerated
+- no previous analysis
+- title changed
+- publishedAt changed
+- forced regeneration requested
+
+This visibility should remain because it directly helps explain unexpected model cost.
+
+## Latest Alert Retention Rule
+
+The user requested that article-level alert status should persist for the same article across runs.
+
+Current intended behavior:
+
+- if an article was previously promoted to alert
+- and the current run is still looking at the same article
+- the article may retain alert status in a later run even if it is no longer newly changed
+
+However, this should not cause infinite alert accumulation.
+
+Current rule:
+
+- new alert candidates are considered first
+- previously alerted same-article items are used only as retained candidates
+- final alert count is still capped
+
+Implication:
+
+- alert status has continuity across runs
+- but the top alert section should not grow forever
+
+This behavior is now an intentional product decision rather than an accidental side effect.
+
+## Latest Model-Split Decision
+
+The user decided that different parts of the pipeline should use different OpenAI models.
+
+Current intended model split:
+
+- translation: `gpt-4.1`
+- summary / alert analysis / digest analysis / weekly themes: `gpt-5`
+
+This reflects the user's view that:
+
+- translation fidelity is already sufficient with a cheaper model
+- Japanese summary quality and judgment quality are worth spending more on
+
+Current environment-variable interpretation:
+
+- `OPENAI_TRANSLATION_MODEL`
+- `OPENAI_SUMMARY_MODEL`
+
+The workflow defaults should preserve this split unless there is a deliberate future cost or
+quality decision.
+
+## Latest Manual Debug Workflow
+
+The GitHub Actions manual run flow now supports targeted debugging.
+
+Current manual inputs include:
+
+- source IDs to refresh
+- optional feed pinning
+- source IDs to force regeneration
+- an option to disable same-article alert retention
+- an option to skip Pages deployment and only inspect the artifact
+
+This workflow exists so the user can:
+
+- inspect how one source changes without paying full-run cost
+- compare cached and forced-regenerated outputs
+- verify behavior in artifact form before deploying to GitHub Pages
+
+### Important operational note
+
+If the user wants to inspect output visually without updating the public site:
+
+- run manual workflow dispatch
+- set deploy-to-pages to false
+- inspect the uploaded artifact
+
+If the user wants to see the result directly on the live GitHub Pages UI:
+
+- run manual workflow dispatch
+- set deploy-to-pages to true
+
+This distinction is now part of the intended operating model.
