@@ -10,6 +10,7 @@ await loadEnv(root);
 const sourcesPath = path.join(root, "config", "sources.json");
 const samplePath = path.join(root, "data", "updates.sample.json");
 const generatedPath = path.join(root, "data", "updates.generated.json");
+const analyzedPath = path.join(root, "data", "updates.analyzed.json");
 const snapshotDir = path.join(root, "data", "snapshots");
 const selectedSourceIds = parseCsvEnv(process.env.SOURCE_IDS);
 const pinnedItemUrls = parsePinnedItemUrls(process.env.PINNED_SOURCE_ITEM_URLS);
@@ -18,6 +19,7 @@ const sources = JSON.parse(await readFile(sourcesPath, "utf8"))
   .filter((source) => source.enabled)
   .filter((source) => selectedSourceIds.size === 0 || selectedSourceIds.has(source.id));
 const sampleData = JSON.parse(await readFile(samplePath, "utf8"));
+const previousAnalyzed = await readJsonIfExists(analyzedPath);
 
 await mkdir(snapshotDir, { recursive: true });
 
@@ -40,7 +42,7 @@ for (const source of sources) {
   snapshotResults.push({ source, previous, current: persisted, change });
 }
 
-const generated = buildGeneratedData(snapshotResults, sampleData);
+const generated = buildGeneratedData(snapshotResults, sampleData, previousAnalyzed);
 await writeFile(generatedPath, JSON.stringify(generated, null, 2), "utf8");
 
 console.log(`Refreshed ${snapshotResults.length} sources and wrote ${generatedPath}`);
@@ -268,17 +270,20 @@ async function enrichAnthropicNewsSnapshot(snapshot, context) {
   }
 }
 
-function buildGeneratedData(snapshotResults, sampleData) {
+function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
   const generatedAt = new Date().toISOString();
   const changedItems = snapshotResults.filter((item) => item.change.changed && item.current.status === "ok");
   const failedItems = snapshotResults.filter((item) => item.current.status === "error");
 
   const rankedItems = rankChangedItems(changedItems);
   const alertCandidates = rankedItems.filter(shouldPromoteToAlert);
-  const alerts = alertCandidates.slice(0, 2).map((item, index) => toAlert(item, index));
+  const retainedAlertCandidates = findRetainedAlertCandidates(snapshotResults, previousAnalyzed);
+  const finalAlertCandidates = mergeAlertCandidates(alertCandidates, retainedAlertCandidates);
+  const alerts = finalAlertCandidates.slice(0, 2).map((candidate, index) => toAlert(candidate.item, index, candidate.retained));
   const usedSampleAlerts = alerts.length === 0;
 
-  const alertIds = new Set(alertCandidates.slice(0, 2).map((item) => item.source.id));
+  const retainedAlertIds = new Set(finalAlertCandidates.filter((candidate) => candidate.retained).map((candidate) => candidate.item.source.id));
+  const alertIds = new Set(finalAlertCandidates.slice(0, 2).map((candidate) => candidate.item.source.id));
   const digest = rankedItems
     .filter((item) => !alertIds.has(item.source.id))
     .map(toDigest);
@@ -312,6 +317,7 @@ function buildGeneratedData(snapshotResults, sampleData) {
       toSourceItem(item, {
         finalAlertIds,
         finalDigestIds,
+        retainedAlertIds,
         usedSampleAlerts,
         usedFallbackDigest
       })
@@ -331,7 +337,7 @@ function buildGeneratedData(snapshotResults, sampleData) {
 }
 
 function toSourceItem(item, options) {
-  const { finalAlertIds, finalDigestIds, usedSampleAlerts, usedFallbackDigest } = options;
+  const { finalAlertIds, finalDigestIds, retainedAlertIds, usedSampleAlerts, usedFallbackDigest } = options;
 
   if (item.current.status !== "ok") {
     return {
@@ -359,7 +365,9 @@ function toSourceItem(item, options) {
     classification = usedSampleAlerts ? "アラート表示(サンプル維持)" : "アラート表示";
     classificationReason = usedSampleAlerts
       ? "今回の実行では新規アラート候補がなかったため、サンプルアラートを継続表示しています。"
-      : "今回の実行で重要度が高い更新としてアラートに分類されました。";
+      : retainedAlertIds.has(item.source.id)
+        ? "初回にアラート判定された同一記事のため、今回もアラート表示を維持しています。"
+        : "今回の実行で重要度が高い更新としてアラートに分類されました。";
   } else if (finalDigestIds.has(item.source.id)) {
     classification = usedFallbackDigest && !item.change.changed ? "Digest表示(定点観測)" : "Digest表示";
     classificationReason =
@@ -386,7 +394,7 @@ function toSourceItem(item, options) {
   };
 }
 
-function toAlert(item, index) {
+function toAlert(item, index, retained = false) {
   const scoreBase = scoreFromSource(item);
   const meaningfulTitle = cleanTitle(item.current.title, item.source.company);
   return {
@@ -401,8 +409,90 @@ function toAlert(item, index) {
     whyNow: explainWhyNow(item),
     scores: scoreBase,
     sourceUrl: item.current.itemUrl ?? item.source.url,
-    publishedAt: item.current.publishedAt ?? null
+    publishedAt: item.current.publishedAt ?? null,
+    retainedFromPreviousAlert: retained
   };
+}
+
+function findRetainedAlertCandidates(snapshotResults, previousAnalyzed) {
+  const currentBySource = new Map(
+    snapshotResults
+      .filter((item) => item.current.status === "ok")
+      .map((item) => [item.source.id, item])
+  );
+
+  return (previousAnalyzed?.alerts ?? [])
+    .map((previousAlert) => {
+      const currentItem = currentBySource.get(previousAlert?.sourceId);
+      if (!currentItem) {
+        return null;
+      }
+
+      const previousIdentity = buildArticleIdentity({
+        sourceId: previousAlert.sourceId,
+        title: previousAlert.titleEn ?? "",
+        publishedAt: previousAlert.publishedAt ?? null
+      });
+      const currentIdentity = buildArticleIdentity({
+        sourceId: currentItem.source.id,
+        title: cleanTitle(currentItem.current.title, currentItem.source.company),
+        publishedAt: currentItem.current.publishedAt ?? null
+      });
+
+      if (!previousIdentity || previousIdentity !== currentIdentity) {
+        return null;
+      }
+
+      return {
+        item: currentItem,
+        retained: true
+      };
+    })
+    .filter(Boolean);
+}
+
+function mergeAlertCandidates(alertCandidates, retainedAlertCandidates) {
+  const merged = [];
+  const seen = new Set();
+
+  for (const item of alertCandidates) {
+    const key = buildArticleIdentity({
+      sourceId: item.source.id,
+      title: cleanTitle(item.current.title, item.source.company),
+      publishedAt: item.current.publishedAt ?? null
+    });
+    if (!key || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    merged.push({ item, retained: false });
+  }
+
+  for (const candidate of retainedAlertCandidates) {
+    const key = buildArticleIdentity({
+      sourceId: candidate.item.source.id,
+      title: cleanTitle(candidate.item.current.title, candidate.item.source.company),
+      publishedAt: candidate.item.current.publishedAt ?? null
+    });
+    if (!key || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    merged.push(candidate);
+  }
+
+  return merged;
+}
+
+function buildArticleIdentity({ sourceId, title, publishedAt }) {
+  const normalizedSourceId = String(sourceId ?? "").trim();
+  const normalizedTitle = normalizeFingerprintText(title);
+  const normalizedPublishedAt = normalizeIdentityDate(publishedAt);
+  if (!normalizedSourceId || !normalizedTitle || !normalizedPublishedAt) {
+    return null;
+  }
+
+  return `${normalizedSourceId}@@${normalizedTitle}@@${normalizedPublishedAt}`;
 }
 
 function toDigest(item) {
@@ -826,6 +916,17 @@ function normalizeText(text) {
     .replace(/Your browser does not support the video tag\.?/gi, " ")
     .replace(/Skip to main content/gi, " ")
     .replace(/Skip to footer/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeFingerprintText(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\r\n/g, "\n")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[‐‑‒–—]/g, "-")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -1288,6 +1389,20 @@ function normalizeDateString(value) {
   const parsed = Date.parse(trimmed);
   if (Number.isNaN(parsed)) {
     return null;
+  }
+
+  return new Date(parsed).toISOString();
+}
+
+function normalizeIdentityDate(value) {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return "";
+  }
+
+  const parsed = Date.parse(text);
+  if (Number.isNaN(parsed)) {
+    return text;
   }
 
   return new Date(parsed).toISOString();

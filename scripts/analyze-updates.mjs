@@ -10,7 +10,8 @@ const generatedPath = path.join(root, "data", "updates.generated.json");
 const analyzedPath = path.join(root, "data", "updates.analyzed.json");
 const snapshotDir = path.join(root, "data", "snapshots");
 
-const model = process.env.OPENAI_MODEL ?? "gpt-4.1";
+const translationModel = process.env.OPENAI_TRANSLATION_MODEL ?? "gpt-4.1";
+const summaryModel = process.env.OPENAI_SUMMARY_MODEL ?? "gpt-5";
 const apiKey = process.env.OPENAI_API_KEY;
 
 const generated = JSON.parse(await readFile(generatedPath, "utf8"));
@@ -38,7 +39,11 @@ let analysisMode = "fallback";
 
 if (apiKey) {
   try {
-    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, analysisTrace, { apiKey, model });
+    analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, analysisTrace, {
+      apiKey,
+      translationModel,
+      summaryModel
+    });
     analysisMode = analysisCache.hasReusableEntries ? "openai_with_cache" : "openai";
   } catch (error) {
     analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, `LLM analysis failed: ${toErrorMessage(error)}`);
@@ -51,7 +56,8 @@ if (apiKey) {
 analyzed.generatedAt = new Date().toISOString();
 analyzed.analysis = {
   mode: analysisMode,
-  model: apiKey ? model : null,
+  summaryModel: apiKey ? summaryModel : null,
+  translationModel: apiKey ? translationModel : null,
   cache: finalizeAnalysisTrace(analysisTrace)
 };
 analyzed.summary = {
@@ -165,7 +171,10 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
     `Source excerpt: ${snapshot.excerpt ?? ""}`
   ].join("\n");
 
-  const result = await callOpenAIJson(prompt, schema, options);
+  const result = await callOpenAIJson(prompt, schema, {
+    apiKey: options.apiKey,
+    model: options.summaryModel
+  });
   return {
     ...item,
     titleJa: result.title_ja || item.titleJa,
@@ -233,7 +242,10 @@ async function buildWeeklyThemes(base, snapshotMap, cache, trace, options) {
     `Source updates: ${JSON.stringify(okSnapshots)}`
   ].join("\n");
 
-  const result = await callOpenAIJson(prompt, schema, options);
+  const result = await callOpenAIJson(prompt, schema, {
+    apiKey: options.apiKey,
+    model: options.summaryModel
+  });
   trace.weeklyThemes = { status: "regenerated" };
   return result.themes?.length ? result.themes : base.weeklyThemes ?? [];
 }
@@ -281,7 +293,10 @@ async function enrichSourceItem(item, cache, trace, options) {
     `Original description: ${item.description ?? ""}`
   ].join("\n");
 
-  const result = await callOpenAIJson(prompt, schema, options);
+  const result = await callOpenAIJson(prompt, schema, {
+    apiKey: options.apiKey,
+    model: options.translationModel
+  });
   const excerptJa = await translateLongExcerpt(item, options);
   return {
     ...item,
@@ -328,7 +343,10 @@ async function translateLongExcerpt(item, options) {
       `Original excerpt chunk: ${chunk}`
     ].join("\n");
 
-    const result = await callOpenAIJson(prompt, schema, options);
+    const result = await callOpenAIJson(prompt, schema, {
+      apiKey: options.apiKey,
+      model: options.translationModel
+    });
     translatedChunks.push(result.excerpt_ja || "");
   }
 
