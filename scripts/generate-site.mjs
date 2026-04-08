@@ -176,13 +176,13 @@ const renderCacheInfo = (sourceId) => {
 
   const reasons = [
     cacheInfo.translation === "regenerated" && cacheInfo.translationReason
-      ? `翻訳: ${formatCacheReason(cacheInfo.translationReason)}`
+      ? `翻訳: ${formatCacheReason(cacheInfo.translationReason, cacheInfo.translationReasonDetail)}`
       : null,
     cacheInfo.alert === "regenerated" && cacheInfo.alertReason
-      ? `Alert: ${formatCacheReason(cacheInfo.alertReason)}`
+      ? `Alert: ${formatCacheReason(cacheInfo.alertReason, cacheInfo.alertReasonDetail)}`
       : null,
     cacheInfo.digest === "regenerated" && cacheInfo.digestReason
-      ? `Digest: ${formatCacheReason(cacheInfo.digestReason)}`
+      ? `Digest: ${formatCacheReason(cacheInfo.digestReason, cacheInfo.digestReasonDetail)}`
       : null
   ].filter(Boolean);
 
@@ -748,7 +748,7 @@ function formatCacheStatus(status) {
   return labels[status] ?? status;
 }
 
-function formatCacheReason(reason) {
+function formatCacheReason(reason, detail) {
   const labels = {
     no_previous_translation: "前回翻訳が未保存",
     no_previous_source_item: "前回 source item が未保存",
@@ -761,5 +761,10 @@ function formatCacheReason(reason) {
     sourceUrl_changed: "sourceUrl が変化"
   };
 
-  return labels[reason] ?? reason;
+  const label = labels[reason] ?? reason;
+  if (!detail?.previous && !detail?.current) {
+    return label;
+  }
+
+  return `${label} (prev: ${detail.previous ?? ""} / current: ${detail.current ?? ""})`;
 }

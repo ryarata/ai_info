@@ -11,8 +11,12 @@ const sourcesPath = path.join(root, "config", "sources.json");
 const samplePath = path.join(root, "data", "updates.sample.json");
 const generatedPath = path.join(root, "data", "updates.generated.json");
 const snapshotDir = path.join(root, "data", "snapshots");
+const selectedSourceIds = parseCsvEnv(process.env.SOURCE_IDS);
+const pinnedItemUrls = parsePinnedItemUrls(process.env.PINNED_SOURCE_ITEM_URLS);
 
-const sources = JSON.parse(await readFile(sourcesPath, "utf8")).filter((source) => source.enabled);
+const sources = JSON.parse(await readFile(sourcesPath, "utf8"))
+  .filter((source) => source.enabled)
+  .filter((source) => selectedSourceIds.size === 0 || selectedSourceIds.has(source.id));
 const sampleData = JSON.parse(await readFile(samplePath, "utf8"));
 
 await mkdir(snapshotDir, { recursive: true });
@@ -118,10 +122,11 @@ async function enrichHtmlSnapshot(snapshot, context) {
 
 async function buildFeedSnapshot(source, xml, fetchedAt) {
   const items = extractFeedItems(xml, source.type);
-  const latest = items[0] ?? {};
+  const selectedItems = selectFeedItemsForSource(items, source);
+  const latest = selectedItems[0] ?? {};
   const title = latest.title || source.label;
   const description = normalizeText(stripTags(latest.description || latest.summary || ""));
-  const excerptParts = items
+  const excerptParts = selectedItems
     .slice(0, 5)
     .map((item) => `${item.title || ""} ${normalizeText(stripTags(item.description || item.summary || ""))}`.trim())
       .filter(Boolean);
@@ -148,6 +153,16 @@ async function buildFeedSnapshot(source, xml, fetchedAt) {
   }
 
   return snapshot;
+}
+
+function selectFeedItemsForSource(items, source) {
+  const pinnedUrl = pinnedItemUrls.get(source.id);
+  if (!pinnedUrl) {
+    return items;
+  }
+
+  const matched = items.filter((item) => normalizeUrl(item.link) === normalizeUrl(pinnedUrl));
+  return matched.length > 0 ? matched : items;
 }
 
 async function enrichClaudeCodeSnapshot(snapshot) {
@@ -1123,6 +1138,48 @@ function hashText(value) {
 
 function previousLikeHash(id, fetchedAt) {
   return hashText(`${id}:${fetchedAt}`);
+}
+
+function parseCsvEnv(value) {
+  return new Set(
+    String(value ?? "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  );
+}
+
+function parsePinnedItemUrls(value) {
+  const map = new Map();
+  const entries = String(value ?? "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  for (const entry of entries) {
+    const separatorIndex = entry.indexOf("=");
+    if (separatorIndex <= 0) {
+      continue;
+    }
+
+    const sourceId = entry.slice(0, separatorIndex).trim();
+    const url = entry.slice(separatorIndex + 1).trim();
+    if (sourceId && url) {
+      map.set(sourceId, url);
+    }
+  }
+
+  return map;
+}
+
+function normalizeUrl(value) {
+  try {
+    const url = new URL(value);
+    url.hash = "";
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    return String(value ?? "").trim().replace(/\/+$/, "");
+  }
 }
 
 function extractDateFromText(text, source) {

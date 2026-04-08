@@ -522,7 +522,7 @@ function buildAnalysisCache(previousAnalyzed) {
 function getCachedTranslationForSourceItem(item, cache) {
   const previous = cache.sourceItems.get(item.sourceId);
   if (!previous?.translated) {
-    return { hit: false, reason: "no_previous_translation" };
+    return { hit: false, reason: { code: "no_previous_translation" } };
   }
 
   const fingerprintDiff = diffSourceIdentity(sourceIdentityPartsFromSourceItem(previous), sourceIdentityPartsFromSourceItem(item));
@@ -536,7 +536,7 @@ function getCachedTranslationForSourceItem(item, cache) {
 function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
   const previousSourceItem = cache.sourceItems.get(sourceId);
   if (!previousSourceItem) {
-    return { hit: false, reason: "no_previous_source_item" };
+    return { hit: false, reason: { code: "no_previous_source_item" } };
   }
 
   const fingerprintDiff = diffSourceIdentity(
@@ -554,7 +554,7 @@ function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
     null;
 
   if (!matched) {
-    return { hit: false, reason: `no_previous_${kind}_analysis` };
+    return { hit: false, reason: { code: `no_previous_${kind}_analysis` } };
   }
 
   return { hit: true, value: matched };
@@ -589,7 +589,13 @@ function sourceIdentityPartsFromSourceItem(item) {
 function diffSourceIdentity(previous, current) {
   for (const key of ["title", "publishedAt"]) {
     if ((previous?.[key] ?? "") !== (current?.[key] ?? "")) {
-      return `${key}_changed`;
+      return {
+        code: `${key}_changed`,
+        detail: {
+          previous: previous?.[key] ?? "",
+          current: current?.[key] ?? ""
+        }
+      };
     }
   }
 
@@ -634,7 +640,8 @@ function markSourceTranslation(trace, sourceId, status, reason = null) {
   trace.sourceItems.set(sourceId, {
     ...current,
     translation: status,
-    translationReason: reason ?? current.translationReason ?? null
+    translationReason: reason?.code ?? reason ?? current.translationReason ?? null,
+    translationReasonDetail: reason?.detail ?? current.translationReasonDetail ?? null
   });
 }
 
@@ -643,7 +650,8 @@ function markItemAnalysis(trace, sourceId, kind, status, reason = null) {
   trace.itemAnalyses.set(sourceId, {
     ...current,
     [kind]: status,
-    [`${kind}Reason`]: reason ?? current[`${kind}Reason`] ?? null
+    [`${kind}Reason`]: reason?.code ?? reason ?? current[`${kind}Reason`] ?? null,
+    [`${kind}ReasonDetail`]: reason?.detail ?? current[`${kind}ReasonDetail`] ?? null
   });
 }
 
