@@ -14,6 +14,7 @@ const analyzedPath = path.join(root, "data", "updates.analyzed.json");
 const snapshotDir = path.join(root, "data", "snapshots");
 const selectedSourceIds = parseCsvEnv(process.env.SOURCE_IDS);
 const pinnedItemUrls = parsePinnedItemUrls(process.env.PINNED_SOURCE_ITEM_URLS);
+const disableAlertRetention = parseBooleanEnv(process.env.DISABLE_ALERT_RETENTION);
 
 const sources = JSON.parse(await readFile(sourcesPath, "utf8"))
   .filter((source) => source.enabled)
@@ -277,7 +278,7 @@ function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
 
   const rankedItems = rankChangedItems(changedItems);
   const alertCandidates = rankedItems.filter(shouldPromoteToAlert);
-  const retainedAlertCandidates = findRetainedAlertCandidates(snapshotResults, previousAnalyzed);
+  const retainedAlertCandidates = disableAlertRetention ? [] : findRetainedAlertCandidates(snapshotResults, previousAnalyzed);
   const finalAlertCandidates = mergeAlertCandidates(alertCandidates, retainedAlertCandidates);
   const alerts = finalAlertCandidates.slice(0, 2).map((candidate, index) => toAlert(candidate.item, index, candidate.retained));
   const usedSampleAlerts = alerts.length === 0;
@@ -1248,6 +1249,10 @@ function parseCsvEnv(value) {
       .map((item) => item.trim())
       .filter(Boolean)
   );
+}
+
+function parseBooleanEnv(value) {
+  return /^(1|true|yes|on)$/i.test(String(value ?? "").trim());
 }
 
 function parsePinnedItemUrls(value) {

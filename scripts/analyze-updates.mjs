@@ -12,6 +12,7 @@ const snapshotDir = path.join(root, "data", "snapshots");
 
 const translationModel = process.env.OPENAI_TRANSLATION_MODEL ?? "gpt-4.1";
 const summaryModel = process.env.OPENAI_SUMMARY_MODEL ?? "gpt-5";
+const forcedRegenSourceIds = parseCsvEnv(process.env.FORCE_REGEN_SOURCE_IDS);
 const apiKey = process.env.OPENAI_API_KEY;
 
 const generated = JSON.parse(await readFile(generatedPath, "utf8"));
@@ -58,6 +59,7 @@ analyzed.analysis = {
   mode: analysisMode,
   summaryModel: apiKey ? summaryModel : null,
   translationModel: apiKey ? translationModel : null,
+  forcedRegenSourceIds: [...forcedRegenSourceIds],
   cache: finalizeAnalysisTrace(analysisTrace)
 };
 analyzed.summary = {
@@ -538,6 +540,10 @@ function buildAnalysisCache(previousAnalyzed) {
 }
 
 function getCachedTranslationForSourceItem(item, cache) {
+  if (forcedRegenSourceIds.has(item.sourceId)) {
+    return { hit: false, reason: { code: "forced_regen_requested" } };
+  }
+
   const previous = cache.sourceItems.get(item.sourceId);
   if (!previous?.translated) {
     return { hit: false, reason: { code: "no_previous_translation" } };
@@ -552,6 +558,10 @@ function getCachedTranslationForSourceItem(item, cache) {
 }
 
 function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
+  if (forcedRegenSourceIds.has(sourceId)) {
+    return { hit: false, reason: { code: "forced_regen_requested" } };
+  }
+
   const previousSourceItem = cache.sourceItems.get(sourceId);
   if (!previousSourceItem) {
     return { hit: false, reason: { code: "no_previous_source_item" } };
@@ -643,6 +653,15 @@ function normalizeIdentityDate(value) {
   }
 
   return new Date(parsed).toISOString();
+}
+
+function parseCsvEnv(value) {
+  return new Set(
+    String(value ?? "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  );
 }
 
 function createAnalysisTrace() {

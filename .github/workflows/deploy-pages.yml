@@ -2,6 +2,32 @@ name: Deploy To GitHub Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      source_ids:
+        description: "Optional comma-separated source IDs to refresh"
+        required: false
+        type: string
+        default: ""
+      pinned_source_item_urls:
+        description: "Optional sourceId=url pairs for feed pinning"
+        required: false
+        type: string
+        default: ""
+      force_regen_source_ids:
+        description: "Optional comma-separated source IDs to bypass translation and analysis cache"
+        required: false
+        type: string
+        default: ""
+      disable_alert_retention:
+        description: "Disable same-article alert retention for this run"
+        required: false
+        type: boolean
+        default: false
+      deploy_result:
+        description: "Deploy this run to GitHub Pages"
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -57,7 +83,13 @@ jobs:
       - name: Refresh data and build static site
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1' }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5' }}
+          OPENAI_TRANSLATION_MODEL: ${{ vars.OPENAI_TRANSLATION_MODEL || 'gpt-4.1' }}
+          OPENAI_SUMMARY_MODEL: ${{ vars.OPENAI_SUMMARY_MODEL || vars.OPENAI_MODEL || 'gpt-5' }}
+          SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ids || '' }}
+          PINNED_SOURCE_ITEM_URLS: ${{ github.event_name == 'workflow_dispatch' && inputs.pinned_source_item_urls || '' }}
+          FORCE_REGEN_SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.force_regen_source_ids || '' }}
+          DISABLE_ALERT_RETENTION: ${{ github.event_name == 'workflow_dispatch' && inputs.disable_alert_retention || false }}
         run: npm run refresh
 
       - name: Save analysis cache
@@ -76,5 +108,6 @@ jobs:
           path: public
 
       - name: Deploy
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy_result }}
         id: deployment
         uses: actions/deploy-pages@v4
