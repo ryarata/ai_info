@@ -174,7 +174,22 @@ const renderCacheInfo = (sourceId) => {
     return "";
   }
 
-  return `<div class="cache-row">${labels.map(renderCacheBadge).join("")}</div>`;
+  const reasons = [
+    cacheInfo.translation === "regenerated" && cacheInfo.translationReason
+      ? `翻訳: ${formatCacheReason(cacheInfo.translationReason)}`
+      : null,
+    cacheInfo.alert === "regenerated" && cacheInfo.alertReason
+      ? `Alert: ${formatCacheReason(cacheInfo.alertReason)}`
+      : null,
+    cacheInfo.digest === "regenerated" && cacheInfo.digestReason
+      ? `Digest: ${formatCacheReason(cacheInfo.digestReason)}`
+      : null
+  ].filter(Boolean);
+
+  return `
+    <div class="cache-row">${labels.map(renderCacheBadge).join("")}</div>
+    ${reasons.length > 0 ? `<p class="cache-reason">${escapeHtml(reasons.join(" / "))}</p>` : ""}
+  `;
 };
 
 const html = `<!DOCTYPE html>
@@ -565,6 +580,12 @@ h3 {
   gap: 8px;
   margin: 0 0 10px;
 }
+.cache-reason {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
 .translation-long {
   white-space: pre-wrap;
   max-height: 48vh;
@@ -725,4 +746,20 @@ function formatCacheStatus(status) {
   };
 
   return labels[status] ?? status;
+}
+
+function formatCacheReason(reason) {
+  const labels = {
+    no_previous_translation: "前回翻訳が未保存",
+    no_previous_source_item: "前回 source item が未保存",
+    no_previous_alert_analysis: "前回 Alert 分析が未保存",
+    no_previous_digest_analysis: "前回 Digest 分析が未保存",
+    title_changed: "title が変化",
+    description_changed: "description が変化",
+    excerpt_changed: "excerpt が変化",
+    publishedAt_changed: "publishedAt が変化",
+    sourceUrl_changed: "sourceUrl が変化"
+  };
+
+  return labels[reason] ?? reason;
 }

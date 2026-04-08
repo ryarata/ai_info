@@ -93,19 +93,20 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
   }
 
   const cached = getCachedAnalysisForItem(sourceId, kind, snapshot, cache);
-  if (cached) {
+  if (cached.hit) {
     markItemAnalysis(trace, sourceId, kind, "cache_hit");
     return {
       ...item,
-      titleJa: cached.titleJa ?? item.titleJa,
-      summaryJa: cached.summaryJa ?? item.summaryJa,
-      whyNow: cached.whyNow ?? item.whyNow,
-      action: kind === "alert" ? item.action : cached.action ?? item.action,
-      scores: cached.scores ?? item.scores,
+      titleJa: cached.value.titleJa ?? item.titleJa,
+      summaryJa: cached.value.summaryJa ?? item.summaryJa,
+      whyNow: cached.value.whyNow ?? item.whyNow,
+      action: kind === "alert" ? item.action : cached.value.action ?? item.action,
+      scores: cached.value.scores ?? item.scores,
       publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
-      trustLevel: cached.trustLevel ?? findTrustLevel(baseLikeItem(item), snapshot)
+      trustLevel: cached.value.trustLevel ?? findTrustLevel(baseLikeItem(item), snapshot)
     };
   }
+  markItemAnalysis(trace, sourceId, kind, "regenerated", cached.reason);
 
   const schema = {
     name: `${kind}_analysis`,
@@ -165,8 +166,6 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
   ].join("\n");
 
   const result = await callOpenAIJson(prompt, schema, options);
-  markItemAnalysis(trace, sourceId, kind, "regenerated");
-
   return {
     ...item,
     titleJa: result.title_ja || item.titleJa,
@@ -248,13 +247,14 @@ async function enrichSourceItem(item, cache, trace, options) {
   }
 
   const cached = getCachedTranslationForSourceItem(item, cache);
-  if (cached) {
+  if (cached.hit) {
     markSourceTranslation(trace, item.sourceId, "cache_hit");
     return {
       ...item,
-      translated: cached
+      translated: cached.value
     };
   }
+  markSourceTranslation(trace, item.sourceId, "regenerated", cached.reason);
 
   const schema = {
     name: "source_item_translation_header",
@@ -283,8 +283,6 @@ async function enrichSourceItem(item, cache, trace, options) {
 
   const result = await callOpenAIJson(prompt, schema, options);
   const excerptJa = await translateLongExcerpt(item, options);
-  markSourceTranslation(trace, item.sourceId, "regenerated");
-
   return {
     ...item,
     translated: {
@@ -524,54 +522,84 @@ function buildAnalysisCache(previousAnalyzed) {
 function getCachedTranslationForSourceItem(item, cache) {
   const previous = cache.sourceItems.get(item.sourceId);
   if (!previous?.translated) {
-    return null;
+    return { hit: false, reason: "no_previous_translation" };
   }
 
-  return sourceFingerprintFromSourceItem(previous) === sourceFingerprintFromSourceItem(item)
-    ? previous.translated
-    : null;
+  const fingerprintDiff = diffSourceFingerprint(sourceFingerprintPartsFromSourceItem(previous), sourceFingerprintPartsFromSourceItem(item));
+  if (fingerprintDiff) {
+    return { hit: false, reason: fingerprintDiff };
+  }
+
+  return { hit: true, value: previous.translated };
 }
 
 function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
   const previousSourceItem = cache.sourceItems.get(sourceId);
   if (!previousSourceItem) {
-    return null;
+    return { hit: false, reason: "no_previous_source_item" };
   }
 
-  if (sourceFingerprintFromSourceItem(previousSourceItem) !== sourceFingerprintFromSnapshot(snapshot)) {
-    return null;
+  const fingerprintDiff = diffSourceFingerprint(
+    sourceFingerprintPartsFromSourceItem(previousSourceItem),
+    sourceFingerprintPartsFromSnapshot(snapshot)
+  );
+  if (fingerprintDiff) {
+    return { hit: false, reason: fingerprintDiff };
   }
 
-  return (
+  const matched =
     cache.itemAnalyses.get(`${kind}:${sourceId}`) ??
     cache.itemAnalyses.get(`alert:${sourceId}`) ??
     cache.itemAnalyses.get(`digest:${sourceId}`) ??
-    null
-  );
+    null;
+
+  if (!matched) {
+    return { hit: false, reason: `no_previous_${kind}_analysis` };
+  }
+
+  return { hit: true, value: matched };
 }
 
 function sourceFingerprintFromSnapshot(snapshot) {
-  return [
-    snapshot?.title ?? "",
-    snapshot?.description ?? "",
-    snapshot?.excerpt ?? "",
-    snapshot?.publishedAt ?? "",
-    snapshot?.itemUrl ?? snapshot?.url ?? ""
-  ].join("\n@@\n");
+  return Object.values(sourceFingerprintPartsFromSnapshot(snapshot)).join("\n@@\n");
 }
 
 function sourceFingerprintFromSourceItem(item) {
-  return [
-    item?.title ?? "",
-    item?.description ?? "",
-    item?.excerpt ?? "",
-    item?.publishedAt ?? "",
-    item?.sourceUrl ?? ""
-  ].join("\n@@\n");
+  return Object.values(sourceFingerprintPartsFromSourceItem(item)).join("\n@@\n");
 }
 
 function fingerprintWeeklyThemes(okSnapshots) {
   return JSON.stringify(okSnapshots);
+}
+
+function sourceFingerprintPartsFromSnapshot(snapshot) {
+  return {
+    title: snapshot?.title ?? "",
+    description: snapshot?.description ?? "",
+    excerpt: snapshot?.excerpt ?? "",
+    publishedAt: snapshot?.publishedAt ?? "",
+    sourceUrl: snapshot?.itemUrl ?? snapshot?.url ?? ""
+  };
+}
+
+function sourceFingerprintPartsFromSourceItem(item) {
+  return {
+    title: item?.title ?? "",
+    description: item?.description ?? "",
+    excerpt: item?.excerpt ?? "",
+    publishedAt: item?.publishedAt ?? "",
+    sourceUrl: item?.sourceUrl ?? ""
+  };
+}
+
+function diffSourceFingerprint(previous, current) {
+  for (const key of ["title", "description", "excerpt", "publishedAt", "sourceUrl"]) {
+    if ((previous?.[key] ?? "") !== (current?.[key] ?? "")) {
+      return `${key}_changed`;
+    }
+  }
+
+  return null;
 }
 
 function createAnalysisTrace() {
@@ -582,19 +610,21 @@ function createAnalysisTrace() {
   };
 }
 
-function markSourceTranslation(trace, sourceId, status) {
+function markSourceTranslation(trace, sourceId, status, reason = null) {
   const current = trace.sourceItems.get(sourceId) ?? {};
   trace.sourceItems.set(sourceId, {
     ...current,
-    translation: status
+    translation: status,
+    translationReason: reason ?? current.translationReason ?? null
   });
 }
 
-function markItemAnalysis(trace, sourceId, kind, status) {
+function markItemAnalysis(trace, sourceId, kind, status, reason = null) {
   const current = trace.itemAnalyses.get(sourceId) ?? {};
   trace.itemAnalyses.set(sourceId, {
     ...current,
-    [kind]: status
+    [kind]: status,
+    [`${kind}Reason`]: reason ?? current[`${kind}Reason`] ?? null
   });
 }
 
