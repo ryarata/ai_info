@@ -501,6 +501,23 @@ The generated site already includes several design choices that reflect the user
 - basic PWA-style assets exist
 - no browser push or on-open notification behavior is currently enabled
 
+### Latest notification-removal state
+
+The notification feature was not just deprioritized conceptually. It was actively removed from the
+current shipped UI and generated assets.
+
+Current intended behavior:
+
+- there is no notification button in the top-right of the dashboard
+- there is no browser-side on-open notification logic
+- there is no generated `public/sw.js`
+- GitHub Pages remains the delivery target without any push registration path
+
+Reason:
+
+- the user decided the notification feature was not important enough to justify the added runtime,
+  storage, and security complexity
+
 ## Latest Review-Driven Product Decisions
 
 The most recent review clarified an important product requirement:
@@ -799,6 +816,11 @@ The latest known successful refresh before this handoff produced:
 - official OpenAI ChatGPT help release notes still blocked by `403`
 - Claude Code changelog fetchable with reliable latest-change datetime
 
+Latest deployment-related commits that should be understood as already pushed to `main`:
+
+- `6c0750f` `docs: align service context with no-notification direction`
+- `22b7e52` `remove notification UI and service worker`
+
 ## Current Deployment Model
 
 The production path now exists and is active through GitHub.
@@ -827,6 +849,17 @@ The current auto-refresh schedule is aligned to the user's locale in JST:
 
 Internally this is implemented with a UTC cron expression in GitHub Actions, but the product-level
 assumption should be understood as "morning, noon, and night in Japan."
+
+### Important current deployment note
+
+During the recent notification-removal work, the context document was pushed first, but the UI
+removal commit was pushed separately afterward.
+
+Implication for future debugging:
+
+- if the live site ever appears inconsistent with the context doc, verify that the latest UI commit
+  has actually been deployed on GitHub Pages
+- the specific notification-removal UI commit is `22b7e52`
 
 ## Current Cost Profile
 
@@ -1062,3 +1095,21 @@ If the user wants to see the result directly on the live GitHub Pages UI:
 - set deploy-to-pages to true
 
 This distinction is now part of the intended operating model.
+
+## Working Tree Note For Next Chat
+
+At the point of this handoff, there are still local uncommitted changes in generated data and
+snapshots.
+
+Current known uncommitted file families:
+
+- `data/snapshots/*`
+- `data/updates.analyzed.json`
+- `data/updates.generated.json`
+
+Important interpretation:
+
+- these are not part of the notification-removal commits already pushed to `main`
+- they likely reflect local refresh output or generated-state drift
+- future work should inspect them carefully rather than assuming they are intentional product-code
+  changes
