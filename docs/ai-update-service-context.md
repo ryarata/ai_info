@@ -93,13 +93,13 @@ Implications:
 - desktop is secondary
 - the product should optimize for quick reading, triage, and low-friction follow-up on mobile
 
-### 4. The product should be web-based and capable of notifications
+### 4. The product should be web-based and easy to check regularly
 
 Implications:
 
 - the delivery model should be web-first
-- the user should not need to remember to check manually
-- immediate alerts should be optimized for short, high-signal mobile delivery
+- the product should be fast to reopen on mobile
+- the user may still rely on periodic manual checking rather than interruptive delivery
 
 ### 5. Server cost should be minimized
 
@@ -307,7 +307,7 @@ An update should trigger immediate high-priority handling if any of the followin
 
 These are the updates most likely to produce "I wish I had started using this earlier" regret.
 
-## Notification Model
+## Output Model
 
 The service separates outputs into two tracks.
 
@@ -499,7 +499,7 @@ The generated site already includes several design choices that reflect the user
 - alert sections default open
 - digest sections are more compressed
 - basic PWA-style assets exist
-- lightweight browser notification behavior exists for urgent items on open
+- no browser push or on-open notification behavior is currently enabled
 
 ## Latest Review-Driven Product Decisions
 
@@ -865,10 +865,10 @@ The following are known limitations rather than mistakes:
 - fetch and extraction quality differs by source
 - source-specific parser improvement remains a likely future task
 
-### 4. Notifications are still lightweight
+### 4. Notifications are intentionally out of scope for now
 
-- the product is web-based and notification-aware
-- richer push strategy may still evolve later
+- the product is web-based, but no notification delivery is currently active
+- the user explicitly chose to remove notification behavior because the added runtime and storage complexity was not worth it
 
 ### 5. Alerting and scoring are still calibrating
 
@@ -892,7 +892,6 @@ Likely future work, if usage reveals the need:
 - better OpenAI official acquisition paths
 - more source-specific extraction rules
 - lower token usage by skipping unnecessary re-analysis
-- richer notification behavior
 - expansion to xAI and major Chinese AI companies
 - continued tuning of alert strictness based on actual daily use
 
