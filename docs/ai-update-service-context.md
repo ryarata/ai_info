@@ -391,6 +391,11 @@ source is equally available.
 - Anthropic Claude updates: official
 - Anthropic Claude Code changelog docs: official
 - Google Gemini updates: official
+- Google Gemini API release notes on `ai.google.dev`: official
+- Google Gemini blog on `blog.google`: official
+- Grok release notes on `grok.com`: official
+- xAI developer release notes on `docs.x.ai`: official
+- Qwen blog on `qwenlm.github.io`: official, experimental
 
 ### Current trust behavior
 
@@ -701,7 +706,7 @@ This is intentional because it provides:
 
 ### 4. Current monitored-source count and shape
 
-As of the latest successful refresh, the active monitored source count is `7`.
+The configured monitored source count is now `12`.
 
 Current enabled sources are:
 
@@ -712,6 +717,11 @@ Current enabled sources are:
 - Anthropic Claude Code changelog Atom feed
 - OpenAI ChatGPT release notes help page
 - Google Gemini updates
+- Google Gemini API release notes
+- Google Gemini blog
+- Grok release notes
+- xAI developer release notes
+- Qwen blog
 
 ### 5. The analyzed layer now preserves publishedAt
 
@@ -758,6 +768,8 @@ The generic extraction path is now better than before, but some sources still ne
 Highest-value targets:
 
 - Google Gemini updates: still often has `publishedAt: null`
+- Grok release notes: may require source-specific extraction or may remain partially JS-dependent
+- Qwen blog: experimental source, so title extraction should be reviewed on live output
 - OpenAI API changelog: latest-entry date now works, but title extraction and item-level targeting
   may still be improved
 - Anthropic news: title derivation is still imperfect in some cases
@@ -888,10 +900,10 @@ The following are known limitations rather than mistakes:
 - some desired official routes return `403`
 - current workaround is official status plus secondary coverage
 
-### 2. Source coverage is still intentionally narrow
+### 2. Some expansion targets are now covered, but breadth is still intentionally limited
 
-- implementation currently focuses on OpenAI, Anthropic, and Google
-- xAI and Chinese companies are still future expansion targets
+- implementation now covers OpenAI, Anthropic, Google, xAI, and an experimental Qwen source
+- broader Chinese-company coverage beyond Qwen is still future work
 
 ### 3. Summaries depend on extraction quality
 
@@ -925,7 +937,7 @@ Likely future work, if usage reveals the need:
 - better OpenAI official acquisition paths
 - more source-specific extraction rules
 - lower token usage by skipping unnecessary re-analysis
-- expansion to xAI and major Chinese AI companies
+- expansion beyond xAI and Qwen to additional major Chinese AI companies
 - continued tuning of alert strictness based on actual daily use
 
 ## Important Implementation Principle

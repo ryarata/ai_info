@@ -75,5 +75,60 @@
     "priority": "high",
     "trustLevel": "official",
     "enabled": true
+  },
+  {
+    "id": "google-gemini-api-release-notes",
+    "company": "Google",
+    "label": "Gemini API release notes",
+    "type": "docs",
+    "url": "https://ai.google.dev/gemini-api/docs/changelog",
+    "pollIntervalHours": 6,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "google-gemini-blog",
+    "company": "Google",
+    "label": "Gemini blog",
+    "type": "docs",
+    "url": "https://blog.google/products/gemini/",
+    "pollIntervalHours": 8,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "xai-grok-release-notes",
+    "company": "xAI",
+    "label": "Grok release notes",
+    "type": "docs",
+    "url": "https://grok.com/release-notes",
+    "pollIntervalHours": 6,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "xai-developer-release-notes",
+    "company": "xAI",
+    "label": "xAI developer release notes",
+    "type": "docs",
+    "url": "https://docs.x.ai/developers/release-notes",
+    "pollIntervalHours": 6,
+    "priority": "high",
+    "trustLevel": "official",
+    "enabled": true
+  },
+  {
+    "id": "qwen-blog",
+    "company": "Qwen",
+    "label": "Qwen blog",
+    "type": "docs",
+    "url": "https://qwenlm.github.io/blog/",
+    "pollIntervalHours": 8,
+    "priority": "medium",
+    "trustLevel": "official",
+    "enabled": true
   }
 ]

@@ -76,7 +76,7 @@ async function fetchSourceSnapshot(source) {
     const readable = extractReadableText(html);
     const normalized = normalizeText(readable);
     const title = chooseBestTitle(rawTitle, normalized, source);
-    const description = extractMeaningfulDescription(html, normalized) ?? normalized.slice(0, 280);
+    const description = extractMeaningfulDescription(html, normalized, source) ?? normalized.slice(0, 280);
     const publishedAt = extractPublishedAt({ html, normalizedText: normalized, source });
 
     const snapshot = {
@@ -659,9 +659,18 @@ function extractTitle(html) {
   return matchTagContent(html, "title") ?? matchMetaContent(html, "property", "og:title");
 }
 
-function extractMeaningfulDescription(html, normalizedText) {
+function extractMeaningfulDescription(html, normalizedText, source = null) {
   const metaDescription = extractMetaDescription(html);
-  if (metaDescription && !looksLikeNavigationNoise(metaDescription)) {
+  const normalizedMeta = normalizeText(metaDescription);
+  const genericMeta =
+    normalizedMeta &&
+    (
+      normalizedMeta.length < 16 ||
+      normalizedMeta.toLowerCase() === normalizeText(source?.company ?? "").toLowerCase() ||
+      normalizedMeta.toLowerCase() === normalizeText(source?.label ?? "").toLowerCase()
+    );
+
+  if (normalizedMeta && !genericMeta && !looksLikeNavigationNoise(normalizedMeta)) {
     return metaDescription;
   }
 
@@ -914,6 +923,9 @@ function normalizeText(text) {
     .replace(/Slide \d+ of \d+/gi, " ")
     .replace(/Try in Gemini/gi, " ")
     .replace(/Try in Google AI Studio/gi, " ")
+    .replace(/Copy for LLM/gi, " ")
+    .replace(/View as Markdown/gi, " ")
+    .replace(/Go Now/gi, " ")
     .replace(/Your browser does not support the video tag\.?/gi, " ")
     .replace(/Skip to main content/gi, " ")
     .replace(/Skip to footer/gi, " ")
@@ -935,7 +947,7 @@ function normalizeFingerprintText(value) {
 function cleanTitle(title, company) {
   return normalizeText(title)
     .replace(new RegExp(`\\s*[|\\\\-–—]+\\s*${escapeRegExp(company)}\\s*$`, "i"), "")
-    .replace(/\s*[|\\\\-–—]+\s*(OpenAI Help Center|Google DeepMind|Anthropic)\s*$/i, "")
+    .replace(/\s*[|\\\\-–—]+\s*(OpenAI Help Center|Google DeepMind|Anthropic|Google AI for Developers|Google Blog|Qwen|xAI Docs)\s*$/i, "")
     .trim();
 }
 
@@ -960,9 +972,23 @@ function deriveTitleFromExcerpt(normalizedText, source) {
   }
 
   if (source.company === "Google") {
-    const googleMatch = cleaned.match(/Gemini 3 ([A-Z][^.?!]{15,90})/);
+    const googleMatch = cleaned.match(/Gemini 3 ([A-Za-z][^.?!]{15,90}?)(?=\s+(?:Today|Gemini App|The latest AI news|Find out what|March|All the Latest)\b|\.)/);
     if (googleMatch?.[1]) {
-      return `Gemini 3: ${googleMatch[1].trim().replace(/\s+Gemini 3.*$/, "")}`;
+      return `Gemini 3 ${googleMatch[1].trim().replace(/\s+Gemini 3.*$/, "")}`;
+    }
+  }
+
+  if (source.company === "xAI") {
+    const xaiMatch = cleaned.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{1,2}\s+([A-Z0-9][^.?!]{12,120}?)(?=\s+(?:The|Support|Supports|Introducing|Added|Released|Launch|Now|is|are)\b|\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{1,2}\b)/);
+    if (xaiMatch?.[1]) {
+      return xaiMatch[1].trim();
+    }
+  }
+
+  if (source.company === "Qwen") {
+    const qwenMatch = cleaned.match(/\b([A-Z0-9][^.?!]{10,120}?)(?=\s+(?:Tech Report|QWEN CHAT|GITHUB|PAPER|DEMO|API|DISCORD|Hugging Face|ModelScope)\b)/);
+    if (qwenMatch?.[1]) {
+      return qwenMatch[1].trim();
     }
   }
 
@@ -983,12 +1009,19 @@ function isGenericTitle(title, source) {
     "newsroom anthropic",
     "api changelog",
     "changelog",
+    "release notes",
     "chatgpt release notes",
     "gemini 3",
+    "gemini",
+    "blog",
+    "blog qwen",
+    "grok release notes",
+    "official gemini news and updates",
+    "xai developer release notes",
     source.label.toLowerCase()
   ];
 
-  return generic.includes(lowered);
+  return generic.includes(lowered) || lowered.startsWith("release notes");
 }
 
 function firstMeaningfulSentence(text) {
@@ -1042,6 +1075,20 @@ function extractSourceSpecificSummary(excerpt, company) {
         .replace(/Gemini 3\.1 Flash-Lite.*$/i, "")
         .replace(/Learn more.*$/i, "")
         .trim();
+    }
+  }
+
+  if (company === "xAI") {
+    const match = cleaned.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{1,2}\s+[A-Z0-9][^.?!]{12,120}?\s+(.{30,220}?\.)/);
+    if (match?.[1]) {
+      return match[1].trim();
+    }
+  }
+
+  if (company === "Qwen") {
+    const match = cleaned.match(/\b(?:Tech Report|QWEN CHAT|GITHUB|PAPER|DEMO|API|DISCORD|Hugging Face|ModelScope)(?:\s+(?:Tech Report|QWEN CHAT|GITHUB|PAPER|DEMO|API|DISCORD|Hugging Face|ModelScope))*\s+(.{40,220}?\.)/);
+    if (match?.[1]) {
+      return match[1].trim();
     }
   }
 

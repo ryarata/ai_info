@@ -1,0 +1,19 @@
+{
+  "id": "xai-grok-release-notes",
+  "sourceId": "xai-grok-release-notes",
+  "company": "xAI",
+  "label": "Grok release notes",
+  "url": "https://grok.com/release-notes",
+  "trustLevel": "official",
+  "fetchedAt": "2026-04-09T08:54:35.413Z",
+  "status": "ok",
+  "title": "Grok",
+  "description": "Grok is an AI assistant built by xAI. Chat, create images, write code, and get real-time answers from the web and X.",
+  "publishedAt": null,
+  "excerpt": "Grok",
+  "hash": "278bbdc02ddf04df035bd40a7aced98a648a5f903f56697854db1a0e0d20bea2",
+  "previousHash": "278bbdc02ddf04df035bd40a7aced98a648a5f903f56697854db1a0e0d20bea2",
+  "changed": false,
+  "changedAt": "2026-04-09T08:48:19.888Z",
+  "changeSummary": "目立つ差分なし"
+}

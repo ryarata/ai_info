@@ -1,0 +1,19 @@
+{
+  "id": "google-gemini-api-release-notes",
+  "sourceId": "google-gemini-api-release-notes",
+  "company": "Google",
+  "label": "Gemini API release notes",
+  "url": "https://ai.google.dev/gemini-api/docs/changelog",
+  "trustLevel": "official",
+  "fetchedAt": "2026-04-09T08:54:29.592Z",
+  "status": "error",
+  "error": "fetch failed",
+  "title": "Gemini API release notes",
+  "description": "Google の取得に失敗しました。次回再試行します。",
+  "excerpt": "",
+  "hash": "03fe0512a828cfaa7203a62c6b19581b7d2405a9424a58d4535dfe32cb2fa67b",
+  "previousHash": "40e1656c3ffa864c51ec08f1c4be031da8f6113d2ca115852e0a433ad84fcf6d",
+  "changed": false,
+  "changedAt": null,
+  "changeSummary": "初回取得"
+}
