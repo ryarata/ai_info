@@ -210,7 +210,6 @@ const html = `<!DOCTYPE html>
           <h1>AI Update Intel</h1>
           <p class="subtle">更新日時: ${escapeHtml(formatDate(data.generatedAt))}</p>
         </div>
-        <button class="notify-button" type="button">通知を有効化</button>
       </header>
 
       <section class="hero-grid">
@@ -313,39 +312,6 @@ const html = `<!DOCTYPE html>
         </div>
       </section>
     </main>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
-      }
-
-      const alertIds = ${JSON.stringify((data.alerts ?? []).map((item) => item.id))};
-      const button = document.querySelector(".notify-button");
-      if (button && "Notification" in window) {
-        button.addEventListener("click", async () => {
-          const result = await Notification.requestPermission();
-          button.textContent = result === "granted" ? "通知が有効です" : "通知は未許可です";
-        });
-
-        if (Notification.permission === "granted") {
-          const seen = JSON.parse(localStorage.getItem("seen-alert-ids") ?? "[]");
-          const unseen = alertIds.filter((id) => !seen.includes(id));
-          if (unseen.length > 0 && navigator.serviceWorker?.controller) {
-            navigator.serviceWorker.controller.postMessage({
-              type: "notify",
-              count: unseen.length
-            });
-          } else if (unseen.length > 0) {
-            new Notification("AI Update Intel", {
-              body: unseen.length + "件の新しい緊急アラートがあります。"
-            });
-          }
-          localStorage.setItem("seen-alert-ids", JSON.stringify(alertIds));
-        }
-      } else if (button) {
-        button.disabled = true;
-        button.textContent = "このブラウザでは通知非対応";
-      }
-    </script>
   </body>
 </html>`;
 
@@ -396,14 +362,6 @@ h1 {
 .subtle {
   margin: 6px 0 0;
   color: var(--muted);
-  font-size: 13px;
-}
-.notify-button {
-  border: 1px solid var(--line-strong);
-  background: var(--panel);
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 11px 14px;
   font-size: 13px;
 }
 .hero-grid {
@@ -650,29 +608,10 @@ const manifest = {
   lang: "ja"
 };
 
-const serviceWorker = `self.addEventListener("install", () => {
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener("message", (event) => {
-  if (event.data?.type === "notify") {
-    self.registration.showNotification("AI Update Intel", {
-      body: event.data.count + "件の新しい緊急アラートがあります。",
-      tag: "ai-update-intel-alert"
-    });
-  }
-});
-`;
-
 await mkdir(publicDir, { recursive: true });
 await writeFile(path.join(publicDir, "index.html"), html, "utf8");
 await writeFile(path.join(publicDir, "styles.css"), css, "utf8");
 await writeFile(path.join(publicDir, "manifest.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
-await writeFile(path.join(publicDir, "sw.js"), serviceWorker, "utf8");
 
 console.log(`Generated site in ${publicDir}`);
 

@@ -47,14 +47,6 @@ h1 {
   color: var(--muted);
   font-size: 13px;
 }
-.notify-button {
-  border: 1px solid var(--line-strong);
-  background: var(--panel);
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 11px 14px;
-  font-size: 13px;
-}
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -176,6 +168,11 @@ h1 {
   color: var(--muted);
   font-size: 11px;
 }
+.cache-badge {
+  background: #eef6f2;
+  color: var(--accent);
+  border-color: #cfe2d8;
+}
 .badge:nth-child(4) {
   letter-spacing: 0.03em;
 }
@@ -214,6 +211,30 @@ h3 {
   color: var(--muted);
   line-height: 1.7;
   font-size: 14px;
+}
+.translation-block {
+  margin-top: 10px;
+}
+.cache-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.cache-reason {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.translation-long {
+  white-space: pre-wrap;
+  max-height: 48vh;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbf7f1;
 }
 .score-row {
   display: flex;
