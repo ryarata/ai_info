@@ -120,6 +120,14 @@ async function enrichHtmlSnapshot(snapshot, context) {
     return await enrichAnthropicNewsSnapshot(snapshot, context);
   }
 
+  if (context.source.id === "xai-developer-release-notes") {
+    return enrichXaiDeveloperReleaseNotesSnapshot(snapshot, context);
+  }
+
+  if (context.source.id === "google-gemini-blog") {
+    return enrichGeminiAppReleaseNotesSnapshot(snapshot, context);
+  }
+
   return snapshot;
 }
 
@@ -269,6 +277,47 @@ async function enrichAnthropicNewsSnapshot(snapshot, context) {
       publishedAt: latestArticle.publishedAt ?? snapshot.publishedAt
     };
   }
+}
+
+function enrichXaiDeveloperReleaseNotesSnapshot(snapshot, context) {
+  const normalized = cleanExcerpt(extractReadableText(context.html));
+  const latest = extractLatestXaiReleaseEntry(normalized);
+  if (!latest) {
+    return snapshot;
+  }
+
+  const description =
+    latest.summary ||
+    snapshot.description;
+  const excerpt = latest.block || snapshot.excerpt;
+
+  return {
+    ...snapshot,
+    title: latest.title || snapshot.title,
+    description,
+    publishedAt: latest.publishedAt || snapshot.publishedAt,
+    excerpt,
+    hash: hashText(`${latest.title || snapshot.title}\n${description}\n${excerpt.slice(0, 4000)}`)
+  };
+}
+
+function enrichGeminiAppReleaseNotesSnapshot(snapshot, context) {
+  const latest = extractLatestGeminiReleaseNote(context.html);
+  if (!latest) {
+    return snapshot;
+  }
+
+  const description = latest.summary || snapshot.description;
+  const excerpt = latest.block || snapshot.excerpt;
+
+  return {
+    ...snapshot,
+    title: latest.title || snapshot.title,
+    description,
+    publishedAt: latest.publishedAt || snapshot.publishedAt,
+    excerpt,
+    hash: hashText(`${latest.title || snapshot.title}\n${description}\n${excerpt.slice(0, 4000)}`)
+  };
 }
 
 function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
@@ -1093,6 +1142,112 @@ function extractSourceSpecificSummary(excerpt, company) {
   }
 
   return null;
+}
+
+function extractLatestXaiReleaseEntry(text) {
+  const normalized = cleanExcerpt(text);
+  const monthSectionMatch = normalized.match(
+    /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\s+([\s\S]+?)(?=\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b|Did you find this page helpful\?|$)/i
+  );
+  if (!monthSectionMatch) {
+    return null;
+  }
+
+  const [, headingMonth, year, sectionBody] = monthSectionMatch;
+  const entryMatch = sectionBody.match(
+    /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+(\d{1,2})\s+([\s\S]+?)(?=\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{1,2}\b|$)/i
+  );
+  if (!entryMatch) {
+    return null;
+  }
+
+  const shortMonth = entryMatch[1];
+  const day = entryMatch[2];
+  const entryBody = entryMatch[3].trim();
+  const heading = expandShortMonth(shortMonth);
+  const monthName = heading && sameMonthName(heading, headingMonth) ? headingMonth : heading ?? headingMonth;
+  const publishedAt = normalizeDateString(`${monthName} ${day}, ${year}`);
+  const titles = extractXaiEntryTitles(entryBody);
+  const title = titles[0] ?? null;
+  const summary = extractXaiEntrySummary(entryBody, title);
+
+  return {
+    publishedAt,
+    title,
+    summary,
+    block: `${shortMonth} ${day} ${entryBody}`.trim()
+  };
+}
+
+function extractXaiEntryTitles(entryBody) {
+  const candidates = [];
+  const pattern = /([A-Z0-9][A-Za-z0-9&/().,:+\- ]{8,120}?)(?=\s+(?:The|You can|Enterprise customers|For more details|Visit|Supports|Both|Image and video|It enables|We have|Learn more\b))/g;
+
+  for (const match of entryBody.matchAll(pattern)) {
+    const title = normalizeText(match[1]);
+    if (!title || looksLikeNavigationNoise(title)) {
+      continue;
+    }
+    candidates.push(title);
+  }
+
+  return [...new Set(candidates)];
+}
+
+function extractXaiEntrySummary(entryBody, firstTitle) {
+  if (!entryBody) {
+    return null;
+  }
+
+  const normalized = normalizeText(entryBody);
+  if (!normalized) {
+    return null;
+  }
+
+  if (firstTitle && normalized.startsWith(firstTitle)) {
+    const afterTitle = normalized.slice(firstTitle.length).trim();
+    return firstMeaningfulSentence(afterTitle);
+  }
+
+  return firstMeaningfulSentence(normalized);
+}
+
+function extractLatestGeminiReleaseNote(html) {
+  const normalizedHtml = String(html ?? "").replace(/\r\n/g, "\n");
+  const cardMatch = normalizedHtml.match(
+    /<div class="_releaseNoteCard[\s\S]*?<h2[^>]*>(\d{4}\.\d{2}\.\d{2})<\/h2>[\s\S]*?<h3[^>]*>([\s\S]*?)<\/h3>[\s\S]*?(?=<div class="_releaseNoteCard|$)/i
+  );
+  if (!cardMatch) {
+    return null;
+  }
+
+  const blockHtml = cardMatch[0];
+  const dateText = normalizeText(cardMatch[1]);
+  const title = normalizeText(stripTags(cardMatch[2]));
+  const updateText = extractGeminiFeatureBullet(blockHtml, "更新内容");
+  const whyText = extractGeminiFeatureBullet(blockHtml, "理由") ?? extractGeminiFeatureBullet(blockHtml, "なぜ");
+  const summary = updateText || whyText || null;
+  const excerptParts = [dateText, title, updateText, whyText].filter(Boolean);
+
+  return {
+    publishedAt: normalizeDateString(dateText.replace(/\./g, "-")),
+    title,
+    summary,
+    block: excerptParts.join(" ")
+  };
+}
+
+function extractGeminiFeatureBullet(blockHtml, label) {
+  const escaped = escapeRegExp(label);
+  const match = blockHtml.match(
+    new RegExp(`<b>\\s*${escaped}\\s*:?\\s*<\\/b>([\\s\\S]*?)(?=<\\/li>|<li>|<\\/ul>)`, "i")
+  );
+  if (!match) {
+    return null;
+  }
+
+  const text = normalizeText(stripTags(match[1]));
+  return text || null;
 }
 
 function extractAnthropicLatestArticle(baseUrl, html) {

@@ -5,7 +5,7 @@
   "label": "Claude Code changelog",
   "url": "https://github.com/anthropics/claude-code/commits/main/CHANGELOG.md.atom",
   "trustLevel": "official",
-  "fetchedAt": "2026-04-09T08:54:27.502Z",
+  "fetchedAt": "2026-04-09T09:23:53.667Z",
   "status": "ok",
   "title": "2.1.97",
   "description": "## 2.1.97 - Added focus view toggle (`Ctrl+O`) in `NO_FLICKER` mode showing prompt, one-line tool summary with edit diffstats, and final response - Added `refreshInterval` status line setting to re-run the status line command every N seconds - Added `workspace.git_worktree` to the status line JSON input, set when the current directory is inside a linked git worktree - Added `● N running` indicator in `/agents` next to agent types with live subagent instances - Added syntax highlighting for Cedar policy files (`.cedar`, `.cedarpolicy`) - Fixed `--dangerously-skip-permissions` being silently downgraded to accept-edits mode after approving a write to a protected path - Fixed and hardened Bash tool permissions, tightening checks around env-var prefixes and network redirects, and reducing false prompts on common commands - Fixed permission rules with names matching JavaScript prototype properties (e.g.",

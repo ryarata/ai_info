@@ -90,9 +90,9 @@
   {
     "id": "google-gemini-blog",
     "company": "Google",
-    "label": "Gemini blog",
+    "label": "Gemini app release notes",
     "type": "docs",
-    "url": "https://blog.google/products/gemini/",
+    "url": "https://gemini.google/release-notes/",
     "pollIntervalHours": 8,
     "priority": "high",
     "trustLevel": "official",
@@ -117,17 +117,6 @@
     "url": "https://docs.x.ai/developers/release-notes",
     "pollIntervalHours": 6,
     "priority": "high",
-    "trustLevel": "official",
-    "enabled": true
-  },
-  {
-    "id": "qwen-blog",
-    "company": "Qwen",
-    "label": "Qwen blog",
-    "type": "docs",
-    "url": "https://qwenlm.github.io/blog/",
-    "pollIntervalHours": 8,
-    "priority": "medium",
     "trustLevel": "official",
     "enabled": true
   }
