@@ -396,6 +396,25 @@ source is equally available.
 - Grok release notes on `grok.com`: official
 - xAI developer release notes on `docs.x.ai`: official
 
+### Latest source-selection changes
+
+Recent source-review decisions that should be preserved:
+
+- Qwen was removed from active monitoring for now
+- reason: the currently tested Qwen surface appears to update progressively in a way that is not a
+  good fit for this fetch path, so extraction quality was not reliable enough
+- Gemini app monitoring now prefers `https://gemini.google/release-notes/` over the older
+  `blog.google` Gemini page because the release-note structure is much more extraction-friendly
+- xAI developer release notes now use source-specific extraction to isolate only the latest release
+  block rather than the full page
+
+Implication:
+
+- the system should prefer sources that expose stable latest-item structure over pages that are
+  visually rich but extraction-hostile
+- experimental sources that do not produce trustworthy latest-item extraction should be removed
+  rather than kept as noisy placeholders
+
 ### Current trust behavior
 
 - official sources rank above secondary sources
@@ -767,6 +786,8 @@ Highest-value targets:
 
 - Google Gemini updates: still often has `publishedAt: null`
 - Grok release notes: may require source-specific extraction or may remain partially JS-dependent
+- Google Gemini API release notes on `ai.google.dev`: currently still failing in this execution
+  environment even though the route is useful conceptually
 - OpenAI API changelog: latest-entry date now works, but title extraction and item-level targeting
   may still be improved
 - Anthropic news: title derivation is still imperfect in some cases
@@ -817,13 +838,16 @@ Implication:
 
 The latest known successful refresh before this handoff produced:
 
-- `activeSources = 7`
+- `activeSources = 11`
 - `urgentCount = 2`
 - `digestCount = 2`
-- `analysis.mode = openai`
+- `analysis.mode = openai_with_cache`
 - official OpenAI API changelog fetchable
 - official OpenAI ChatGPT help release notes still blocked by `403`
 - Claude Code changelog fetchable with reliable latest-change datetime
+- Gemini app release notes on `gemini.google` fetchable with latest card title and date extraction
+- xAI developer release notes fetchable with latest-block-only extraction and latest item date
+- Grok release notes page fetchable, but current extraction remains weak
 
 Latest deployment-related commits that should be understood as already pushed to `main`:
 
@@ -906,6 +930,12 @@ The following are known limitations rather than mistakes:
 
 - fetch and extraction quality differs by source
 - source-specific parser improvement remains a likely future task
+
+### 4. Some official pages are fetchable but still not cost-efficient without tailored extraction
+
+- pages like xAI release notes can expose long historical content on a single route
+- these should be trimmed to the latest relevant block before translation and analysis
+- this is now implemented for `docs.x.ai/developers/release-notes` and should be preserved
 
 ### 4. Notifications are intentionally out of scope for now
 
