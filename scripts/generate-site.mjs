@@ -647,6 +647,7 @@ function escapeHtml(value) {
 
 function formatDate(value) {
   return new Date(value).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

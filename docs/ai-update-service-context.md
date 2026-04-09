@@ -522,6 +522,7 @@ The generated site already includes several design choices that reflect the user
 - alert sections default open
 - digest sections are more compressed
 - basic PWA-style assets exist
+- the top-of-page generated timestamp is rendered in JST rather than server-local or UTC time
 - no browser push or on-open notification behavior is currently enabled
 
 ### Latest notification-removal state
