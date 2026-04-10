@@ -493,9 +493,9 @@ When analysis runs successfully, the product generates:
 
 - Japanese titles
 - Japanese summaries
-- short reasoning for why an update matters
+- richer "why this matters now" reasoning
+- concrete "how to inspect this update" angles for alert items
 - simple score fields
-- weekly-theme style interpretation
 
 If no API key is available, the pipeline can still fall back, but the intended production mode is
 OpenAI-powered analysis.
@@ -510,6 +510,9 @@ The generated site already includes several design choices that reflect the user
 - Japanese-first reading flow
 - company-grouped alert and digest views
 - collapsible company sections to reduce mobile scrolling
+- alert cards now show both a short reason and a concrete "how to look at this" checklist
+- digest is now expected to show one representative card for each monitored company, not only the
+  companies with the strongest changed-item ranking
 
 ### Trust and prioritization
 
@@ -524,6 +527,7 @@ The generated site already includes several design choices that reflect the user
 - basic PWA-style assets exist
 - the top-of-page generated timestamp is rendered in JST rather than server-local or UTC time
 - no browser push or on-open notification behavior is currently enabled
+- there is no "weekly themes" / "weekly outlook" section in the current shipped UI
 
 ### Latest notification-removal state
 
@@ -775,6 +779,65 @@ comes from the raw `CHANGELOG.md` file at the matching commit SHA.
 
 This change was made because commit titles alone were not enough for meaningful product review.
 
+### 9. Alert cards now separate "why now" from "how to inspect"
+
+The alert section was made richer because a single short summary was not enough for the user's
+actual decision-making.
+
+Current intended behavior:
+
+- alert cards still include a concise Japanese summary
+- alert cards still include a short "why now" explanation
+- alert cards now also include a concrete checklist of viewing angles such as:
+  - whether context carryover improves
+  - whether workflow steps can be compressed
+  - whether lightweight-model routing should change
+  - whether a previously failing operational flow can now be retried
+
+Important product meaning:
+
+- the alert layer should not only say that something matters
+- it should help the user know what to verify or compare when deciding whether to adopt it
+
+### 10. Digest is now company-complete rather than only rank-complete
+
+An important usability issue was discovered:
+
+- if digest only rendered ranked changed items
+- the "today's digest" area could collapse to one company such as OpenAI
+- this made the dashboard feel narrower than the actual monitoring scope
+
+Current intended behavior:
+
+- digest should show one representative card per monitored company
+- if a company has a changed item, that should usually be the representative item
+- if a company has no strong changed item, the UI may still show the best available representative
+  source for that company
+- if a company's latest fetch failed, digest may still show that failure state explicitly rather
+  than silently omitting the company
+
+Important product meaning:
+
+- digest is partly a coverage surface, not only a ranked-importance surface
+- the user should be able to confirm that OpenAI, Anthropic, Google, and xAI were all considered
+  in the current run
+
+### 11. Weekly strategic themes were intentionally removed
+
+The previous "weekly themes" / "weekly outlook" section was removed after review.
+
+Reason:
+
+- it added an extra interpretation layer that was less important than immediate practical reading
+- it competed with the richer alert cards and company-level digest for screen space
+- the user explicitly preferred removing it
+
+Current intended behavior:
+
+- neither the generated site nor the analyzed output model should depend on a weekly-themes section
+- cache summaries no longer need to report weekly-theme regeneration state
+- future work should focus on alert usefulness and digest coverage instead
+
 ## Current Operational Priorities
 
 The next chat should treat the following as the highest-signal unresolved priorities.
@@ -841,7 +904,8 @@ The latest known successful refresh before this handoff produced:
 
 - `activeSources = 11`
 - `urgentCount = 2`
-- `digestCount = 2`
+- `digestCount` should now be interpreted as company-oriented and should normally cover all
+  monitored companies shown in the current UI
 - `analysis.mode = openai_with_cache`
 - official OpenAI API changelog fetchable
 - official OpenAI ChatGPT help release notes still blocked by `403`
@@ -854,6 +918,7 @@ Latest deployment-related commits that should be understood as already pushed to
 
 - `6c0750f` `docs: align service context with no-notification direction`
 - `22b7e52` `remove notification UI and service worker`
+- `06c8291` `feat: enrich alerts and company digests`
 
 ## Current Deployment Model
 
@@ -880,6 +945,26 @@ The current auto-refresh schedule is aligned to the user's locale in JST:
 - 09:00 JST
 - 12:00 JST
 - 21:00 JST
+
+### Current manual force-refresh path
+
+If the user wants to push product-code changes and then re-run analysis without reusing translation
+or summary cache, the intended production path is:
+
+- open GitHub Actions
+- run `Deploy To GitHub Pages` manually
+- leave `source_ids` empty unless narrowing scope intentionally
+- leave `pinned_source_item_urls` empty unless debugging feed selection
+- set `force_regen_source_ids` to the desired comma-separated source IDs
+- optionally enable `disable_alert_retention`
+- enable `deploy_result` so the refreshed result is published to GitHub Pages
+
+Important interpretation:
+
+- this is now the recommended way to validate prompt or presentation changes in production
+- a push to `main` alone may still reuse cached analysis for unchanged article identities
+- manual `force_regen_source_ids` is the deliberate way to force fresh translation and summary
+  output for the selected sources
 
 Internally this is implemented with a UTC cron expression in GitHub Actions, but the product-level
 assumption should be understood as "morning, noon, and night in Japan."
