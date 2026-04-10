@@ -86,8 +86,6 @@ async function enrichGeneratedDataWithModel(base, snapshotMap, cache, trace, opt
     (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, cache, trace, options))
   );
 
-  next.weeklyThemes = await buildWeeklyThemes(base, snapshotMap, cache, trace, options);
-
   return next;
 }
 
@@ -108,6 +106,7 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
       titleJa: cached.value.titleJa ?? item.titleJa,
       summaryJa: cached.value.summaryJa ?? item.summaryJa,
       whyNow: cached.value.whyNow ?? item.whyNow,
+      watchAngles: cached.value.watchAngles ?? item.watchAngles,
       action: kind === "alert" ? item.action : cached.value.action ?? item.action,
       scores: cached.value.scores ?? item.scores,
       publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
@@ -126,6 +125,12 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
         title_ja: { type: "string" },
         summary_ja: { type: "string" },
         why_now: { type: "string" },
+        watch_angles: {
+          type: "array",
+          minItems: 2,
+          maxItems: 4,
+          items: { type: "string" }
+        },
         action: { type: "string", enum: ["今すぐ試す", "今週理解", "監視", "定点観測"] },
         scores: {
           type: "object",
@@ -138,7 +143,7 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
           required: ["contextUx", "workUx", "workflow"]
         }
       },
-      required: ["title_ja", "summary_ja", "why_now", "action", "scores"]
+      required: ["title_ja", "summary_ja", "why_now", "watch_angles", "action", "scores"]
     }
   };
 
@@ -159,6 +164,9 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
     "Prioritize context UX, work UX, workflow compression, and practical impact.",
     "Do not invent facts not supported by the provided source text.",
     "If the source text is generic, still produce the best concise summary possible from it.",
+    "Make the summary richer than a headline recap: include the practical change and where it affects work.",
+    "For watch_angles, return 2 to 4 concrete angles the user should inspect when reviewing this update.",
+    "Each watch angle should be a short Japanese sentence framed as a practical checkpoint.",
     "Return scores from 1 to 5 for contextUx, workUx, and workflow.",
     trustInstruction,
     `Kind: ${kind}`,
@@ -182,74 +190,12 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
     titleJa: result.title_ja || item.titleJa,
     summaryJa: result.summary_ja || item.summaryJa,
     whyNow: result.why_now || item.whyNow,
+    watchAngles: result.watch_angles?.length ? result.watch_angles : item.watchAngles,
     action: result.action || item.action,
     scores: result.scores || item.scores,
     publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
     trustLevel
   };
-}
-
-async function buildWeeklyThemes(base, snapshotMap, cache, trace, options) {
-  const okSnapshots = [...snapshotMap.values()]
-    .filter((snapshot) => snapshot.status === "ok")
-    .map((snapshot) => ({
-      company: snapshot.company,
-      label: snapshot.label,
-      title: snapshot.title,
-      description: snapshot.description,
-      excerpt: snapshot.excerpt.slice(0, 800)
-    }));
-
-  if (okSnapshots.length === 0) {
-    trace.weeklyThemes = { status: "skipped_no_snapshot" };
-    return base.weeklyThemes ?? [];
-  }
-
-  if (cache.weeklyThemesFingerprint && cache.weeklyThemesFingerprint === fingerprintWeeklyThemes(okSnapshots)) {
-    trace.weeklyThemes = { status: "cache_hit" };
-    return cache.weeklyThemes;
-  }
-
-  const schema = {
-    name: "weekly_themes",
-    strict: true,
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      properties: {
-        themes: {
-          type: "array",
-          minItems: 1,
-          maxItems: 3,
-          items: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              title: { type: "string" },
-              body: { type: "string" }
-            },
-            required: ["title", "body"]
-          }
-        }
-      },
-      required: ["themes"]
-    }
-  };
-
-  const prompt = [
-    "You are creating a weekly strategic memo in Japanese for a single user.",
-    "Use only the source-derived information provided.",
-    "Focus on what may matter for work style, context UX, workflow, and practical usage constraints over the next 3 to 6 months.",
-    "Write concise Japanese.",
-    `Source updates: ${JSON.stringify(okSnapshots)}`
-  ].join("\n");
-
-  const result = await callOpenAIJson(prompt, schema, {
-    apiKey: options.apiKey,
-    model: options.summaryModel
-  });
-  trace.weeklyThemes = { status: "regenerated" };
-  return result.themes?.length ? result.themes : base.weeklyThemes ?? [];
 }
 
 async function enrichSourceItem(item, cache, trace, options) {
@@ -419,6 +365,7 @@ function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
   next.alerts = (base.alerts ?? []).map((item) => ({
     ...item,
     whyNow: item.whyNow ?? "分析理由は次回更新で補完します。",
+    watchAngles: item.watchAngles ?? [],
     publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
     trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
@@ -454,11 +401,6 @@ function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
       markSourceTranslation(trace, item.sourceId, item?.status === "ok" ? "fallback" : "skipped_non_ok");
     }
   }
-
-  next.weeklyThemes = [
-    ...(base.weeklyThemes ?? [])
-  ];
-  trace.weeklyThemes = { status: "fallback" };
 
   next.analysisFallback = {
     reason
@@ -520,22 +462,10 @@ function buildAnalysisCache(previousAnalyzed) {
     }
   }
 
-  const okSnapshots = (previousAnalyzed?.sourceItems ?? [])
-    .filter((item) => item?.status === "ok")
-    .map((item) => ({
-      company: item.company,
-      label: item.label,
-      title: item.title,
-      description: item.description,
-      excerpt: String(item.excerpt ?? "").slice(0, 800)
-    }));
-
   return {
     hasReusableEntries: sourceItems.size > 0 || itemAnalyses.size > 0,
     sourceItems,
-    itemAnalyses,
-    weeklyThemes: previousAnalyzed?.weeklyThemes ?? [],
-    weeklyThemesFingerprint: okSnapshots.length > 0 ? fingerprintWeeklyThemes(okSnapshots) : null
+    itemAnalyses
   };
 }
 
@@ -594,10 +524,6 @@ function sourceFingerprintFromSnapshot(snapshot) {
 
 function sourceFingerprintFromSourceItem(item) {
   return Object.values(sourceIdentityPartsFromSourceItem(item)).join("\n@@\n");
-}
-
-function fingerprintWeeklyThemes(okSnapshots) {
-  return JSON.stringify(okSnapshots);
 }
 
 function sourceIdentityPartsFromSnapshot(snapshot) {
@@ -667,8 +593,7 @@ function parseCsvEnv(value) {
 function createAnalysisTrace() {
   return {
     sourceItems: new Map(),
-    itemAnalyses: new Map(),
-    weeklyThemes: null
+    itemAnalyses: new Map()
   };
 }
 
@@ -711,8 +636,7 @@ function finalizeAnalysisTrace(trace) {
       alertCacheHits: entries.filter((entry) => entry.alert === "cache_hit").length,
       alertRegenerated: entries.filter((entry) => entry.alert === "regenerated").length,
       digestCacheHits: entries.filter((entry) => entry.digest === "cache_hit").length,
-      digestRegenerated: entries.filter((entry) => entry.digest === "regenerated").length,
-      weeklyThemes: trace.weeklyThemes?.status ?? "unknown"
+      digestRegenerated: entries.filter((entry) => entry.digest === "regenerated").length
     },
     bySource
   };

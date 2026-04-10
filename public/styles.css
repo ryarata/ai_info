@@ -250,6 +250,14 @@ h3 {
 .why-now strong {
   font-size: 13px;
 }
+.insight-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+}
+.insight-list li + li {
+  margin-top: 6px;
+}
 .source-list {
   display: grid;
   gap: 10px;

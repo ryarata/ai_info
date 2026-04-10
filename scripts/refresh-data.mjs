@@ -323,7 +323,6 @@ function enrichGeminiAppReleaseNotesSnapshot(snapshot, context) {
 function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
   const generatedAt = new Date().toISOString();
   const changedItems = snapshotResults.filter((item) => item.change.changed && item.current.status === "ok");
-  const failedItems = snapshotResults.filter((item) => item.current.status === "error");
 
   const rankedItems = rankChangedItems(changedItems);
   const alertCandidates = rankedItems.filter(shouldPromoteToAlert);
@@ -334,9 +333,7 @@ function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
 
   const retainedAlertIds = new Set(finalAlertCandidates.filter((candidate) => candidate.retained).map((candidate) => candidate.item.source.id));
   const alertIds = new Set(finalAlertCandidates.slice(0, 2).map((candidate) => candidate.item.source.id));
-  const digest = rankedItems
-    .filter((item) => !alertIds.has(item.source.id))
-    .map(toDigest);
+  const digest = buildCompanyDigests(snapshotResults, rankedItems, alertIds);
   const usedFallbackDigest = digest.length === 0;
 
   if (digest.length === 0) {
@@ -347,8 +344,6 @@ function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
 
   const finalAlerts = alerts.length > 0 ? alerts : sampleData.alerts;
   const finalDigest = digest.length > 0 ? digest : sampleData.digest;
-  const weeklyThemes = buildThemes(snapshotResults, failedItems);
-  const finalThemes = weeklyThemes.length > 0 ? weeklyThemes : sampleData.weeklyThemes;
   const finalAlertIds = new Set((finalAlerts ?? []).map((item) => item.sourceId));
   const finalDigestIds = new Set((finalDigest ?? []).map((item) => item.sourceId));
 
@@ -362,7 +357,6 @@ function buildGeneratedData(snapshotResults, sampleData, previousAnalyzed) {
     },
     alerts: finalAlerts,
     digest: finalDigest,
-    weeklyThemes: finalThemes,
     sourceItems: snapshotResults.map((item) =>
       toSourceItem(item, {
         finalAlertIds,
@@ -457,6 +451,7 @@ function toAlert(item, index, retained = false) {
     titleJa: `${item.source.company} の更新を検知: ${translateTitle(meaningfulTitle)}`,
     summaryJa: summarizeForJapanese(item.current.description, item.current.excerpt, item.source.company),
     whyNow: explainWhyNow(item),
+    watchAngles: explainWatchAngles(item),
     scores: scoreBase,
     sourceUrl: item.current.itemUrl ?? item.source.url,
     publishedAt: item.current.publishedAt ?? null,
@@ -547,44 +542,98 @@ function buildArticleIdentity({ sourceId, title, publishedAt }) {
 
 function toDigest(item) {
   const meaningfulTitle = cleanTitle(item.current.title, item.source.company);
+  if (item.current.status !== "ok") {
+    return {
+      id: `${item.source.id}-digest`,
+      sourceId: item.source.id,
+      company: item.source.company,
+      titleJa: `${item.source.company} の今日のDigest: 一次情報の取得失敗`,
+      summaryJa: `${item.source.company} の主要ソースは今回の実行で取得できませんでした。更新有無の判断は保留とし、次回取得で再確認します。`,
+      action: "定点観測",
+      publishedAt: null,
+      sourceUrl: item.source.url
+    };
+  }
+
   return {
     id: `${item.source.id}-digest`,
     sourceId: item.source.id,
     company: item.source.company,
-    titleJa: `${item.source.company} の一次情報更新: ${translateTitle(meaningfulTitle)}`,
+    titleJa: `${item.source.company} の今日のDigest: ${translateTitle(meaningfulTitle)}`,
     summaryJa: summarizeForJapanese(item.current.description, item.current.excerpt, item.source.company),
     action: item.change.changed ? "監視" : "定点観測",
-    publishedAt: item.current.publishedAt ?? null
+    publishedAt: item.current.publishedAt ?? null,
+    sourceUrl: item.current.itemUrl ?? item.source.url
   };
 }
 
-function buildThemes(snapshotResults, failedItems) {
-  const themes = [];
+function buildCompanyDigests(snapshotResults, rankedItems, alertIds) {
+  const companyOrder = [];
+  const grouped = new Map();
 
-  const changedCount = snapshotResults.filter((item) => item.change.changed && item.current.status === "ok").length;
-  if (changedCount > 0) {
-    themes.push({
-      title: "一次情報の差分を自動検知できる状態に入った",
-      body: `${changedCount} 件のソース更新を検出しました。今後はこの差分をもとに、日本語要約と重要度判定の精度を上げていく段階です。`
-    });
+  for (const item of snapshotResults) {
+    const company = item.source.company;
+    if (!grouped.has(company)) {
+      grouped.set(company, []);
+      companyOrder.push(company);
+    }
+    grouped.get(company).push(item);
   }
 
-  const okCompanies = [...new Set(snapshotResults.filter((item) => item.current.status === "ok").map((item) => item.source.company))];
-  if (okCompanies.length > 0) {
-    themes.push({
-      title: "主要監視先の定点観測を開始",
-      body: `${okCompanies.join("、")} の一次情報をもとに、スマホで読める個人用ダッシュボードを更新できる基盤ができています。`
-    });
+  return companyOrder
+    .map((company) => {
+      const items = grouped.get(company) ?? [];
+      const rankedForCompany = rankedItems.filter((item) => item.source.company === company);
+      const representative =
+        rankedForCompany.find((item) => !alertIds.has(item.source.id)) ??
+        rankedForCompany[0] ??
+        pickDigestRepresentative(items, alertIds);
+      return representative ? toDigest(representative) : null;
+    })
+    .filter(Boolean);
+}
+
+function pickDigestRepresentative(items, alertIds) {
+  const candidates = [...items];
+  candidates.sort((left, right) => compareDigestRepresentatives(left, right, alertIds));
+  return candidates[0] ?? null;
+}
+
+function compareDigestRepresentatives(left, right, alertIds) {
+  const leftScore = digestRepresentativeScore(left, alertIds);
+  const rightScore = digestRepresentativeScore(right, alertIds);
+
+  if (leftScore !== rightScore) {
+    return rightScore - leftScore;
   }
 
-  if (failedItems.length > 0) {
-    themes.push({
-      title: "一部ソースは取得失敗時のフォールバックを保持",
-      body: `${failedItems.length} 件のソースで取得失敗がありました。低コスト構成を保ちながら、再試行と通知経路の設計を次段で整える必要があります。`
-    });
+  const leftTime = left.current.status === "ok" && left.current.publishedAt ? Date.parse(left.current.publishedAt) : 0;
+  const rightTime = right.current.status === "ok" && right.current.publishedAt ? Date.parse(right.current.publishedAt) : 0;
+  if (leftTime !== rightTime) {
+    return rightTime - leftTime;
   }
 
-  return themes.slice(0, 3);
+  return left.source.label.localeCompare(right.source.label);
+}
+
+function digestRepresentativeScore(item, alertIds) {
+  let score = 0;
+  if (item.current.status === "ok") {
+    score += 100;
+  }
+  if (item.change.changed) {
+    score += 20;
+  }
+  if ((item.source.trustLevel ?? "official") === "official") {
+    score += 10;
+  }
+  if (item.source.priority === "high") {
+    score += 5;
+  }
+  if (!alertIds.has(item.source.id)) {
+    score += 3;
+  }
+  return score;
 }
 
 function describeChange(previous, current) {
@@ -672,6 +721,45 @@ function explainWhyNow(item) {
     return "性能そのものより、現実的な継続利用のしやすさに影響する可能性があるためです。";
   }
   return "一次情報に変化があり、今後の作業体験の変化につながる可能性があるためです。";
+}
+
+function explainWatchAngles(item) {
+  if (item.current.status !== "ok") {
+    return [
+      "次回取得で本文が取れたら、単なる取得失敗か実際の更新かを切り分ける",
+      "今日依存している機能やAPIに影響が出ていないかだけ先に確認する"
+    ];
+  }
+
+  const text = `${item.current.title} ${item.current.description} ${item.current.excerpt}`.toLowerCase();
+  const angles = [];
+
+  if (/(context|memory|workspace|project|history|resume)/.test(text)) {
+    angles.push("過去の会話や案件文脈を持ち越せる範囲が広がるか");
+    angles.push("作業再開時の説明やプロンプト再構築がどこまで減るか");
+  }
+
+  if (/(workflow|agent|task|automation|computer use|tool search|tool calling|search|batch)/.test(text)) {
+    angles.push("調べる→要約→実行までを一往復でつなげられるか");
+    angles.push("既存の手作業や自動化フローをどこまで置き換えられるか");
+  }
+
+  if (/(pricing|limit|tier|cost|latency|throughput|mini|nano|flash-lite|performance)/.test(text)) {
+    angles.push("高頻度タスクを軽量モデル側へ逃がしてコストと速度を最適化できるか");
+    angles.push("上位モデルに回す判断基準を見直す必要があるか");
+  }
+
+  if (/(voice|status|incident|login|outage|error|degraded|operational|responses api)/.test(text)) {
+    angles.push("直近で失敗した処理や利用を今なら再実行してよいか");
+    angles.push("監視や運用回避策を元に戻せる状態か");
+  }
+
+  if (angles.length < 2) {
+    angles.push("自分の普段の作業時間や手戻りを本当に減らせる更新か");
+    angles.push("今すぐ試すべき変更か、仕様把握だけで十分な更新か");
+  }
+
+  return [...new Set(angles)].slice(0, 4);
 }
 
 function translateTitle(title) {

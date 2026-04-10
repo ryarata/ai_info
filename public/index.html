@@ -25,7 +25,7 @@
         </article>
         <article class="metric-card">
           <span>今日のDigest</span>
-          <strong>2</strong>
+          <strong>4</strong>
         </article>
         <article class="metric-card">
           <span>監視企業</span>
@@ -50,7 +50,6 @@
             <span class="badge cache-badge">Alert regen 1</span>
             <span class="badge cache-badge">Digest cache 0</span>
             <span class="badge cache-badge">Digest regen 2</span>
-            <span class="badge cache-badge">Weekly regen</span>
           </div>
         </article>
       </section>
@@ -84,6 +83,14 @@
     <h3>ログインでエラー増加（解消済み）</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/09 02:44</p>
     <p class="summary">一時的にログインでエラーレートが上昇し、ChatGPT Web（特にVPN経由）へのアクセス不具合、Webでの空レスポンス、音声ディクテーション障害、/v1/responses エンドポイント停止などが発生していました。現在は解消され、Login／Conversations／Responses／Voice mode／GPTs など影響したコンポーネントはすべて稼働中です。過去の失敗や空返答はこの事象が原因だった可能性が高く、再試行で正常動作する見込みです。</p>
+    
+    <div class="why-now">
+      <strong>どう見るか</strong>
+      <ul class="insight-list">
+        <li>公式ステータスで復旧完了が確認されたため。直近でログイン失敗やAPI・Webの空レスポンスがあった場合は、今なら安全に再実行できます。運用上依存する機能が復帰しているかの確認にも有用です。</li>
+      </ul>
+    </div>
+  
     <details class="translation">
       <summary>英語原文タイトル</summary>
       <p>Elevated Errors with Login</p>
@@ -107,40 +114,27 @@
       <section class="section-block">
         <div class="section-head">
           <h2>今日のDigest</h2>
-          <span class="subtle">非緊急だが追うべき更新</span>
+          <span class="subtle">各社ごとに今日押さえる更新を1枚で確認</span>
         </div>
         
-        <details class="company-group" >
+        <details class="company-group" open>
           <summary class="company-group-head">
             <span class="company-group-title">OpenAI</span>
             <span class="company-group-meta">
-              <span class="subtle">2件</span>
+              <span class="subtle">1件</span>
               <span class="group-toggle">表示</span>
             </span>
           </summary>
           <div class="stack company-group-body">
             
   <article class="card digest-card">
-    <div class="badge-row">
-      <span class="badge">OpenAI</span>
-      <span class="badge">今すぐ試す</span>
-      <span class="badge">OFFICIAL</span>
-    </div>
-    <h3>OpenAI 3月アップデート要約: GPT-5.4系・ツール検索・コンピュータ操作・Sora強化</h3>
-    <p class="published-at">一次情報の投稿日時: 2026/03/17 00:00</p>
-    <p class="summary">- GPT-5.4/5.4-proをAPI提供開始（Chat Completions/Responses）。Responses APIにツール検索を追加。大規模ツール群は実行時まで遅延読込でき、トークン削減・キャッシュ保持・低レイテンシに寄与。GPT-5.4は内蔵のコンピュータ操作（スクリーンショット経由のUI操作）に対応。1Mトークンのコンテキストとネイティブのコンパクションで長時間エージェント運用が現実的に。
-- GPT-5.4 mini/nanoを提供開始。miniはGPT-5.4級の能力を高スループット向けに最適化（ツール検索・コンピュータ操作・コンパクション対応）。nanoは最小コスト/低遅延の単純大量処理向け（コンパクション対応、ツール検索/コンピュータ操作は非対応）。
-- Sora API拡張：再利用可能なキャラクター参照、最長20秒生成、sora-2-proで1080p（$0.70/秒）、ビデオ拡張、/v1/videosのBatch対応。編集用のPOST /v1/videos/editsを追加（/v1/videos/{video_id}/remixは6か月で廃止予定）。
-- 画質改善：GPT-5.4のinput_image処理バグ修正（画像理解の品質向上。対処不要）。
-- 互換性：gpt-5.3-chat-latestスラグをChatGPTの最新モデルへ更新。
-- 参考（2月の実務向け改善）：Responses APIにphase（途中解説/最終回答ラベル）、WebSocketモード、input_fileの対応拡張、サーバー側コンパクション、Skills/ホステッドShellツールなど。</p>
-  </article>
-
-  <article class="card digest-card">
-    <div class="badge-row">
-      <span class="badge">OpenAI</span>
-      <span class="badge">監視</span>
-      <span class="badge">OFFICIAL</span>
+    <div class="card-top">
+      <div class="badge-row">
+        <span class="badge">OpenAI</span>
+        <span class="badge">監視</span>
+        <span class="badge">OFFICIAL</span>
+      </div>
+      
     </div>
     <h3>OpenAI ステータス: 障害は解消済み（ログイン／ChatGPT Web／音声／Responses API）</h3>
     <p class="published-at">一次情報の投稿日時: 2026/04/09 02:44</p>
@@ -150,31 +144,87 @@
           </div>
         </details>
       
-      </section>
+        <details class="company-group" open>
+          <summary class="company-group-head">
+            <span class="company-group-title">Anthropic</span>
+            <span class="company-group-meta">
+              <span class="subtle">1件</span>
+              <span class="group-toggle">表示</span>
+            </span>
+          </summary>
+          <div class="stack company-group-body">
+            
+  <article class="card digest-card">
+    <div class="card-top">
+      <div class="badge-row">
+        <span class="badge">Anthropic</span>
+        <span class="badge">定点観測</span>
+        <span class="badge">OFFICIAL</span>
+      </div>
+      <a class="link" href="https://github.com/anthropics/claude-code/commit/22fdf68049e8c24e5a36087bb742857d3d5e407d">原文</a>
+    </div>
+    <h3>Anthropic の今日のDigest: 2.1.97</h3>
+    <p class="published-at">一次情報の投稿日時: 2026/04/09 06:52</p>
+    <p class="summary">## 2.1.97 - `NO_FLICKER`モードでフォーカスビュートグル（`Ctrl+O`）を追加。プロンプト、1行ツール要約（編集差分統計付き）、最終応答を表示 - `refreshInterval`ステータスライン設定を追加。ステータスラインコマンドをN秒ごとに再実行 - `workspace.git_worktree`をステータスラインJSON入力に追加。現在のディレクトリがリンクされたgitワークツリー内のときに設定 - `/agents`のエージェント種別の横に、サブエージェントインスタンスが稼働中の場合に`● N running`インジケーターを表示 - Cedarポリシーファイル（`.cedar`、`.cedarpolicy`）にシンタックスハイライトを追加 - `--dangerously-skip-permissions`が保護パスへの書き込み承認後に静かにaccept-editsモードへダウングレードされる問題を修正 - Bashツールの権限を修正および強化。env-var接頭辞やネットワークリダイレクトに関するチェックを厳格化し、一般的なコマンドでの誤検出プロンプトを削減 - JavaScriptのプロトタイププロパティと一致する名前の権限制御ルールを修正（例:</p>
+  </article>
 
-      <section class="section-block">
-        <div class="section-head">
-          <h2>今週の見立て</h2>
-          <span class="subtle">3〜6か月の意味づけ</span>
-        </div>
-        <div class="stack">
-          
-            <article class="card theme-card">
-              <h3>OpenAI: GPT-5.4 mini/nanoの使い分けと移行計画</h3>
-              <p class="summary">5.4 miniは高負荷ワークロード向けの高速・高機能（tool search・内蔵computer use・compaction対応）。5.4 nanoは単純な高ボリューム処理向け（compactionのみ、tool search/computer use非対応）。次期エージェント/自動化はmini、単純分類・抽出はnanoでA/B導入を検討。gpt-5.3-chat-latestのスラッグは自動更新されるため、再現性重視の本番はモデルIDを明示固定。</p>
-            </article>
-          
-            <article class="card theme-card">
-              <h3>エンドポイント信頼性とフェイルオーバー設計</h3>
-              <p class="summary">直近でLoginやVPN経由アクセス、GET /v1/responsesの障害が発生し復旧済み。Chat CompletionsとResponsesの両対応モデル（5.4 mini/nano）を活用し、片系障害時に切替可能な実装に。リトライ/バックオフ、サーキットブレーカー、ステータス監視を標準化。</p>
-            </article>
-          
-            <article class="card theme-card">
-              <h3>画像系ワークフローの品質・将来対応</h3>
-              <p class="summary">GPT-5.4のinput_image処理で小バグ修正あり。加えて、次世代Image V2がテスト中で、プロンプト整合性とUIレンダリングの写実性が評価されつつある。画像理解/生成の評価基準を整備し、API切替に備えてアダプタ層を分離。GA以降に段階移行。{</p>
-            </article>
-          
-        </div>
+          </div>
+        </details>
+      
+        <details class="company-group" open>
+          <summary class="company-group-head">
+            <span class="company-group-title">Google</span>
+            <span class="company-group-meta">
+              <span class="subtle">1件</span>
+              <span class="group-toggle">表示</span>
+            </span>
+          </summary>
+          <div class="stack company-group-body">
+            
+  <article class="card digest-card">
+    <div class="card-top">
+      <div class="badge-row">
+        <span class="badge">Google</span>
+        <span class="badge">定点観測</span>
+        <span class="badge">OFFICIAL</span>
+      </div>
+      <a class="link" href="https://gemini.google/release-notes/">原文</a>
+    </div>
+    <h3>Google の今日のDigest: 切り替えツール: AI のメモリーとチャット履歴を Gemini にシームレスに移行する</h3>
+    <p class="published-at">一次情報の投稿日時: 2026/03/26 09:00</p>
+    <p class="summary">本日より、すべての一般ユーザー向けアカウントの[設定]ページに新しい切り替えツールが導入されます。他のAIアプリに保存されているパーソナライズ設定、好み、チャット履歴全体を、簡単な操作でGeminiにインポートできるようになります。メモリーを移行するには、[設定]でインポートオプションを選択します。Geminiからプロンプトが提案されるので、これを他のAIアプリに貼り付け、生成された要約をGeminiにコピーするだけです。他のAIプロバイダのチャット履歴をZIPファイルでアップロードすると、チャットを中断したところからシームレスに再開できます。今回のリリースに伴い、機能名を「過去のチャット」から「メモリー」に変更しました。この機能は、今後数週間かけてアプリにリリースする予定です。</p>
+  </article>
+
+          </div>
+        </details>
+      
+        <details class="company-group" open>
+          <summary class="company-group-head">
+            <span class="company-group-title">xAI</span>
+            <span class="company-group-meta">
+              <span class="subtle">1件</span>
+              <span class="group-toggle">表示</span>
+            </span>
+          </summary>
+          <div class="stack company-group-body">
+            
+  <article class="card digest-card">
+    <div class="card-top">
+      <div class="badge-row">
+        <span class="badge">xAI</span>
+        <span class="badge">定点観測</span>
+        <span class="badge">OFFICIAL</span>
+      </div>
+      <a class="link" href="https://docs.x.ai/developers/release-notes">原文</a>
+    </div>
+    <h3>xAI の今日のDigest: バッチAPIが画像および動画生成をサポート</h3>
+    <p class="published-at">一次情報の投稿日時: 2026/03/15 00:00</p>
+    <p class="summary">バッチAPIは、チャット完了に加えて、画像生成、画像編集、動画生成もサポートするようになりました。</p>
+  </article>
+
+          </div>
+        </details>
+      
       </section>
 
       <section class="section-block">

@@ -14,6 +14,7 @@ const publicDir = path.join(root, "public");
 
 const data = JSON.parse(await readFile(await resolveDataPath(), "utf8"));
 const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
+const digestItems = buildDigestDisplayItems(data);
 
 const renderBadge = (text) => `<span class="badge">${escapeHtml(text)}</span>`;
 const renderCacheBadge = (text) => `<span class="badge cache-badge">${escapeHtml(text)}</span>`;
@@ -36,6 +37,7 @@ const renderAlert = (alert) => `
     <h3>${escapeHtml(alert.titleJa)}</h3>
     ${renderPublishedAt(alert.publishedAt)}
     <p class="summary">${escapeHtml(alert.summaryJa)}</p>
+    ${renderInsightList("どう見るか", deriveWatchAngles(alert))}
     <details class="translation">
       <summary>英語原文タイトル</summary>
       <p>${escapeHtml(alert.titleEn)}</p>
@@ -47,17 +49,20 @@ const renderAlert = (alert) => `
     </div>
     <div class="why-now">
       <strong>今見る理由</strong>
-      <p>${escapeHtml(alert.whyNow)}</p>
+      ${renderRichText(alert.whyNow)}
     </div>
   </article>
 `;
 
 const renderDigestItem = (item) => `
   <article class="card digest-card">
-    <div class="badge-row">
-      ${renderBadge(item.company)}
-      ${renderBadge(item.action)}
-      ${renderBadge((item.trustLevel ?? "official").toUpperCase())}
+    <div class="card-top">
+      <div class="badge-row">
+        ${renderBadge(item.company)}
+        ${renderBadge(item.action)}
+        ${renderBadge((item.trustLevel ?? "official").toUpperCase())}
+      </div>
+      ${item.sourceUrl ? `<a class="link" href="${escapeHtml(item.sourceUrl)}">原文</a>` : ""}
     </div>
     <h3>${escapeHtml(item.titleJa)}</h3>
     ${renderPublishedAt(item.publishedAt)}
@@ -84,6 +89,39 @@ const renderGroupedItems = (items, renderer, options = {}) =>
       `
     )
     .join("");
+
+const renderInsightList = (label, items) =>
+  items?.length
+    ? `
+    <div class="why-now">
+      <strong>${escapeHtml(label)}</strong>
+      <ul class="insight-list">
+        ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    </div>
+  `
+    : "";
+
+const renderRichText = (value) => {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return "<p>理由は今回の更新で補完します。</p>";
+  }
+
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const bulletLike = lines.length > 1 && lines.every((line) => /^[-*・]/.test(line));
+
+  if (bulletLike) {
+    return `<ul class="insight-list">${lines
+      .map((line) => `<li>${escapeHtml(line.replace(/^[-*・]\s*/, ""))}</li>`)
+      .join("")}</ul>`;
+  }
+
+  return lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+};
 
 const renderSource = (source) => `
   <article class="source-item">
@@ -219,7 +257,7 @@ const html = `<!DOCTYPE html>
         </article>
         <article class="metric-card">
           <span>今日のDigest</span>
-          <strong>${data.summary.digestCount}</strong>
+          <strong>${digestItems.length}</strong>
         </article>
         <article class="metric-card">
           <span>監視企業</span>
@@ -244,7 +282,6 @@ const html = `<!DOCTYPE html>
             ${renderCacheBadge(`Alert regen ${data.analysis?.cache?.summary?.alertRegenerated ?? 0}`)}
             ${renderCacheBadge(`Digest cache ${data.analysis?.cache?.summary?.digestCacheHits ?? 0}`)}
             ${renderCacheBadge(`Digest regen ${data.analysis?.cache?.summary?.digestRegenerated ?? 0}`)}
-            ${renderCacheBadge(`Weekly ${formatCacheStatus(data.analysis?.cache?.summary?.weeklyThemes ?? "unknown")}`)}
           </div>
         </article>
       </section>
@@ -260,28 +297,9 @@ const html = `<!DOCTYPE html>
       <section class="section-block">
         <div class="section-head">
           <h2>今日のDigest</h2>
-          <span class="subtle">非緊急だが追うべき更新</span>
+          <span class="subtle">各社ごとに今日押さえる更新を1枚で確認</span>
         </div>
-        ${renderGroupedItems(data.digest, renderDigestItem, { defaultOpen: false })}
-      </section>
-
-      <section class="section-block">
-        <div class="section-head">
-          <h2>今週の見立て</h2>
-          <span class="subtle">3〜6か月の意味づけ</span>
-        </div>
-        <div class="stack">
-          ${data.weeklyThemes
-            .map(
-              (theme) => `
-            <article class="card theme-card">
-              <h3>${escapeHtml(theme.title)}</h3>
-              <p class="summary">${escapeHtml(theme.body)}</p>
-            </article>
-          `
-            )
-            .join("")}
-        </div>
+        ${renderGroupedItems(digestItems, renderDigestItem, { defaultOpen: false })}
       </section>
 
       <section class="section-block">
@@ -567,6 +585,14 @@ h3 {
 .why-now strong {
   font-size: 13px;
 }
+.insight-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+}
+.insight-list li + li {
+  margin-top: 6px;
+}
 .source-list {
   display: grid;
   gap: 10px;
@@ -634,6 +660,86 @@ async function resolveDataPath() {
     }
     throw error;
   }
+}
+
+function buildDigestDisplayItems(currentData) {
+  const digestByCompany = new Map((currentData.digest ?? []).map((item) => [item.company ?? "Unknown", item]));
+
+  for (const [company, items] of groupByCompany(currentData.sourceItems ?? [])) {
+    if (digestByCompany.has(company)) {
+      continue;
+    }
+
+    const representative = pickDigestSourceItem(items);
+    if (!representative) {
+      continue;
+    }
+
+    digestByCompany.set(company, {
+      id: `${representative.sourceId}-company-digest`,
+      sourceId: representative.sourceId,
+      company,
+      titleJa:
+        representative.status === "ok"
+          ? `${company} の今日のDigest: ${representative.translated?.titleJa || representative.title || representative.label}`
+          : `${company} の今日のDigest: 一次情報の取得失敗`,
+      summaryJa:
+        representative.status === "ok"
+          ? representative.translated?.descriptionJa || representative.description || "今回の取得内容を確認してください。"
+          : `${company} の主要ソースは今回の実行で取得できませんでした。更新有無の判断は保留です。`,
+      action: representative.changed ? "監視" : "定点観測",
+      trustLevel: representative.trustLevel ?? "official",
+      publishedAt: representative.publishedAt ?? null,
+      sourceUrl: representative.sourceUrl
+    });
+  }
+
+  return [...digestByCompany.values()];
+}
+
+function pickDigestSourceItem(items) {
+  return [...items].sort((left, right) => compareDigestSourceItems(left, right))[0] ?? null;
+}
+
+function compareDigestSourceItems(left, right) {
+  const leftScore = digestSourceScore(left);
+  const rightScore = digestSourceScore(right);
+  if (leftScore !== rightScore) {
+    return rightScore - leftScore;
+  }
+
+  const leftTime = left.publishedAt ? Date.parse(left.publishedAt) : 0;
+  const rightTime = right.publishedAt ? Date.parse(right.publishedAt) : 0;
+  return rightTime - leftTime;
+}
+
+function digestSourceScore(item) {
+  let score = item.status === "ok" ? 100 : 0;
+  if (item.changed) {
+    score += 20;
+  }
+  if ((item.trustLevel ?? "official") === "official") {
+    score += 10;
+  }
+  return score;
+}
+
+function deriveWatchAngles(alert) {
+  const explicit = Array.isArray(alert.watchAngles) ? alert.watchAngles.filter(Boolean) : [];
+  if (explicit.length > 0) {
+    return explicit;
+  }
+
+  const text = String(alert.whyNow ?? "").trim();
+  if (!text) {
+    return [];
+  }
+
+  return text
+    .split("\n")
+    .map((line) => line.replace(/^[-*・]\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 4);
 }
 
 function escapeHtml(value) {
