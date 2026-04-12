@@ -6,42 +6,25 @@ import { loadEnv } from "./load-env.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 await loadEnv(root);
+
 const generatedPath = path.join(root, "data", "updates.generated.json");
 const analyzedPath = path.join(root, "data", "updates.analyzed.json");
 const snapshotDir = path.join(root, "data", "snapshots");
 
-const translationModelCandidates = uniqueNonEmpty([
-  process.env.ANTHROPIC_TRANSLATION_MODEL,
-  process.env.ANTHROPIC_MODEL,
-  "claude-3-5-haiku-latest",
-  "claude-3-5-haiku-20241022",
-  "claude-sonnet-4-0",
-  "claude-sonnet-4-20250514"
-]);
-const summaryModelCandidates = uniqueNonEmpty([
-  process.env.ANTHROPIC_SUMMARY_MODEL,
-  process.env.ANTHROPIC_MODEL,
-  "claude-sonnet-4-0",
-  "claude-sonnet-4-20250514",
-  "claude-3-7-sonnet-latest",
-  "claude-3-7-sonnet-20250219"
-]);
+const summaryModel = process.env.OPENAI_SUMMARY_MODEL ?? process.env.OPENAI_MODEL ?? "gpt-5";
 const forcedRegenSourceIds = parseCsvEnv(process.env.FORCE_REGEN_SOURCE_IDS);
-const apiKey = process.env.ANTHROPIC_API_KEY;
+const apiKey = process.env.OPENAI_API_KEY;
 
 const generated = JSON.parse(await readFile(generatedPath, "utf8"));
-const snapshotFiles = (generated.sourceHealth ?? [])
-  .map((item) => item.sourceId)
-  .filter(Boolean);
-
+const snapshotFiles = (generated.sourceHealth ?? []).map((item) => item.sourceId).filter(Boolean);
 const snapshots = new Map();
+
 for (const sourceId of snapshotFiles) {
   const filePath = path.join(snapshotDir, `${sourceId}.json`);
   try {
-    const content = JSON.parse(await readFile(filePath, "utf8"));
-    snapshots.set(sourceId, content);
+    snapshots.set(sourceId, JSON.parse(await readFile(filePath, "utf8")));
   } catch {
-    // Ignore missing snapshots; fallback path will handle it.
+    // Missing snapshot falls back later.
   }
 }
 
@@ -56,23 +39,22 @@ if (apiKey) {
   try {
     analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, analysisTrace, {
       apiKey,
-      translationModelCandidates,
-      summaryModelCandidates
+      summaryModel
     });
-    analysisMode = analysisCache.hasReusableEntries ? "claude_with_cache" : "claude";
+    analysisMode = analysisCache.hasReusableEntries ? "openai_with_cache" : "openai";
   } catch (error) {
     analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, `LLM analysis failed: ${toErrorMessage(error)}`);
     analysisMode = "fallback_after_error";
   }
 } else {
-  analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, "ANTHROPIC_API_KEY not set");
+  analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, "OPENAI_API_KEY not set");
 }
 
 analyzed.generatedAt = new Date().toISOString();
 analyzed.analysis = {
   mode: analysisMode,
-  summaryModel: apiKey ? summaryModelCandidates[0] ?? null : null,
-  translationModel: apiKey ? translationModelCandidates[0] ?? null : null,
+  summaryModel: apiKey ? summaryModel : null,
+  translationModel: null,
   forcedRegenSourceIds: [...forcedRegenSourceIds],
   cache: finalizeAnalysisTrace(analysisTrace)
 };
@@ -90,17 +72,35 @@ console.log(`Wrote analyzed updates to ${analyzedPath} using mode=${analysisMode
 async function enrichGeneratedDataWithModel(base, snapshotMap, cache, trace, options) {
   const next = structuredClone(base);
 
-  next.alerts = await Promise.all(
-    (base.alerts ?? []).map(async (item) => enrichItem(item, "alert", snapshotMap, cache, trace, options))
-  );
-  next.digest = await Promise.all(
-    (base.digest ?? []).map(async (item) => enrichItem(item, "digest", snapshotMap, cache, trace, options))
-  );
-  next.sourceItems = await Promise.all(
-    (base.sourceItems ?? []).map(async (item) => enrichSourceItem(item, cache, trace, options))
-  );
+  next.alerts = [];
+  for (const item of base.alerts ?? []) {
+    next.alerts.push(await enrichItemSafely(item, "alert", snapshotMap, cache, trace, options));
+  }
 
+  next.digest = [];
+  for (const item of base.digest ?? []) {
+    next.digest.push(await enrichItemSafely(item, "digest", snapshotMap, cache, trace, options));
+  }
+
+  next.sourceItems = (base.sourceItems ?? []).map((item) => ({ ...item }));
   return next;
+}
+
+async function enrichItemSafely(item, kind, snapshotMap, cache, trace, options) {
+  try {
+    return await enrichItem(item, kind, snapshotMap, cache, trace, options);
+  } catch (error) {
+    const sourceId = item?.sourceId ?? item?.id?.replace(/-(alert|digest)$/, "");
+    if (sourceId) {
+      markItemAnalysis(trace, sourceId, kind, "fallback", toErrorMessage(error));
+    }
+    return {
+      ...item,
+      publishedAt: item.publishedAt ?? snapshotMap.get(sourceId)?.publishedAt ?? null,
+      trustLevel: findTrustLevel(item, snapshotMap.get(sourceId)),
+      trendJa: kind === "digest" ? item.trendJa ?? deriveFallbackTrend(item) : undefined
+    };
+  }
 }
 
 async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
@@ -120,17 +120,53 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
       titleJa: cached.value.titleJa ?? item.titleJa,
       summaryJa: cached.value.summaryJa ?? item.summaryJa,
       whyNow: cached.value.whyNow ?? item.whyNow,
+      trendJa: kind === "digest" ? cached.value.trendJa ?? item.trendJa : undefined,
       watchAngles: cached.value.watchAngles ?? item.watchAngles,
       action: kind === "alert" ? item.action : cached.value.action ?? item.action,
       scores: cached.value.scores ?? item.scores,
       publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
-      trustLevel: cached.value.trustLevel ?? findTrustLevel(baseLikeItem(item), snapshot)
+      trustLevel: cached.value.trustLevel ?? findTrustLevel(item, snapshot)
     };
   }
+
   markItemAnalysis(trace, sourceId, kind, "regenerated", cached.reason);
 
-  const schema = {
-    name: `${kind}_analysis`,
+  const trustLevel = findTrustLevel(item, snapshot);
+  const trustInstruction =
+    trustLevel === "secondary"
+      ? [
+          "This source is secondary, not official.",
+          "Be conservative.",
+          "Avoid overclaiming.",
+          "Explicitly leave uncertainty when evidence is weak."
+        ].join("\n")
+      : "This source is official. You may summarize directly, but stay factual.";
+
+  const schema = kind === "alert" ? buildAlertSchema() : buildDigestSchema();
+  const prompt = kind === "alert" ? buildAlertPrompt(item, snapshot, trustLevel, trustInstruction) : buildDigestPrompt(item, snapshot, trustLevel, trustInstruction);
+
+  const result = await callOpenAIJson(prompt, schema, {
+    apiKey: options.apiKey,
+    model: options.summaryModel
+  });
+
+  return {
+    ...item,
+    titleJa: result.title_ja || item.titleJa,
+    summaryJa: result.summary_ja || item.summaryJa,
+    whyNow: kind === "alert" ? result.why_now || item.whyNow : undefined,
+    trendJa: kind === "digest" ? result.trend_ja || item.trendJa || deriveFallbackTrend(item) : undefined,
+    watchAngles: kind === "alert" ? result.watch_angles?.length ? result.watch_angles : item.watchAngles : item.watchAngles,
+    action: result.action || item.action,
+    scores: result.scores || item.scores,
+    publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
+    trustLevel
+  };
+}
+
+function buildAlertSchema() {
+  return {
+    name: "alert_analysis",
     strict: true,
     schema: {
       type: "object",
@@ -160,248 +196,135 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
       required: ["title_ja", "summary_ja", "why_now", "watch_angles", "action", "scores"]
     }
   };
-
-  const trustLevel = findTrustLevel(baseLikeItem(item), snapshot);
-  const trustInstruction =
-    trustLevel === "secondary"
-      ? [
-          "This source is secondary, not official.",
-          "Be conservative.",
-          "Do not overstate certainty.",
-          "If needed, indicate that the update is being reported by a secondary source."
-        ].join("\n")
-      : "This source is official. You may summarize it more directly while staying factual.";
-
-  const prompt = [
-    "You analyze first-party AI product updates for a single Japanese-speaking user.",
-    "Summarize in natural Japanese.",
-    "Prioritize context UX, work UX, workflow compression, and practical impact.",
-    "Do not invent facts not supported by the provided source text.",
-    "If the source text is generic, still produce the best concise summary possible from it.",
-    "Make the summary richer than a headline recap: include the practical change and where it affects work.",
-    "For watch_angles, return 2 to 4 concrete angles the user should inspect when reviewing this update.",
-    "Each watch angle should be a short Japanese sentence framed as a practical checkpoint.",
-    "Return scores from 1 to 5 for contextUx, workUx, and workflow.",
-    trustInstruction,
-    `Kind: ${kind}`,
-    `Company: ${item.company}`,
-    `Product label: ${item.product ?? item.company}`,
-    `Trust level: ${trustLevel}`,
-    `Current English title: ${item.titleEn ?? ""}`,
-    `Existing fallback title in Japanese: ${item.titleJa ?? ""}`,
-    `Current fallback summary in Japanese: ${item.summaryJa ?? ""}`,
-    `Current fallback reason: ${item.whyNow ?? ""}`,
-    `Source description: ${snapshot.description ?? ""}`,
-    `Source excerpt: ${snapshot.excerpt ?? ""}`
-  ].join("\n");
-
-  const result = await callClaudeJson(prompt, schema, {
-    apiKey: options.apiKey,
-    modelCandidates: options.summaryModelCandidates
-  });
-  return {
-    ...item,
-    titleJa: result.title_ja || item.titleJa,
-    summaryJa: result.summary_ja || item.summaryJa,
-    whyNow: result.why_now || item.whyNow,
-    watchAngles: result.watch_angles?.length ? result.watch_angles : item.watchAngles,
-    action: result.action || item.action,
-    scores: result.scores || item.scores,
-    publishedAt: item.publishedAt ?? snapshot.publishedAt ?? null,
-    trustLevel
-  };
 }
 
-async function enrichSourceItem(item, cache, trace, options) {
-  if (!item || item.status !== "ok") {
-    if (item?.sourceId) {
-      markSourceTranslation(trace, item.sourceId, "skipped_non_ok");
-    }
-    return item;
-  }
-
-  const cached = getCachedTranslationForSourceItem(item, cache);
-  if (cached.hit) {
-    markSourceTranslation(trace, item.sourceId, "cache_hit");
-    return {
-      ...item,
-      translated: cached.value
-    };
-  }
-  markSourceTranslation(trace, item.sourceId, "regenerated", cached.reason);
-
-  const schema = {
-    name: "source_item_translation_header",
+function buildDigestSchema() {
+  return {
+    name: "digest_analysis",
     strict: true,
     schema: {
       type: "object",
       additionalProperties: false,
       properties: {
         title_ja: { type: "string" },
-        description_ja: { type: "string" }
+        summary_ja: { type: "string" },
+        trend_ja: { type: "string" },
+        action: { type: "string", enum: ["今すぐ試す", "今週理解", "監視", "定点観測"] },
+        scores: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            contextUx: { type: "integer", minimum: 1, maximum: 5 },
+            workUx: { type: "integer", minimum: 1, maximum: 5 },
+            workflow: { type: "integer", minimum: 1, maximum: 5 }
+          },
+          required: ["contextUx", "workUx", "workflow"]
+        }
       },
-      required: ["title_ja", "description_ja"]
-    }
-  };
-
-  const prompt = [
-    "You translate extracted AI product source text into natural Japanese for a single user.",
-    "Translate faithfully.",
-    "Do not add interpretation, scoring, recommendations, or extra facts.",
-    "If the source text is noisy or partial, preserve that uncertainty rather than filling gaps.",
-    `Company: ${item.company}`,
-    `Source label: ${item.label}`,
-    `Original title: ${item.title ?? ""}`,
-    `Original description: ${item.description ?? ""}`
-  ].join("\n");
-
-  const result = await callClaudeJson(prompt, schema, {
-    apiKey: options.apiKey,
-    modelCandidates: options.translationModelCandidates
-  });
-  const excerptJa = await translateLongExcerpt(item, options);
-  return {
-    ...item,
-    translated: {
-      titleJa: result.title_ja || "",
-      descriptionJa: result.description_ja || "",
-      excerptJa
+      required: ["title_ja", "summary_ja", "trend_ja", "action", "scores"]
     }
   };
 }
 
-async function translateLongExcerpt(item, options) {
-  const originalExcerpt = String(item.excerpt ?? "").trim();
-  if (!originalExcerpt) {
-    return "";
-  }
-
-  const chunks = splitTextForTranslation(originalExcerpt, 1800);
-  const translatedChunks = [];
-
-  for (const [index, chunk] of chunks.entries()) {
-    const schema = {
-      name: "source_excerpt_translation_chunk",
-      strict: true,
-      schema: {
-        type: "object",
-        additionalProperties: false,
-        properties: {
-          excerpt_ja: { type: "string" }
-        },
-        required: ["excerpt_ja"]
-      }
-    };
-
-    const prompt = [
-      "You translate extracted AI product source text into natural Japanese for a single user.",
-      "Translate faithfully.",
-      "Do not add interpretation, scoring, recommendations, headings, or extra facts.",
-      "Translate only the provided excerpt chunk.",
-      "Keep the order and meaning intact.",
-      `Company: ${item.company}`,
-      `Source label: ${item.label}`,
-      `Chunk: ${index + 1}/${chunks.length}`,
-      `Original excerpt chunk: ${chunk}`
-    ].join("\n");
-
-    const result = await callClaudeJson(prompt, schema, {
-      apiKey: options.apiKey,
-      modelCandidates: options.translationModelCandidates
-    });
-    translatedChunks.push(result.excerpt_ja || "");
-  }
-
-  return translatedChunks.join("\n\n").trim();
-}
-
-async function callClaudeJson(prompt, schema, options) {
-  const modelCandidates = uniqueNonEmpty(options.modelCandidates);
-  let lastError = null;
-
-  for (const model of modelCandidates) {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": options.apiKey,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 1600,
-        temperature: 0,
-        messages: [
-          {
-            role: "user",
-            content: buildClaudeJsonPrompt(prompt, schema)
-          }
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      lastError = new Error(`Anthropic API HTTP ${response.status} for model ${model}: ${errorText.slice(0, 400)}`);
-      if (response.status === 404) {
-        continue;
-      }
-      throw lastError;
-    }
-
-    const body = await response.json();
-    const rawText = extractClaudeText(body);
-    if (!rawText) {
-      throw new Error(`Anthropic API returned no text output for model ${model}`);
-    }
-
-    return parseJsonResponseText(rawText);
-  }
-
-  if (lastError) {
-    throw lastError;
-  }
-
-  throw new Error("No Anthropic model candidates configured");
-}
-
-function buildClaudeJsonPrompt(prompt, schema) {
+function buildAlertPrompt(item, snapshot, trustLevel, trustInstruction) {
   return [
-    prompt,
-    "",
-    "Return only valid JSON.",
-    "Do not wrap the JSON in markdown fences.",
-    `The JSON must match this schema exactly: ${JSON.stringify(schema.schema)}`
+    "You analyze first-party AI product updates for a single Japanese-speaking user.",
+    "Return concise, natural Japanese for an alert card.",
+    "The alert is for updates that may change how the user should work now.",
+    "Prioritize context UX, work UX, workflow compression, reliability, and immediate operational meaning.",
+    "Do not invent facts not supported by the source text.",
+    "title_ja should be an alert headline in Japanese.",
+    "summary_ja should explain the actual change in 2-4 Japanese sentences.",
+    "why_now should say why the user should look now.",
+    "watch_angles should be concrete Japanese checkpoints for inspection.",
+    trustInstruction,
+    `Company: ${item.company}`,
+    `Product label: ${item.product ?? item.company}`,
+    `Trust level: ${trustLevel}`,
+    `Current English title: ${item.titleEn ?? ""}`,
+    `Current fallback title in Japanese: ${item.titleJa ?? ""}`,
+    `Current fallback summary in Japanese: ${item.summaryJa ?? ""}`,
+    `Current fallback why_now in Japanese: ${item.whyNow ?? ""}`,
+    `Source description: ${snapshot.description ?? ""}`,
+    `Source excerpt: ${snapshot.excerpt ?? ""}`
   ].join("\n");
 }
 
-function extractClaudeText(body) {
-  const texts = [];
-
-  for (const contentItem of body.content ?? []) {
-    if (contentItem?.type === "text" && typeof contentItem.text === "string" && contentItem.text.trim()) {
-      texts.push(contentItem.text.trim());
-    }
-  }
-
-  return texts.join("\n").trim() || null;
+function buildDigestPrompt(item, snapshot, trustLevel, trustInstruction) {
+  return [
+    "You analyze first-party AI product updates for a single Japanese-speaking user.",
+    "Return concise, natural Japanese for a digest card.",
+    "The digest is for calm catch-up reading, not urgent alerts.",
+    "summary_ja should explain what changed and what it means at a practical level.",
+    "trend_ja should be one short Japanese sentence about the likely near-term direction or what to keep watching.",
+    "Avoid generic hype and avoid copying the source wording too literally.",
+    "Do not invent facts not supported by the source text.",
+    trustInstruction,
+    `Company: ${item.company}`,
+    `Trust level: ${trustLevel}`,
+    `Current fallback title in Japanese: ${item.titleJa ?? ""}`,
+    `Current fallback summary in Japanese: ${item.summaryJa ?? ""}`,
+    `Source description: ${snapshot.description ?? ""}`,
+    `Source excerpt: ${snapshot.excerpt ?? ""}`
+  ].join("\n");
 }
 
-function parseJsonResponseText(rawText) {
-  const trimmed = String(rawText ?? "").trim();
-  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
-  const candidate = fenced ? fenced[1].trim() : trimmed;
+async function callOpenAIJson(prompt, schema, options) {
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${options.apiKey}`
+    },
+    body: JSON.stringify({
+      model: options.model,
+      input: [
+        {
+          role: "user",
+          content: [{ type: "input_text", text: prompt }]
+        }
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: schema.name,
+          strict: schema.strict,
+          schema: schema.schema
+        }
+      }
+    })
+  });
 
-  try {
-    return JSON.parse(candidate);
-  } catch {
-    const objectMatch = candidate.match(/\{[\s\S]*\}$/);
-    if (objectMatch) {
-      return JSON.parse(objectMatch[0]);
+  if (!response.ok) {
+    throw new Error(`OpenAI API HTTP ${response.status}`);
+  }
+
+  const body = await response.json();
+  const rawText = extractResponseText(body);
+  if (!rawText) {
+    throw new Error("OpenAI API returned no text output");
+  }
+
+  return JSON.parse(rawText);
+}
+
+function extractResponseText(body) {
+  if (typeof body.output_text === "string" && body.output_text.trim()) {
+    return body.output_text.trim();
+  }
+
+  for (const outputItem of body.output ?? []) {
+    for (const contentItem of outputItem.content ?? []) {
+      if (typeof contentItem.text === "string" && contentItem.text.trim()) {
+        return contentItem.text.trim();
+      }
+      if (typeof contentItem.output_text === "string" && contentItem.output_text.trim()) {
+        return contentItem.output_text.trim();
+      }
     }
   }
 
-  throw new Error("Anthropic API returned invalid JSON");
+  return null;
 }
 
 function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
@@ -409,57 +332,41 @@ function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
 
   next.alerts = (base.alerts ?? []).map((item) => ({
     ...item,
-    whyNow: item.whyNow ?? "分析理由は次回更新で補完します。",
+    whyNow: item.whyNow ?? "今回の更新での追加分析は次回実行で補完します。",
     watchAngles: item.watchAngles ?? [],
     publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
-    trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
+    trustLevel: findTrustLevel(item, snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
   }));
+
+  next.digest = (base.digest ?? []).map((item) => ({
+    ...item,
+    trendJa: item.trendJa ?? deriveFallbackTrend(item),
+    publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
+    trustLevel: findTrustLevel(item, snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
+  }));
+
+  next.sourceItems = (base.sourceItems ?? []).map((item) => ({ ...item }));
+  next.analysisFallback = { reason };
+
   for (const item of next.alerts) {
     if (item?.sourceId) {
       markItemAnalysis(trace, item.sourceId, "alert", "fallback");
     }
   }
-
-  next.digest = (base.digest ?? []).map((item) => ({
-    ...item,
-    publishedAt: item.publishedAt ?? snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, ""))?.publishedAt ?? null,
-    trustLevel: findTrustLevel(baseLikeItem(item), snapshotMap.get(item.sourceId ?? item.id.replace(/-(alert|digest)$/, "")))
-  }));
   for (const item of next.digest) {
     if (item?.sourceId) {
       markItemAnalysis(trace, item.sourceId, "digest", "fallback");
     }
   }
-  next.sourceItems = (base.sourceItems ?? []).map((item) => ({
-    ...item,
-    translated:
-      item?.status === "ok"
-        ? {
-            titleJa: item.title ?? "",
-            descriptionJa: item.description ?? "",
-            excerptJa: item.excerpt ?? ""
-          }
-        : undefined
-  }));
-  for (const item of next.sourceItems) {
-    if (item?.sourceId) {
-      markSourceTranslation(trace, item.sourceId, item?.status === "ok" ? "fallback" : "skipped_non_ok");
-    }
-  }
-
-  next.analysisFallback = {
-    reason
-  };
-
-  for (const item of next.alerts) {
-    const sourceId = item.sourceId ?? item.id.replace(/-(alert|digest)$/, "");
-    const snapshot = snapshotMap.get(sourceId);
-    if (snapshot?.status === "ok") {
-      item.summaryJa = item.summaryJa || `${item.company} の一次情報更新を確認しました。`;
-    }
-  }
 
   return next;
+}
+
+function deriveFallbackTrend(item) {
+  if (item?.action === "監視") {
+    return "まずは次の更新や関連発表が続くかを数週間追うのが良さそうです。";
+  }
+  return "大きな変化はまだ限定的なので、定点観測を続けながら次の動きを待つ段階です。";
 }
 
 function toErrorMessage(error) {
@@ -467,11 +374,7 @@ function toErrorMessage(error) {
 }
 
 function findTrustLevel(item, snapshot) {
-  return item.trustLevel ?? snapshot?.trustLevel ?? "official";
-}
-
-function baseLikeItem(item) {
-  return item ?? {};
+  return item?.trustLevel ?? snapshot?.trustLevel ?? "official";
 }
 
 async function readJsonIfExists(filePath) {
@@ -494,15 +397,13 @@ function buildAnalysisCache(previousAnalyzed) {
       sourceItems.set(item.sourceId, item);
     }
   }
-
   for (const item of previousAnalyzed?.alerts ?? []) {
     if (item?.sourceId) {
       itemAnalyses.set(`alert:${item.sourceId}`, item);
     }
   }
-
   for (const item of previousAnalyzed?.digest ?? []) {
-    if (item?.sourceId && !itemAnalyses.has(`digest:${item.sourceId}`)) {
+    if (item?.sourceId) {
       itemAnalyses.set(`digest:${item.sourceId}`, item);
     }
   }
@@ -512,24 +413,6 @@ function buildAnalysisCache(previousAnalyzed) {
     sourceItems,
     itemAnalyses
   };
-}
-
-function getCachedTranslationForSourceItem(item, cache) {
-  if (forcedRegenSourceIds.has(item.sourceId)) {
-    return { hit: false, reason: { code: "forced_regen_requested" } };
-  }
-
-  const previous = cache.sourceItems.get(item.sourceId);
-  if (!previous?.translated) {
-    return { hit: false, reason: { code: "no_previous_translation" } };
-  }
-
-  const fingerprintDiff = diffSourceIdentity(sourceIdentityPartsFromSourceItem(previous), sourceIdentityPartsFromSourceItem(item));
-  if (fingerprintDiff) {
-    return { hit: false, reason: fingerprintDiff };
-  }
-
-  return { hit: true, value: previous.translated };
 }
 
 function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
@@ -550,25 +433,12 @@ function getCachedAnalysisForItem(sourceId, kind, snapshot, cache) {
     return { hit: false, reason: fingerprintDiff };
   }
 
-  const matched =
-    cache.itemAnalyses.get(`${kind}:${sourceId}`) ??
-    cache.itemAnalyses.get(`alert:${sourceId}`) ??
-    cache.itemAnalyses.get(`digest:${sourceId}`) ??
-    null;
-
+  const matched = cache.itemAnalyses.get(`${kind}:${sourceId}`) ?? null;
   if (!matched) {
     return { hit: false, reason: { code: `no_previous_${kind}_analysis` } };
   }
 
   return { hit: true, value: matched };
-}
-
-function sourceFingerprintFromSnapshot(snapshot) {
-  return Object.values(sourceIdentityPartsFromSnapshot(snapshot)).join("\n@@\n");
-}
-
-function sourceFingerprintFromSourceItem(item) {
-  return Object.values(sourceIdentityPartsFromSourceItem(item)).join("\n@@\n");
 }
 
 function sourceIdentityPartsFromSnapshot(snapshot) {
@@ -597,7 +467,6 @@ function diffSourceIdentity(previous, current) {
       };
     }
   }
-
   return null;
 }
 
@@ -617,12 +486,10 @@ function normalizeIdentityDate(value) {
   if (!text) {
     return "";
   }
-
   const parsed = Date.parse(text);
   if (Number.isNaN(parsed)) {
     return text;
   }
-
   return new Date(parsed).toISOString();
 }
 
@@ -635,25 +502,10 @@ function parseCsvEnv(value) {
   );
 }
 
-function uniqueNonEmpty(values) {
-  return [...new Set((values ?? []).map((value) => String(value ?? "").trim()).filter(Boolean))];
-}
-
 function createAnalysisTrace() {
   return {
-    sourceItems: new Map(),
     itemAnalyses: new Map()
   };
-}
-
-function markSourceTranslation(trace, sourceId, status, reason = null) {
-  const current = trace.sourceItems.get(sourceId) ?? {};
-  trace.sourceItems.set(sourceId, {
-    ...current,
-    translation: status,
-    translationReason: reason?.code ?? reason ?? current.translationReason ?? null,
-    translationReasonDetail: reason?.detail ?? current.translationReasonDetail ?? null
-  });
 }
 
 function markItemAnalysis(trace, sourceId, kind, status, reason = null) {
@@ -668,20 +520,14 @@ function markItemAnalysis(trace, sourceId, kind, status, reason = null) {
 
 function finalizeAnalysisTrace(trace) {
   const bySource = {};
-  const sourceIds = new Set([...trace.sourceItems.keys(), ...trace.itemAnalyses.keys()]);
-
-  for (const sourceId of sourceIds) {
-    bySource[sourceId] = {
-      ...(trace.sourceItems.get(sourceId) ?? {}),
-      ...(trace.itemAnalyses.get(sourceId) ?? {})
-    };
+  for (const [sourceId, value] of trace.itemAnalyses.entries()) {
+    bySource[sourceId] = { ...value };
   }
-
   const entries = Object.values(bySource);
   return {
     summary: {
-      translationCacheHits: entries.filter((entry) => entry.translation === "cache_hit").length,
-      translationRegenerated: entries.filter((entry) => entry.translation === "regenerated").length,
+      translationCacheHits: 0,
+      translationRegenerated: 0,
       alertCacheHits: entries.filter((entry) => entry.alert === "cache_hit").length,
       alertRegenerated: entries.filter((entry) => entry.alert === "regenerated").length,
       digestCacheHits: entries.filter((entry) => entry.digest === "cache_hit").length,
@@ -689,47 +535,4 @@ function finalizeAnalysisTrace(trace) {
     },
     bySource
   };
-}
-
-function splitTextForTranslation(text, maxChunkLength) {
-  const normalized = String(text ?? "").trim();
-  if (!normalized) {
-    return [];
-  }
-
-  if (normalized.length <= maxChunkLength) {
-    return [normalized];
-  }
-
-  const chunks = [];
-  let remaining = normalized;
-
-  while (remaining.length > maxChunkLength) {
-    let splitIndex = Math.max(
-      remaining.lastIndexOf(". ", maxChunkLength),
-      remaining.lastIndexOf("! ", maxChunkLength),
-      remaining.lastIndexOf("? ", maxChunkLength),
-      remaining.lastIndexOf("。", maxChunkLength),
-      remaining.lastIndexOf("！", maxChunkLength),
-      remaining.lastIndexOf("？", maxChunkLength)
-    );
-
-    if (splitIndex < Math.floor(maxChunkLength * 0.6)) {
-      splitIndex = remaining.lastIndexOf(" ", maxChunkLength);
-    }
-
-    if (splitIndex < Math.floor(maxChunkLength * 0.4)) {
-      splitIndex = maxChunkLength;
-    }
-
-    const endIndex = splitIndex === maxChunkLength ? splitIndex : splitIndex + 1;
-    chunks.push(remaining.slice(0, endIndex).trim());
-    remaining = remaining.slice(endIndex).trim();
-  }
-
-  if (remaining) {
-    chunks.push(remaining);
-  }
-
-  return chunks.filter(Boolean);
 }

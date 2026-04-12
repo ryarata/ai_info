@@ -64,9 +64,10 @@ const renderDigestItem = (item) => `
       </div>
       ${item.sourceUrl ? `<a class="link" href="${escapeHtml(item.sourceUrl)}">原文</a>` : ""}
     </div>
-    <h3>${escapeHtml(item.titleJa)}</h3>
+    <h3>${escapeHtml(cleanDigestTitleText(item.titleJa, item.company))}</h3>
     ${renderPublishedAt(item.publishedAt)}
     <p class="summary">${escapeHtml(item.summaryJa)}</p>
+    ${item.trendJa ? `<div class="why-now"><strong>見立て</strong>${renderRichText(item.trendJa)}</div>` : ""}
   </article>
 `;
 
@@ -174,21 +175,14 @@ const renderSourceItem = (item) => `
     ${renderPublishedAt(item.publishedAt)}
     ${renderCacheInfo(item.sourceId)}
     <p class="summary">${escapeHtml(item.description ?? "抽出本文なし")}</p>
-    ${
-      item.translated
-        ? `
     <details class="translation">
-      <summary>抽出内容の日本語訳</summary>
-      <p><strong>タイトル訳:</strong> ${escapeHtml(item.translated.titleJa ?? "")}</p>
-      <p><strong>要約訳:</strong> ${escapeHtml(item.translated.descriptionJa ?? "")}</p>
+      <summary>抽出本文を見る</summary>
+      <p class="summary">長文の本文はブラウザの自動翻訳で読む前提にします。</p>
       <div class="translation-block">
-        <strong>抽出本文訳:</strong>
-        <p class="translation-long">${escapeHtml(item.translated.excerptJa ?? "")}</p>
+        <strong>抽出本文:</strong>
+        <p class="translation-long">${escapeHtml(item.excerpt ?? item.description ?? "抽出本文なし")}</p>
       </div>
     </details>
-    `
-        : ""
-    }
     <div class="why-now">
       <strong>今回の分類</strong>
       <p>${escapeHtml(item.classificationReason ?? "分類理由なし")}</p>
@@ -203,7 +197,6 @@ const renderCacheInfo = (sourceId) => {
   }
 
   const labels = [
-    cacheInfo.translation ? `翻訳 ${formatCacheStatus(cacheInfo.translation)}` : null,
     cacheInfo.alert ? `Alert ${formatCacheStatus(cacheInfo.alert)}` : null,
     cacheInfo.digest ? `Digest ${formatCacheStatus(cacheInfo.digest)}` : null
   ].filter(Boolean);
@@ -213,9 +206,6 @@ const renderCacheInfo = (sourceId) => {
   }
 
   const reasons = [
-    cacheInfo.translation === "regenerated" && cacheInfo.translationReason
-      ? `翻訳: ${formatCacheReason(cacheInfo.translationReason, cacheInfo.translationReasonDetail)}`
-      : null,
     cacheInfo.alert === "regenerated" && cacheInfo.alertReason
       ? `Alert: ${formatCacheReason(cacheInfo.alertReason, cacheInfo.alertReasonDetail)}`
       : null,
@@ -276,8 +266,6 @@ const html = `<!DOCTYPE html>
         </div>
         <article class="card">
           <div class="badge-row">
-            ${renderCacheBadge(`翻訳 cache ${data.analysis?.cache?.summary?.translationCacheHits ?? 0}`)}
-            ${renderCacheBadge(`翻訳 regen ${data.analysis?.cache?.summary?.translationRegenerated ?? 0}`)}
             ${renderCacheBadge(`Alert cache ${data.analysis?.cache?.summary?.alertCacheHits ?? 0}`)}
             ${renderCacheBadge(`Alert regen ${data.analysis?.cache?.summary?.alertRegenerated ?? 0}`)}
             ${renderCacheBadge(`Digest cache ${data.analysis?.cache?.summary?.digestCacheHits ?? 0}`)}
@@ -681,12 +669,16 @@ function buildDigestDisplayItems(currentData) {
       company,
       titleJa:
         representative.status === "ok"
-          ? `${company} の今日のDigest: ${representative.translated?.titleJa || representative.title || representative.label}`
+          ? buildDigestTitle(company, representative)
           : `${company} の今日のDigest: 一次情報の取得失敗`,
       summaryJa:
         representative.status === "ok"
-          ? representative.translated?.descriptionJa || representative.description || "今回の取得内容を確認してください。"
+          ? buildDigestSummary(company, representative)
           : `${company} の主要ソースは今回の実行で取得できませんでした。更新有無の判断は保留です。`,
+      trendJa:
+        representative.status === "ok"
+          ? buildDigestTrend(company, representative)
+          : "まずは次回の取得成功を待って、更新有無の判断を再開します。",
       action: representative.changed ? "監視" : "定点観測",
       trustLevel: representative.trustLevel ?? "official",
       publishedAt: representative.publishedAt ?? null,
@@ -740,6 +732,50 @@ function deriveWatchAngles(alert) {
     .map((line) => line.replace(/^[-*・]\s*/, "").trim())
     .filter(Boolean)
     .slice(0, 4);
+}
+
+function buildDigestTitle(company, representative) {
+  const translatedTitle = firstNonEmpty(
+    representative.translated?.titleJa,
+    representative.title,
+    representative.label
+  );
+  const cleanedTitle = cleanDigestTitleText(translatedTitle, company);
+  return cleanedTitle || `${company} の更新`;
+}
+
+function buildDigestSummary(company, representative) {
+  const translated = firstNonEmpty(
+    representative.translated?.descriptionJa,
+    representative.description
+  );
+  const text = String(translated ?? "").trim();
+
+  if (!text) {
+    return `${company} の一次情報を取得しました。詳細は原文と抽出本文訳を確認してください。`;
+  }
+
+  if (looksJapaneseText(text)) {
+    return text;
+  }
+
+  return `${company} の一次情報を取得しました。詳細は抽出本文訳を確認してください。`;
+}
+
+function buildDigestTrend(company, representative) {
+  if (representative.changed) {
+    return "この更新を起点に、数週間は関連機能の拡張や運用面の追従が続く前提で見ておくと良さそうです。";
+  }
+
+  if ((representative.trustLevel ?? "official") !== "official") {
+    return "二次情報なので、まずは公式側で同種の更新が出るかを待ちながら温度感だけ追うのが良さそうです。";
+  }
+
+  if (representative.publishedAt) {
+    return "直近の大きな差分は見えないため、当面は定点観測を続けつつ次の明確な仕様変化を待つ段階です。";
+  }
+
+  return "まだ鮮明な変化点は読みにくいため、取得精度を見ながら次回以降の更新を待つのがよさそうです。";
 }
 
 function escapeHtml(value) {
@@ -813,4 +849,31 @@ function formatCacheReason(reason, detail) {
   }
 
   return `${label} (prev: ${detail.previous ?? ""} / current: ${detail.current ?? ""})`;
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const text = String(value ?? "").trim();
+    if (text) {
+      return text;
+    }
+  }
+  return "";
+}
+
+function cleanDigestTitleText(value, company) {
+  return String(value ?? "")
+    .replace(new RegExp(`^${escapeRegExp(company)}\\s*の今日のDigest[:：]?\\s*`, "i"), "")
+    .replace(/^changelog\s*[:|：-]?\s*/i, "変更履歴: ")
+    .replace(/\s+\|\s+/g, " - ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function looksJapaneseText(text) {
+  return /[ぁ-んァ-ン一-龠々ー]/.test(String(text ?? ""));
+}
+
+function escapeRegExp(value) {
+  return String(value ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

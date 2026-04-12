@@ -38,20 +38,20 @@ If you only want to serve the already generated files:
 
 ## Optional LLM analysis
 
-If you set `ANTHROPIC_API_KEY`, the pipeline will run an additional analysis step that improves
-Japanese summaries and interpretation quality.
+If you set `OPENAI_API_KEY`, the pipeline will run an additional analysis step that improves
+Japanese alert and digest generation.
 
 Optional environment variables:
 
-- `ANTHROPIC_API_KEY`
-- `ANTHROPIC_MODEL` default: `claude-sonnet-4-0`
-- `ANTHROPIC_TRANSLATION_MODEL` default: `claude-3-5-haiku-latest`
-- `ANTHROPIC_SUMMARY_MODEL` default: `claude-sonnet-4-0`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` default: `gpt-4.1`
+- `OPENAI_TRANSLATION_MODEL` default: `gpt-4.1`
+- `OPENAI_SUMMARY_MODEL` default: `gpt-5`
 
 Example:
 
 1. Copy `.env.example` to `.env`
-2. Set `ANTHROPIC_API_KEY`
+2. Set `OPENAI_API_KEY`
 3. Run `npm run refresh`
 
 The scripts automatically read `.env`, so you do not need to export environment variables manually.
@@ -68,8 +68,8 @@ Recommended path:
 
 1. Put this project in a GitHub repository
 2. Set the repository default branch to `main`
-3. Add repository secret `ANTHROPIC_API_KEY`
-4. Optional: add repository variables `ANTHROPIC_TRANSLATION_MODEL` and `ANTHROPIC_SUMMARY_MODEL`
+3. Add repository secret `OPENAI_API_KEY`
+4. Optional: add repository variables `OPENAI_TRANSLATION_MODEL` and `OPENAI_SUMMARY_MODEL`
 5. Push to `main`
 6. Enable GitHub Pages for GitHub Actions
 
@@ -82,7 +82,7 @@ The deployment workflow is:
 
 - [deploy-pages.yml](C:\Users\arata\ws\ai_info\.github\workflows\deploy-pages.yml)
 
-The workflow fails early if `ANTHROPIC_API_KEY` is missing.
+The workflow fails early if `OPENAI_API_KEY` is missing.
 
 ## Auto-update behavior
 
