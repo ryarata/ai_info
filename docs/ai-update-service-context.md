@@ -82,8 +82,10 @@ Implications:
 Implications:
 
 - outputs should default to natural Japanese
-- important source excerpts should be translated or summarized in Japanese
-- readability should improve without losing fidelity to the source
+- alert and digest outputs should be written for Japanese reading first
+- long extracted source bodies can rely on browser auto-translation rather than LLM full
+  translation
+- readability should improve without turning source inspection into a costly translation pipeline
 
 ### 3. Smartphone-first consumption is strongly preferred
 
@@ -469,7 +471,8 @@ Important implemented scripts:
 
 - `scripts/load-env.mjs`: loads `.env`
 - `scripts/refresh-data.mjs`: source fetching, snapshotting, and generated update creation
-- `scripts/analyze-updates.mjs`: OpenAI-powered alert and digest generation
+- `scripts/analyze-updates.mjs`: OpenAI-powered alert and digest generation focused on
+  purpose-specific Japanese output
 - `scripts/generate-site.mjs`: builds the static site assets
 - `scripts/serve-preview.mjs`: local preview server
 
@@ -486,17 +489,20 @@ The product now supports LLM-assisted alert and digest generation using OpenAI.
 - `.env` is supported locally
 - `OPENAI_API_KEY` is required for OpenAI-powered analysis
 - `OPENAI_SUMMARY_MODEL` defaults to `gpt-5`
-- `OPENAI_TRANSLATION_MODEL` defaults to `gpt-4.1`
+- `OPENAI_TRANSLATION_MODEL` may still exist in older local env files, but the current intended
+  product path does not use a full source-body LLM translation step
 
 ### Output behavior
 
 When analysis runs successfully, the product generates:
 
-- Japanese titles
-- Japanese summaries
+- Japanese alert and digest titles
+- Japanese alert and digest summaries
 - richer "why this matters now" reasoning
 - concrete "how to inspect this update" angles for alert items
+- a simple Japanese digest "trend" or near-term reading layer rather than a flat literal rewrite
 - simple score fields
+- no full Japanese translation of the extracted source body
 
 If no API key is available, the pipeline can still fall back, but the intended production mode is
 OpenAI-powered analysis.
@@ -514,6 +520,8 @@ The generated site already includes several design choices that reflect the user
 - alert cards now show both a short reason and a concrete "how to look at this" checklist
 - digest is now expected to show one representative card for each monitored company, not only the
   companies with the strongest changed-item ranking
+- source inspection should prioritize raw extracted text plus structured labels, with long-form
+  reading delegated to browser translation when needed
 
 ### Trust and prioritization
 
@@ -602,28 +610,33 @@ This transparency layer exists so the user can evaluate:
 - whether ranking logic is correct
 - whether model analysis is over- or under-interpreting the source
 
-## Latest Translation Inspection Layer Added
+## Latest Source Reading Decision
 
-The user requested the ability to inspect not only summaries and classifications, but also a direct
-Japanese reading layer for the extracted source content itself.
+The product briefly explored a direct LLM translation layer for extracted source content, but that
+is no longer the intended default.
+
+Latest decision:
+
+- OpenAI/GPT remains the active model provider for this product
+- Claude was tried as a possible way to avoid short-window rate limits, but it did not solve the
+  problem enough for this workflow and cost materially more
+- full extracted-body LLM translation should be removed from the main pipeline
+- long source text is expected to be read with browser auto-translation when the user wants the
+  full context
 
 Current intended behavior:
 
-- each successfully fetched source card includes a collapsible translation section
-- the translation section shows:
-  - translated title
-  - translated extracted description
-  - translated extracted excerpt
-- the translation should be faithful and should not add interpretation
-- the translation layer exists to help the user personally judge what the source means
+- each successfully fetched source card should still expose the extracted raw content
+- source inspection exists so the user can judge extraction quality and classification quality
+- Japanese LLM output should be reserved for alert and digest generation, where interpretation is
+  the actual product value
 
 Important product principle:
 
-- translated extracted source content is distinct from analysis
-- translation should preserve ambiguity and noisiness where the source is noisy
-- analysis and prioritization should remain separate from raw translation
-
-This is now an intentional design principle and should be preserved.
+- raw source reading is distinct from analysis
+- analysis should spend model budget on "what matters" and "what to watch" rather than on
+  translating every long excerpt
+- source inspection and strategic interpretation should remain separate layers
 
 ## Latest Claude Code Changelog Fix
 
@@ -762,10 +775,12 @@ Current intended behavior:
 - the UI should show classification labels and reasons alongside the extracted content
 - this inspection layer is a first-class tool for tuning extraction and ranking quality
 
-### 7. Source-content translation is now available for review
+### 7. Source-content inspection is now available for review
 
-Each successful source item now supports a collapsible Japanese translation view for the extracted
-content itself.
+Each successful source item should remain reviewable in the UI, but the intended inspection layer
+is the extracted raw text rather than a full LLM-generated Japanese body translation.
+
+Long-form reading can rely on browser auto-translation when needed.
 
 This should remain separate from:
 
@@ -895,7 +910,8 @@ The latest review established that the system should be auditable by the user.
 Implication:
 
 - prefer visible reasoning over hidden filtering
-- make it easy to compare extracted raw content, translation, and final classification
+- make it easy to compare extracted raw content, the browser-readable source view, and final
+  classification
 - use this transparency to decide whether future improvements should target parsing, prompting, or
   scoring
 
@@ -949,8 +965,8 @@ The current auto-refresh schedule is aligned to the user's locale in JST:
 
 ### Current manual force-refresh path
 
-If the user wants to push product-code changes and then re-run analysis without reusing translation
-or summary cache, the intended production path is:
+If the user wants to push product-code changes and then re-run analysis without reusing cached
+alert/digest output, the intended production path is:
 
 - open GitHub Actions
 - run `Deploy To GitHub Pages` manually
@@ -964,8 +980,8 @@ Important interpretation:
 
 - this is now the recommended way to validate prompt or presentation changes in production
 - a push to `main` alone may still reuse cached analysis for unchanged article identities
-- manual `force_regen_source_ids` is the deliberate way to force fresh translation and summary
-  output for the selected sources
+- manual `force_regen_source_ids` is the deliberate way to force fresh alert and digest generation
+  for the selected sources
 
 Internally this is implemented with a UTC cron expression in GitHub Actions, but the product-level
 assumption should be understood as "morning, noon, and night in Japan."
@@ -1021,7 +1037,7 @@ The following are known limitations rather than mistakes:
 ### 4. Some official pages are fetchable but still not cost-efficient without tailored extraction
 
 - pages like xAI release notes can expose long historical content on a single route
-- these should be trimmed to the latest relevant block before translation and analysis
+- these should be trimmed to the latest relevant block before model analysis
 - this is now implemented for `docs.x.ai/developers/release-notes` and should be preserved
 
 ### 4. Notifications are intentionally out of scope for now
@@ -1091,7 +1107,7 @@ currently deployed logic.
 
 Current intended effect:
 
-- unchanged source items should avoid unnecessary re-translation and re-analysis
+- unchanged source items should avoid unnecessary re-analysis
 - rerunning the same workflow should be materially cheaper than a cold run
 - production deploy behavior should depend on the latest cached analyzed state, not only on what is
   committed in Git
@@ -1115,7 +1131,7 @@ separate debug cache and production cache if this becomes operationally noisy.
 
 The most recent rounds of debugging clarified what should count as "the same article."
 
-### 1. Translation and analysis cache identity is article-based
+### 1. Analysis cache identity is article-based
 
 Current intended rule:
 
@@ -1123,7 +1139,7 @@ Current intended rule:
 
 The current implementation normalizes those values for comparison, but the product-level intent is:
 
-- do not retranslate or reanalyze just because extracted excerpt text changed slightly
+- do not reanalyze just because extracted excerpt text changed slightly
 - do not invalidate cache because of small body-level parsing differences when the article itself is
   the same
 
@@ -1167,26 +1183,33 @@ Implication:
 
 This behavior is now an intentional product decision rather than an accidental side effect.
 
-## Latest Model-Split Decision
+## Latest LLM Scope And Provider Decision
 
-The user decided that different parts of the pipeline should use different OpenAI models.
+The latest local validation changed both provider scope and output scope.
 
-Current intended model split:
+Current intended decision:
 
-- translation or lightweight Japanese phrasing: `gpt-4.1`
-- summary / alert analysis / digest analysis: `gpt-5`
+- use OpenAI/GPT for model-assisted output
+- do not use Claude for this service for now
+- do not spend LLM budget on full source-body translation
+- use browser auto-translation for long extracted source text when needed
+- spend LLM budget on alert generation and digest generation, because that is where Japanese
+  interpretation changes product value
 
-This reflects the user's view that:
+Why this changed:
 
-- translation fidelity is already sufficient with a cheaper model
-- Japanese summary quality and judgment quality are worth spending more on
+- Claude was tested as a possible way to avoid short-window rate-limit pressure
+- the same class of operational issue still appeared in practice
+- API cost was materially higher than the OpenAI/GPT path
 
 Current environment-variable interpretation:
 
-- `OPENAI_TRANSLATION_MODEL`
+- `OPENAI_API_KEY`
 - `OPENAI_SUMMARY_MODEL`
+- `OPENAI_TRANSLATION_MODEL` may still appear in older examples or local files, but should not be
+  treated as an active full-source translation path unless that feature is deliberately reintroduced
 
-The workflow defaults should preserve this split unless there is a deliberate future cost or
+The workflow defaults should preserve this scope unless there is a deliberate future cost or
 quality decision.
 
 ## Latest Manual Debug Workflow
