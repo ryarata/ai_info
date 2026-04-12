@@ -10,10 +10,24 @@ const generatedPath = path.join(root, "data", "updates.generated.json");
 const analyzedPath = path.join(root, "data", "updates.analyzed.json");
 const snapshotDir = path.join(root, "data", "snapshots");
 
-const translationModel = process.env.OPENAI_TRANSLATION_MODEL ?? "gpt-4.1";
-const summaryModel = process.env.OPENAI_SUMMARY_MODEL ?? "gpt-5";
+const translationModelCandidates = uniqueNonEmpty([
+  process.env.ANTHROPIC_TRANSLATION_MODEL,
+  process.env.ANTHROPIC_MODEL,
+  "claude-3-5-haiku-latest",
+  "claude-3-5-haiku-20241022",
+  "claude-sonnet-4-0",
+  "claude-sonnet-4-20250514"
+]);
+const summaryModelCandidates = uniqueNonEmpty([
+  process.env.ANTHROPIC_SUMMARY_MODEL,
+  process.env.ANTHROPIC_MODEL,
+  "claude-sonnet-4-0",
+  "claude-sonnet-4-20250514",
+  "claude-3-7-sonnet-latest",
+  "claude-3-7-sonnet-20250219"
+]);
 const forcedRegenSourceIds = parseCsvEnv(process.env.FORCE_REGEN_SOURCE_IDS);
-const apiKey = process.env.OPENAI_API_KEY;
+const apiKey = process.env.ANTHROPIC_API_KEY;
 
 const generated = JSON.parse(await readFile(generatedPath, "utf8"));
 const snapshotFiles = (generated.sourceHealth ?? [])
@@ -42,23 +56,23 @@ if (apiKey) {
   try {
     analyzed = await enrichGeneratedDataWithModel(generated, snapshots, analysisCache, analysisTrace, {
       apiKey,
-      translationModel,
-      summaryModel
+      translationModelCandidates,
+      summaryModelCandidates
     });
-    analysisMode = analysisCache.hasReusableEntries ? "openai_with_cache" : "openai";
+    analysisMode = analysisCache.hasReusableEntries ? "claude_with_cache" : "claude";
   } catch (error) {
     analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, `LLM analysis failed: ${toErrorMessage(error)}`);
     analysisMode = "fallback_after_error";
   }
 } else {
-  analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, "OPENAI_API_KEY not set");
+  analyzed = applyFallbackAnalysis(generated, snapshots, analysisTrace, "ANTHROPIC_API_KEY not set");
 }
 
 analyzed.generatedAt = new Date().toISOString();
 analyzed.analysis = {
   mode: analysisMode,
-  summaryModel: apiKey ? summaryModel : null,
-  translationModel: apiKey ? translationModel : null,
+  summaryModel: apiKey ? summaryModelCandidates[0] ?? null : null,
+  translationModel: apiKey ? translationModelCandidates[0] ?? null : null,
   forcedRegenSourceIds: [...forcedRegenSourceIds],
   cache: finalizeAnalysisTrace(analysisTrace)
 };
@@ -181,9 +195,9 @@ async function enrichItem(item, kind, snapshotMap, cache, trace, options) {
     `Source excerpt: ${snapshot.excerpt ?? ""}`
   ].join("\n");
 
-  const result = await callOpenAIJson(prompt, schema, {
+  const result = await callClaudeJson(prompt, schema, {
     apiKey: options.apiKey,
-    model: options.summaryModel
+    modelCandidates: options.summaryModelCandidates
   });
   return {
     ...item,
@@ -241,9 +255,9 @@ async function enrichSourceItem(item, cache, trace, options) {
     `Original description: ${item.description ?? ""}`
   ].join("\n");
 
-  const result = await callOpenAIJson(prompt, schema, {
+  const result = await callClaudeJson(prompt, schema, {
     apiKey: options.apiKey,
-    model: options.translationModel
+    modelCandidates: options.translationModelCandidates
   });
   const excerptJa = await translateLongExcerpt(item, options);
   return {
@@ -291,9 +305,9 @@ async function translateLongExcerpt(item, options) {
       `Original excerpt chunk: ${chunk}`
     ].join("\n");
 
-    const result = await callOpenAIJson(prompt, schema, {
+    const result = await callClaudeJson(prompt, schema, {
       apiKey: options.apiKey,
-      model: options.translationModel
+      modelCandidates: options.translationModelCandidates
     });
     translatedChunks.push(result.excerpt_ja || "");
   }
@@ -301,62 +315,93 @@ async function translateLongExcerpt(item, options) {
   return translatedChunks.join("\n\n").trim();
 }
 
-async function callOpenAIJson(prompt, schema, options) {
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${options.apiKey}`
-    },
-    body: JSON.stringify({
-      model: options.model,
-      input: [
-        {
-          role: "user",
-          content: [{ type: "input_text", text: prompt }]
-        }
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: schema.name,
-          strict: schema.strict,
-          schema: schema.schema
-        }
+async function callClaudeJson(prompt, schema, options) {
+  const modelCandidates = uniqueNonEmpty(options.modelCandidates);
+  let lastError = null;
+
+  for (const model of modelCandidates) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": options.apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1600,
+        temperature: 0,
+        messages: [
+          {
+            role: "user",
+            content: buildClaudeJsonPrompt(prompt, schema)
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      lastError = new Error(`Anthropic API HTTP ${response.status} for model ${model}: ${errorText.slice(0, 400)}`);
+      if (response.status === 404) {
+        continue;
       }
-    })
-  });
+      throw lastError;
+    }
 
-  if (!response.ok) {
-    throw new Error(`OpenAI API HTTP ${response.status}`);
+    const body = await response.json();
+    const rawText = extractClaudeText(body);
+    if (!rawText) {
+      throw new Error(`Anthropic API returned no text output for model ${model}`);
+    }
+
+    return parseJsonResponseText(rawText);
   }
 
-  const body = await response.json();
-  const rawText = extractResponseText(body);
-  if (!rawText) {
-    throw new Error("OpenAI API returned no text output");
+  if (lastError) {
+    throw lastError;
   }
 
-  return JSON.parse(rawText);
+  throw new Error("No Anthropic model candidates configured");
 }
 
-function extractResponseText(body) {
-  if (typeof body.output_text === "string" && body.output_text.trim()) {
-    return body.output_text.trim();
-  }
+function buildClaudeJsonPrompt(prompt, schema) {
+  return [
+    prompt,
+    "",
+    "Return only valid JSON.",
+    "Do not wrap the JSON in markdown fences.",
+    `The JSON must match this schema exactly: ${JSON.stringify(schema.schema)}`
+  ].join("\n");
+}
 
-  for (const outputItem of body.output ?? []) {
-    for (const contentItem of outputItem.content ?? []) {
-      if (typeof contentItem.text === "string" && contentItem.text.trim()) {
-        return contentItem.text.trim();
-      }
-      if (typeof contentItem.output_text === "string" && contentItem.output_text.trim()) {
-        return contentItem.output_text.trim();
-      }
+function extractClaudeText(body) {
+  const texts = [];
+
+  for (const contentItem of body.content ?? []) {
+    if (contentItem?.type === "text" && typeof contentItem.text === "string" && contentItem.text.trim()) {
+      texts.push(contentItem.text.trim());
     }
   }
 
-  return null;
+  return texts.join("\n").trim() || null;
+}
+
+function parseJsonResponseText(rawText) {
+  const trimmed = String(rawText ?? "").trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  const candidate = fenced ? fenced[1].trim() : trimmed;
+
+  try {
+    return JSON.parse(candidate);
+  } catch {
+    const objectMatch = candidate.match(/\{[\s\S]*\}$/);
+    if (objectMatch) {
+      return JSON.parse(objectMatch[0]);
+    }
+  }
+
+  throw new Error("Anthropic API returned invalid JSON");
 }
 
 function applyFallbackAnalysis(base, snapshotMap, trace, reason) {
@@ -588,6 +633,10 @@ function parseCsvEnv(value) {
       .map((item) => item.trim())
       .filter(Boolean)
   );
+}
+
+function uniqueNonEmpty(values) {
+  return [...new Set((values ?? []).map((value) => String(value ?? "").trim()).filter(Boolean))];
 }
 
 function createAnalysisTrace() {

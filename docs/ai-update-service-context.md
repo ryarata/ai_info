@@ -363,7 +363,7 @@ The product currently follows this low-cost architecture:
 - static site output generated into `public/`
 - scheduled fetch, analysis, and build pipeline
 - JSON-based storage for generated artifacts and snapshots
-- OpenAI API used for Japanese analysis and interpretation
+- Anthropic Claude API used for Japanese analysis and interpretation
 - GitHub Pages used as the delivery surface
 - GitHub Actions used for refresh and deployment
 
@@ -469,7 +469,7 @@ Important implemented scripts:
 
 - `scripts/load-env.mjs`: loads `.env`
 - `scripts/refresh-data.mjs`: source fetching, snapshotting, and generated update creation
-- `scripts/analyze-updates.mjs`: OpenAI-powered Japanese analysis and interpretation
+- `scripts/analyze-updates.mjs`: Claude-powered Japanese analysis and interpretation
 - `scripts/generate-site.mjs`: builds the static site assets
 - `scripts/serve-preview.mjs`: local preview server
 
@@ -479,13 +479,15 @@ Current package flow:
 
 ## Current Analysis Behavior
 
-The product now supports LLM-assisted analysis using OpenAI.
+The product now supports LLM-assisted analysis using Claude.
 
 ### Environment model behavior
 
 - `.env` is supported locally
-- `OPENAI_API_KEY` is required for OpenAI-powered analysis
-- `OPENAI_MODEL` defaults to `gpt-4.1`
+- `ANTHROPIC_API_KEY` is required for Claude-powered analysis
+- `ANTHROPIC_MODEL` can be used as a shared fallback model
+- `ANTHROPIC_SUMMARY_MODEL` defaults to `claude-sonnet-4-0`
+- `ANTHROPIC_TRANSLATION_MODEL` defaults to `claude-3-5-haiku-latest`
 
 ### Output behavior
 
@@ -498,7 +500,7 @@ When analysis runs successfully, the product generates:
 - simple score fields
 
 If no API key is available, the pipeline can still fall back, but the intended production mode is
-OpenAI-powered analysis.
+Claude-powered analysis.
 
 ## Current UI Behavior
 
@@ -906,7 +908,7 @@ The latest known successful refresh before this handoff produced:
 - `urgentCount = 2`
 - `digestCount` should now be interpreted as company-oriented and should normally cover all
   monitored companies shown in the current UI
-- `analysis.mode = openai_with_cache`
+- `analysis.mode = claude_with_cache`
 - official OpenAI API changelog fetchable
 - official OpenAI ChatGPT help release notes still blocked by `403`
 - Claude Code changelog fetchable with reliable latest-change datetime
@@ -1168,12 +1170,12 @@ This behavior is now an intentional product decision rather than an accidental s
 
 ## Latest Model-Split Decision
 
-The user decided that different parts of the pipeline should use different OpenAI models.
+The user decided that different parts of the pipeline should use different Claude models.
 
 Current intended model split:
 
-- translation: `gpt-4.1`
-- summary / alert analysis / digest analysis / weekly themes: `gpt-5`
+- translation: `claude-3-5-haiku-latest`
+- summary / alert analysis / digest analysis: `claude-sonnet-4-0`
 
 This reflects the user's view that:
 
@@ -1182,8 +1184,9 @@ This reflects the user's view that:
 
 Current environment-variable interpretation:
 
-- `OPENAI_TRANSLATION_MODEL`
-- `OPENAI_SUMMARY_MODEL`
+- `ANTHROPIC_MODEL`
+- `ANTHROPIC_TRANSLATION_MODEL`
+- `ANTHROPIC_SUMMARY_MODEL`
 
 The workflow defaults should preserve this split unless there is a deliberate future cost or
 quality decision.

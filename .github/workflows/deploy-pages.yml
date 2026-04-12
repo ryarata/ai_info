@@ -60,8 +60,8 @@ jobs:
 
       - name: Validate required secrets
         run: |
-          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
-            echo "OPENAI_API_KEY secret is required for deployment."
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "ANTHROPIC_API_KEY secret is required for deployment."
             exit 1
           fi
 
@@ -82,10 +82,10 @@ jobs:
 
       - name: Refresh data and build static site
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5' }}
-          OPENAI_TRANSLATION_MODEL: ${{ vars.OPENAI_TRANSLATION_MODEL || 'gpt-4.1' }}
-          OPENAI_SUMMARY_MODEL: ${{ vars.OPENAI_SUMMARY_MODEL || vars.OPENAI_MODEL || 'gpt-5' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514' }}
+          ANTHROPIC_TRANSLATION_MODEL: ${{ vars.ANTHROPIC_TRANSLATION_MODEL || 'claude-3-5-haiku-20241022' }}
+          ANTHROPIC_SUMMARY_MODEL: ${{ vars.ANTHROPIC_SUMMARY_MODEL || vars.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514' }}
           SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ids || '' }}
           PINNED_SOURCE_ITEM_URLS: ${{ github.event_name == 'workflow_dispatch' && inputs.pinned_source_item_urls || '' }}
           FORCE_REGEN_SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.force_regen_source_ids || '' }}
