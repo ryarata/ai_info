@@ -47,6 +47,7 @@ Optional environment variables:
 - `OPENAI_MODEL` default: `gpt-4.1`
 - `OPENAI_TRANSLATION_MODEL` default: `gpt-4.1`
 - `OPENAI_SUMMARY_MODEL` default: `gpt-5`
+- `SITE_URL` default: `https://ryarata.github.io/ai_info/`
 
 Example:
 
@@ -77,6 +78,7 @@ After that:
 
 - every push to `main` will build and deploy the latest static site
 - a scheduled GitHub Actions run will also refresh and redeploy automatically three times per day
+- OGP canonical URL and share image use `SITE_URL` when set, otherwise GitHub Pages URL is inferred
 
 The deployment workflow is:
 

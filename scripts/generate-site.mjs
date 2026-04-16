@@ -11,6 +11,13 @@ const generatedDataPath = path.join(root, "data", "updates.generated.json");
 const sampleDataPath = path.join(root, "data", "updates.sample.json");
 const sourcesPath = path.join(root, "config", "sources.json");
 const publicDir = path.join(root, "public");
+const siteUrl = resolveSiteUrl(process.env.SITE_URL);
+const ogImagePath = "og-image.svg";
+const ogImageUrl = buildAbsoluteUrl(siteUrl, ogImagePath);
+const pageUrl = buildAbsoluteUrl(siteUrl, "index.html");
+const pageTitle = "AI Update Intel";
+const pageDescription =
+  "AI主要各社の一次情報アップデートを、日本語で素早く確認するためのパーソナル監視ダッシュボード。";
 
 const data = JSON.parse(await readFile(await resolveDataPath(), "utf8"));
 const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
@@ -225,8 +232,23 @@ const html = `<!DOCTYPE html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Update Intel</title>
+    <title>${pageTitle}</title>
+    <meta name="description" content="${escapeHtml(pageDescription)}" />
     <meta name="theme-color" content="#2e5b4b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="${pageTitle}" />
+    <meta property="og:title" content="${pageTitle}" />
+    <meta property="og:description" content="${escapeHtml(pageDescription)}" />
+    <meta property="og:url" content="${escapeHtml(pageUrl)}" />
+    <meta property="og:image" content="${escapeHtml(ogImageUrl)}" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${pageTitle}" />
+    <meta name="twitter:description" content="${escapeHtml(pageDescription)}" />
+    <meta name="twitter:image" content="${escapeHtml(ogImageUrl)}" />
+    <link rel="canonical" href="${escapeHtml(pageUrl)}" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -622,10 +644,48 @@ const manifest = {
   lang: "ja"
 };
 
+const ogImage = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">${pageTitle}</title>
+  <desc id="desc">${pageDescription}</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7f2ea" />
+      <stop offset="100%" stop-color="#e8dccd" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffaf1" />
+      <stop offset="100%" stop-color="#f3e7d6" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1010" cy="120" r="170" fill="#d7e7dd" opacity="0.9" />
+  <circle cx="180" cy="530" r="220" fill="#ecd8b7" opacity="0.55" />
+  <rect x="72" y="72" width="1056" height="486" rx="36" fill="url(#panel)" stroke="#cdbda9" />
+  <text x="110" y="176" fill="#2e5b4b" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="28" font-weight="700" letter-spacing="4">PERSONAL DASHBOARD</text>
+  <text x="110" y="280" fill="#1f1b16" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="72" font-weight="700">AI Update Intel</text>
+  <text x="110" y="346" fill="#6f675e" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="30">主要AIサービスの更新を、日本語で素早く確認</text>
+  <g transform="translate(110 400)">
+    <rect width="240" height="96" rx="24" fill="#fff7ed" stroke="#d8c5af" />
+    <text x="28" y="38" fill="#6f675e" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="22">緊急アラート</text>
+    <text x="28" y="74" fill="#1f1b16" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="38" font-weight="700">Workflow first</text>
+  </g>
+  <g transform="translate(374 400)">
+    <rect width="240" height="96" rx="24" fill="#f4f8f5" stroke="#c8d9cf" />
+    <text x="28" y="38" fill="#6f675e" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="22">Digest</text>
+    <text x="28" y="74" fill="#1f1b16" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="38" font-weight="700">Official first</text>
+  </g>
+  <g transform="translate(638 400)">
+    <rect width="420" height="96" rx="24" fill="#f7f2ea" stroke="#d6c8b9" />
+    <text x="28" y="38" fill="#6f675e" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="22">Monitoring</text>
+    <text x="28" y="74" fill="#1f1b16" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="38" font-weight="700">OpenAI / Anthropic / Google / xAI</text>
+  </g>
+</svg>`;
+
 await mkdir(publicDir, { recursive: true });
 await writeFile(path.join(publicDir, "index.html"), html, "utf8");
 await writeFile(path.join(publicDir, "styles.css"), css, "utf8");
 await writeFile(path.join(publicDir, "manifest.webmanifest"), JSON.stringify(manifest, null, 2), "utf8");
+await writeFile(path.join(publicDir, ogImagePath), ogImage, "utf8");
 
 console.log(`Generated site in ${publicDir}`);
 
@@ -876,4 +936,46 @@ function looksJapaneseText(text) {
 
 function escapeRegExp(value) {
   return String(value ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function resolveSiteUrl(explicitSiteUrl) {
+  const direct = normalizeSiteUrl(explicitSiteUrl);
+  if (direct) {
+    return direct;
+  }
+
+  const repository = process.env.GITHUB_REPOSITORY;
+  if (repository) {
+    const [owner, repo] = repository.split("/");
+    if (owner && repo) {
+      return normalizeSiteUrl(`https://${owner}.github.io/${repo}/`);
+    }
+  }
+
+  return normalizeSiteUrl("https://ryarata.github.io/ai_info/");
+}
+
+function normalizeSiteUrl(value) {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return "";
+  }
+
+  try {
+    const url = new URL(text);
+    if (!url.pathname.endsWith("/")) {
+      url.pathname = `${url.pathname}/`;
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function buildAbsoluteUrl(baseUrl, relativePath) {
+  if (!baseUrl) {
+    return relativePath;
+  }
+
+  return new URL(relativePath, baseUrl).toString();
 }

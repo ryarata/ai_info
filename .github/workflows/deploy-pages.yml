@@ -86,6 +86,7 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5' }}
           OPENAI_TRANSLATION_MODEL: ${{ vars.OPENAI_TRANSLATION_MODEL || 'gpt-4.1' }}
           OPENAI_SUMMARY_MODEL: ${{ vars.OPENAI_SUMMARY_MODEL || vars.OPENAI_MODEL || 'gpt-5' }}
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}
           SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ids || '' }}
           PINNED_SOURCE_ITEM_URLS: ${{ github.event_name == 'workflow_dispatch' && inputs.pinned_source_item_urls || '' }}
           FORCE_REGEN_SOURCE_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.force_regen_source_ids || '' }}
